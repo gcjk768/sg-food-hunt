@@ -24,6 +24,7 @@ api_rate_limits:                  # requests per minute per API (official APIs o
   google_places: 60
   reddit: 30
   data_gov_sg: 60
+  onemap: 60
 
 scoring:                          # global parameters; per-category weights live in categories.yaml
   top_n: 15

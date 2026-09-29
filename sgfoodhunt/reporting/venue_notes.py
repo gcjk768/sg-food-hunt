@@ -98,6 +98,9 @@ def build_venue_note(
         "lat": venue.lat,
         "lng": venue.lng,
         "location": f"{venue.lat},{venue.lng}" if venue.lat and venue.lng else None,
+        "nearest_mrt": venue.nearest_mrt,
+        "mrt_lines": venue.mrt_lines or None,
+        "mrt_walk_min": venue.mrt_walk_min,
         "cuisine": venue.cuisine or None,
         "price_level": "$" * venue.price_level if venue.price_level else None,
         "price_per_pax_sgd": per_pax,
@@ -128,6 +131,14 @@ def build_venue_note(
         or None,
         "hygiene_grade": venue.hygiene_grade,
         "michelin": venue.michelin,
+        "rating_trend": venue.rating_trend,
+        "aspect_food": venue.aspects.get("food"),
+        "aspect_service": venue.aspects.get("service"),
+        "aspect_ambience": venue.aspects.get("ambience"),
+        "aspect_value": venue.aspects.get("value"),
+        "noise_level": venue.noise_level,
+        "keyword_counts": venue.keyword_counts or None,
+        "best_for": venue.best_for,
         "business_status": venue.business_status,
         "source_count": len(venue.source_keys),
         "independent_sources": len(venue.independent_sources),
@@ -175,6 +186,11 @@ def build_venue_note(
                 ", ".join(ev.category_keys),
             ]
         )
+    mrt_line = (
+        f"Nearest MRT: **{venue.nearest_mrt}** ({', '.join(venue.mrt_lines)}), about {venue.mrt_walk_min} min walk."
+        if venue.nearest_mrt
+        else "_no coordinates yet_"
+    )
     excluded_block = (
         ("\n**Excluded from:**\n" + "\n".join(excluded_lines)) if excluded_lines else ""
     )
@@ -194,11 +210,15 @@ def build_venue_note(
 
 ## Summary
 
-_Generated summary arrives with stage 3 (review analysis)._
+{venue.summary or "_no data yet_"}
 
 ## Best for
 
-_Stage 3._
+{venue.best_for or "_not ranked yet_"}
+
+## Getting there
+
+{mrt_line}
 
 ## Rankings
 
@@ -263,6 +283,7 @@ def build_category_note(
             s.rank,
             link,
             v.region or "",
+            f"{v.nearest_mrt} ({v.mrt_walk_min} min)" if v.nearest_mrt else "",
             "$" * v.price_level if v.price_level else "",
             f"{v.google_rating:.1f} ({v.google_reviews or 0})" if v.google_rating else "",
             len(v.independent_sources),
@@ -270,12 +291,14 @@ def build_category_note(
             f"~${bill * category.party_size:.0f}" if bill else "",
             f"[book]({v.booking_url})" if v.booking_url else "",
             f"{s.score:.2f}",
+            v.best_for or "",
         ]
 
     headers = [
         "#",
         "Venue",
         "Region",
+        "MRT",
         "Price",
         "Google",
         "Sources",
@@ -283,6 +306,7 @@ def build_category_note(
         f"Bill ({category.party_size} pax)",
         "Booking",
         "Score",
+        "Best for",
     ]
     top_rows = [row(s) for s in visible[:top_n]]
     rest_rows = [row(s) for s in visible[top_n:]]

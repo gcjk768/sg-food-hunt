@@ -16,7 +16,7 @@ from sgfoodhunt.config import AppConfig, load_config
 from sgfoodhunt.http.cache import ResponseCache
 from sgfoodhunt.logging_setup import setup_logging
 from sgfoodhunt.pipeline import Collector, select_sources
-from sgfoodhunt.ranking import rank_run
+from sgfoodhunt.ranking import default_geocoder, rank_run
 from sgfoodhunt.reporting import (
     export_raw_candidates,
     write_home_note,
@@ -129,8 +129,16 @@ def run(
     csv_path, json_path = export_raw_candidates(
         store, record.run_id, config.resolve(config.settings.paths.exports_dir)
     )
-    ranked = rank_run(
-        config, store, vault, record.run_id, hide_visited=hide_visited, category_keys=category
+    ranked = asyncio.run(
+        rank_run(
+            config,
+            store,
+            vault,
+            record.run_id,
+            hide_visited=hide_visited,
+            category_keys=category,
+            geocoder=default_geocoder(config, cache, dry_run=dry_run),
+        )
     )
     record = store.load_run(record.run_id)
     robots = {
@@ -170,11 +178,14 @@ def rank(
     ] = None,
     category: Annotated[list[str] | None, typer.Option("--category", "-c")] = None,
     hide_visited: Annotated[bool, typer.Option("--hide-visited")] = False,
+    offline: Annotated[
+        bool, typer.Option("--offline", help="No OneMap lookups (cache only)")
+    ] = False,
     verbose: Annotated[bool, typer.Option("--verbose", "-v")] = False,
 ) -> None:
-    """Re-run dedup, scoring and note generation for a stored run without any network access."""
+    """Re-run dedup, enrichment, review analysis, scoring and notes for a stored run."""
     config = _load(config_dir)
-    store, _, vault = _paths(config)
+    store, cache, vault = _paths(config)
     setup_logging(config.resolve(config.settings.paths.logs_dir), "rank", verbose)
     if run_id is None:
         latest = store.latest_run(status=None)
@@ -182,8 +193,16 @@ def rank(
             console.print("[red]no runs found[/red]")
             raise typer.Exit(code=2)
         run_id = latest.run_id
-    ranked = rank_run(
-        config, store, vault, run_id, hide_visited=hide_visited, category_keys=category
+    ranked = asyncio.run(
+        rank_run(
+            config,
+            store,
+            vault,
+            run_id,
+            hide_visited=hide_visited,
+            category_keys=category,
+            geocoder=default_geocoder(config, cache, dry_run=offline),
+        )
     )
     _print_rank_summary(config, ranked)
     link = write_run_note(vault, store, store.load_run(run_id), config)

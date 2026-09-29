@@ -4,7 +4,7 @@ Collects, ranks and keeps fresh a list of dining venues in Singapore for dates a
 occasions, and writes the results into an Obsidian vault. Everything is plain files (JSON,
 JSONL, Markdown) so the project can live on a NAS share. There is no database.
 
-**Status: stage 2 of 5 (sources, storage, dedup, scoring and vault notes).** See [docs/DESIGN.md](docs/DESIGN.md) for the
+**Status: stage 3 of 5 (sources, storage, dedup, scoring, vault notes, MRT enrichment and review analysis).** See [docs/DESIGN.md](docs/DESIGN.md) for the
 full outline, config schema and storage schema, and the stage plan at the bottom of this file.
 
 ## Setup
@@ -34,6 +34,7 @@ sgfh run --dry-run                 # cached responses only, no network
 sgfh run --hide-visited            # keep venues marked `status: visited` out of the rankings
 sgfh rank                          # re-score the latest run offline (after changing weights or notes)
 sgfh rank --run 20260929T031500Z -c zichar_family
+sgfh rank --offline               # also skip OneMap lookups (cached coordinates only)
 sgfh runs                          # list past runs
 sgfh show <run_id>                 # per source counts and sample candidates
 sgfh cache stats | sgfh cache purge
@@ -48,8 +49,8 @@ sgfh cache stats | sgfh cache purge
 | `GOOGLE_PLACES_API_KEY` | Google Maps via Places API (New) | Google Cloud console, enable "Places API (New)", restrict the key to it |
 | `REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET`, `REDDIT_USER_AGENT` | Reddit | reddit.com/prefs/apps, "script" app; user agent like `sgfoodhunt/0.1 by u/yourname` |
 
-Without a key the source is skipped and the run note says so. Blogs, Michelin and the booking
-platforms need no keys.
+Without a key the source is skipped and the run note says so. Blogs, Michelin, the booking
+platforms and OneMap (postal code geocoding) need no keys.
 
 ## What a run produces
 
@@ -73,6 +74,24 @@ logs/<timestamp>-run.jsonl            structured per run log
 ```
 
 Chains get one note per outlet, named `Brand (Outlet)`, with a shared `brand` property.
+
+### Location, MRT and review analysis (stage 3)
+
+- Coordinates come from Google Places; venues without them are geocoded by postal code through
+  OneMap's public search endpoint (cached for a year). No driving distance is computed.
+- Nearest MRT station, its lines and walking minutes (straight line × 1.25 at 80 m/min) come from
+  a bundled station table in `sgfoodhunt/data/mrt_stations.json` (MRT only, approximate
+  coordinates). Refresh it from the data.gov.sg "LTA MRT Station Exit" GeoJSON with
+  `python scripts/update_mrt_stations.py <file.geojson>`.
+- Review analysis is lexicon based and runs over the stored anonymised snippets and article
+  snippets: per category keyword counts, aspect scores for food, service, ambience and value
+  (0 to 1, 0.5 neutral, omitted when nothing mentions the aspect), a noise level, and a rating
+  trend. The trend uses the tool's own run-to-run Google rating history once two runs are at
+  least 30 days apart; before that it compares the last 12 months of stored reviews with the
+  overall rating.
+- The `summary` and `best_for` fields are generated from structured data only (cuisine, area,
+  price band, MRT, source count, Michelin, aspect strengths and weaknesses, trend). They never
+  copy review or article text.
 
 ### The personal layer lives in the venue notes
 
@@ -224,8 +243,6 @@ CI runs the same three on every push (`.github/workflows/ci.yml`).
 
 1. Sources and storage (done)
 2. Normalisation, dedup, scoring, venue and category notes (done)
-3. Enrichment and review analysis: nearest MRT station, line and walking minutes (bundled station
-   table + OneMap postal code geocoding; no driving distance by request), keyword counts, aspect
-   scores, rating trend, generated summary and best-for line
+3. Enrichment (OneMap geocoding, nearest MRT) and review analysis (done)
 4. Social buzz module (exports, oEmbed, SERP, hashtag API)
 5. Diff report, notifications, Streamlit dashboard, weekly workflow, Sheets export

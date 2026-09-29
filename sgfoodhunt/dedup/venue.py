@@ -58,6 +58,18 @@ class Venue:
     review_snippets: list[dict[str, Any]] = field(default_factory=list)
     social_words: int = 0
     earliest_evidence: str | None = None
+    # stage 3: enrichment and review analysis
+    nearest_mrt: str | None = None
+    mrt_lines: list[str] = field(default_factory=list)
+    mrt_distance_m: int | None = None
+    mrt_walk_min: int | None = None
+    rating_history: list[dict[str, Any]] = field(default_factory=list)
+    rating_trend: str | None = None
+    aspects: dict[str, float] = field(default_factory=dict)
+    keyword_counts: dict[str, int] = field(default_factory=dict)
+    noise_level: str | None = None
+    summary: str | None = None
+    best_for: str | None = None
     first_seen_run: str | None = None
     last_seen_run: str | None = None
 

@@ -8,8 +8,9 @@ from typer.testing import CliRunner
 
 from sgfoodhunt.cli import app
 from sgfoodhunt.config import AppConfig
+from sgfoodhunt.enrich import OneMapGeocoder
 from sgfoodhunt.http.cache import ResponseCache
-from sgfoodhunt.http.client import PoliteClient
+from sgfoodhunt.http.client import AsyncApiClient, PoliteClient
 from sgfoodhunt.pipeline import Collector, select_categories, select_sources
 from sgfoodhunt.reporting import export_raw_candidates, write_home_note, write_run_note
 from sgfoodhunt.storage.runs import RunStore
@@ -210,7 +211,19 @@ async def test_rank_run_end_to_end(
         api_factory=MockApiFactory(http_settings, cache, lambda r: httpx.Response(404)),
     )
     run = await collector.collect(["cafes_date", "zichar_family"], ["sethlui"])
-    result = rank_run(app_config, run_store, vault, run.run_id)
+    onemap = AsyncApiClient(
+        http_settings,
+        cache,
+        rpm=1000,
+        client=httpx.AsyncClient(
+            transport=httpx.MockTransport(
+                lambda r: httpx.Response(200, json=json.loads(fixture_text("onemap_search.json")))
+            )
+        ),
+    )
+    result = await rank_run(
+        app_config, run_store, vault, run.run_id, geocoder=OneMapGeocoder(onemap)
+    )
     assert {v.name for v in result.venues.values()} == {
         "Tiong Bahru Bakery",
         "Keng Eng Kee Seafood",
@@ -231,6 +244,10 @@ async def test_rank_run_end_to_end(
         and fm["name_zh"] == "琼荣记海鲜"
     )
     assert fm["ranks"]["zichar_family"] == 1 and fm["price_level"] == "$$"
+    assert fm["nearest_mrt"] == "Redhill" and fm["mrt_walk_min"] >= 1 and fm["lat"] == 1.2865
+    assert fm["best_for"] == "a no-fuss zi char dinner with the family"
+    assert "## Getting there" in note.body and "Nearest MRT: **Redhill**" in note.body
+    assert "Keng Eng Kee Seafood is a" in note.body
     assert fm["bill_estimate"]["zichar_family"] == 35.0 * 5
     assert "## My notes" in note.body and "## Evidence" in note.body
     assert (vault.root / "Categories" / "Best zi char places for a family weekend meal.md").exists()
@@ -252,7 +269,9 @@ async def test_rank_run_end_to_end(
     from sgfoodhunt.storage.frontmatter import render_note
 
     path.write_text(render_note(edited))
-    result2 = rank_run(app_config, run_store, vault, run.run_id, hide_visited=True)
+    result2 = await rank_run(
+        app_config, run_store, vault, run.run_id, hide_visited=True, geocoder=None
+    )
     kek = next(s for s in result2.scores["zichar_family"] if s.name == "Keng Eng Kee Seafood")
     assert kek.hidden and kek.rank == 0 and "personal" in kek.adjustments
     again = parse_note(path.read_text())

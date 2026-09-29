@@ -44,7 +44,7 @@ sgfh = "sgfoodhunt.cli:app"
 include = ["sgfoodhunt*"]
 
 [tool.setuptools.package-data]
-sgfoodhunt = ["py.typed"]
+sgfoodhunt = ["py.typed", "data/*.json"]
 
 [tool.ruff]
 line-length = 100

@@ -10,6 +10,13 @@ address: '124 Bukit Merah Lane 1, #01-136, Singapore 150124'
 postal_code: '150124'
 district: D03 Queenstown / Tiong Bahru
 region: Central
+lat: 1.2865
+lng: 103.8127
+location: 1.2865,103.8127
+nearest_mrt: Redhill
+mrt_lines:
+- East West
+mrt_walk_min: 9
 cuisine:
 - Chinese
 - Seafood
@@ -27,6 +34,18 @@ google_rating: 4.3
 google_reviews: 2100
 hygiene_grade: A
 michelin: Bib Gourmand
+rating_trend: unknown
+aspect_food: 0.962
+aspect_ambience: 0.5
+aspect_value: 0.75
+keyword_counts:
+  cafe: 4
+  date: 4
+  family: 1
+  parents: 1
+  romantic: 8
+  zi char: 7
+best_for: a no-fuss zi char dinner with the family
 business_status: OPERATIONAL
 source_count: 10
 independent_sources: 7
@@ -42,8 +61,8 @@ sources:
 - sethlui
 - sfa
 scores:
-  cafes_date: 0.917
-  zichar_family: 0.95
+  cafes_date: 0.884
+  zichar_family: 0.937
 ranks:
   cafes_date: 1
   zichar_family: 1
@@ -52,9 +71,9 @@ categories:
 - zichar_family
 best_rank: 1
 earliest_evidence: '2026-02-02'
-first_seen: 20260929T031143Z
-last_seen: 20260929T031143Z
-updated_run: 20260929T031143Z
+first_seen: 20260929T031852Z
+last_seen: 20260929T031852Z
+updated_run: 20260929T031852Z
 tags:
 - sgfoodhunt/venue
 ---
@@ -66,16 +85,20 @@ tags:
 
 ## Summary
 
-_Generated summary arrives with stage 3 (review analysis)._
+Keng Eng Kee Seafood is a budget friendly Zi Char place in Queenstown / Tiong Bahru, about 9 min on foot from Redhill MRT. It is recommended by 7 independent sources, holds a Michelin Bib Gourmand and rated 4.3 on Google over 2,100 reviews.
 
 ## Best for
 
-_Stage 3._
+a no-fuss zi char dinner with the family
+
+## Getting there
+
+Nearest MRT: **Redhill** (East West), about 9 min walk.
 
 ## Rankings
 
-- [[SG Food Hunt/Categories/Best cafes for a date|Best cafes for a date]]: rank 1, score 0.92
-- [[SG Food Hunt/Categories/Best zi char places for a family weekend meal|Best zi char places for a family weekend meal]]: rank 1, score 0.95
+- [[SG Food Hunt/Categories/Best cafes for a date|Best cafes for a date]]: rank 1, score 0.88
+- [[SG Food Hunt/Categories/Best zi char places for a family weekend meal|Best zi char places for a family weekend meal]]: rank 1, score 0.94
 
 **Excluded from:**
 - Newly opened zi char places: earliest evidence 2026-02-02 is older than 30 days
