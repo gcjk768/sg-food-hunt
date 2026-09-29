@@ -8,8 +8,16 @@ ENV PYTHONUNBUFFERED=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     TZ=Asia/Singapore
 
+# WITH_CLAUDE=true installs Node and the Claude Code CLI so the optional AI layer (`ai.enabled`)
+# can shell out to `claude -p`. Authenticate with ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN in .env.
+ARG WITH_CLAUDE=false
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends tzdata ca-certificates \
+    && apt-get install -y --no-install-recommends tzdata ca-certificates curl gnupg \
+    && if [ "$WITH_CLAUDE" = "true" ]; then \
+         curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+         && apt-get install -y --no-install-recommends nodejs \
+         && npm install -g @anthropic-ai/claude-code; \
+       fi \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

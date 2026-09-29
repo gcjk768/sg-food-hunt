@@ -18,6 +18,7 @@ from urllib.parse import quote_plus
 
 from bs4 import BeautifulSoup
 
+from sgfoodhunt.ai.client import AiClient
 from sgfoodhunt.config import AppConfig, Source
 from sgfoodhunt.http.browser import BrowserFetcher, BrowserUnavailable
 from sgfoodhunt.http.cache import CachedResponse, CacheMiss
@@ -38,6 +39,7 @@ class ScraperContext:
     api_factory: ApiClientFactory
     dry_run: bool = False
     browser: BrowserFetcher | None = None
+    ai: AiClient | None = None
 
     @property
     def ttl(self) -> timedelta:

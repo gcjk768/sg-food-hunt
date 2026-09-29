@@ -194,6 +194,9 @@ def build_venue_note(
         if venue.nearest_mrt
         else "_no coordinates yet_"
     )
+    dishes = (
+        "\n".join(f"- {d}" for d in venue.ai_dishes) if venue.ai_dishes else "_none identified yet_"
+    )
     social_lines = [
         f"- {m.get('date') or 'undated'} · {m.get('platform')} · {('@' + m['creator']) if m.get('creator') else m.get('source')} · [post]({m['url']})"
         for m in venue.recent_social
@@ -226,6 +229,10 @@ def build_venue_note(
 ## Best for
 
 {venue.best_for or "_not ranked yet_"}
+
+## Signature dishes
+
+{dishes}
 
 ## Getting there
 

@@ -103,6 +103,16 @@ def write_run_note(vault: Vault, store: RunStore, run: RunRecord, config: AppCon
         diff_obj.new_sources = d.get("new_sources", [])
         diff_obj.new_social_mentions = d.get("new_social_mentions", [])
         diff_section = diff_markdown(diff_obj)
+    ai_stats = stats.get("ai") or {}
+    if not ai_stats:
+        ai_section = "_disabled (`ai.enabled: false`)_"
+    else:
+        ai_section = (
+            f"- CLI calls: {ai_stats.get('calls', 0)}, cache hits: {ai_stats.get('cache_hits', 0)}, "
+            f"failures: {ai_stats.get('failures', 0)}, skipped over budget: {ai_stats.get('skipped_budget', 0)}\n"
+            f"- Cost this run: ${ai_stats.get('cost_usd', 0):.2f}\n"
+            f"- By task: {', '.join(f'{k} {v}' for k, v in (ai_stats.get('by_task') or {}).items()) or 'none'}"
+        )
     body = f"""# Run {run.run_id}
 
 Mode **{run.mode}**, status **{run.status}**. Started {run.started_at}, finished {run.finished_at}.
@@ -132,6 +142,10 @@ Mode **{run.mode}**, status **{run.status}**. Started {run.started_at}, finished
 ## Social buzz
 
 {social_section}
+
+## AI layer
+
+{ai_section}
 
 ## Diff
 

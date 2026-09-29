@@ -68,6 +68,7 @@ class Venue:
     noise_level: str | None = None
     summary: str | None = None
     best_for: str | None = None
+    ai_dishes: list[str] = field(default_factory=list)
     # stage 4: social buzz
     social_secondhand: int = 0
     buzz_score: float = 0.0

@@ -41,7 +41,7 @@ sgfh rank --offline               # also skip OneMap lookups (cached coordinates
 sgfh runs                          # list past runs
 sgfh show <run_id>                 # per source counts and sample candidates
 sgfh cache stats | sgfh cache purge
-sgfh doctor                        # deployment check: paths, keys, notification config
+sgfh doctor                        # deployment check: paths, keys, notification config, claude CLI
 sgfh notify-test                   # send a test message to Telegram / email
 sgfh serve                         # built-in weekly scheduler (used by the Docker image)
 sgfh dashboard                     # start the Streamlit dashboard
@@ -235,6 +235,45 @@ venue id. No commenter or viewer data is ever stored.
 (`0.5^(age_days / buzz_half_life_days)`), normalised across venues, and added to the ranking as
 at most `scoring.buzz_bonus_max` (5% by default). A venue with at least
 `social.trending_threshold` mentions in the window gets `trending_social: true`.
+
+## Does it need AI? (optional Claude layer via `claude -p`)
+
+No. The whole pipeline runs on rules: regex and CSS selectors for extraction, fuzzy matching for
+dedup, lexicons for sentiment, templates for the summary. Four steps are clearly better with a
+model, and each has an optional AI path behind `ai.enabled: true` in `config/settings.yaml`:
+
+| task | rule-based path | with AI |
+| --- | --- | --- |
+| `reddit_extraction` | bold text, list items, "at X" patterns (noisy) | Claude reads the thread and returns real venue names |
+| `article_extraction` | one venue per heading + address regex | used only when an article yields headings but no venue details |
+| `review_analysis` | lexicon aspect scores, templated summary | aspect scores 0 to 1, noise level, a genuine two-sentence summary in its own words, signature dishes |
+| `social_matching` | creator handle / fuzzy caption match | Claude picks the venue from the top fuzzy candidates when they are all below the threshold |
+
+Every call goes through the **Claude Code CLI in print mode** (`claude -p ... --output-format json
+--json-schema ...`), so there is no SDK dependency and it uses whatever login the CLI has. Answers
+are cached by prompt hash for `ai.cache_ttl_days`, and each run is capped by
+`ai.max_calls_per_run` and `ai.max_budget_usd` (the CLI reports the cost of every call, and the
+run note shows calls, cache hits and dollars). If the CLI is missing, fails, or the budget is
+spent, the rule-based path is used for that item. Default model is `claude-opus-5-5` at
+`effort: low`; set `ai.model: claude-sonnet-5-5` to roughly halve the cost. A typical weekly run
+with all four tasks on costs a few dollars; review analysis is the bulk of it.
+
+Setup on the NAS:
+
+```bash
+# local machine / venv
+npm install -g @anthropic-ai/claude-code
+claude          # log in once, or export ANTHROPIC_API_KEY
+sgfh doctor     # reports whether `claude` is on PATH when ai.enabled is true
+
+# docker: build with the CLI baked in and pass the key through .env
+docker compose build --build-arg WITH_CLAUDE=true
+echo "ANTHROPIC_API_KEY=sk-ant-..." >> .env      # or CLAUDE_CODE_OAUTH_TOKEN from `claude setup-token`
+```
+
+What is sent to the model: public article text, anonymised review snippets (no reviewer names),
+public social captions, and venue names. Never your exports beyond those captions, never
+commenter data.
 
 ## Diff report and notifications
 

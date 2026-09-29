@@ -7,6 +7,8 @@ import re
 from datetime import UTC, date, datetime
 from typing import Any
 
+from sgfoodhunt.ai.client import AiClient
+from sgfoodhunt.ai.tasks import analyse_reviews as ai_analyse_reviews
 from sgfoodhunt.config import AppConfig, Category
 from sgfoodhunt.dedup.venue import Venue
 
@@ -190,6 +192,17 @@ ASPECTS: dict[str, dict[str, tuple[str, ...]]] = {
             "costly",
         ),
     },
+}
+AMBIENCE_TAGS_ALLOWED = {
+    "romantic",
+    "quiet",
+    "lively",
+    "rooftop",
+    "waterfront",
+    "garden",
+    "heritage",
+    "cosy",
+    "view",
 }
 QUIET_WORDS = ("quiet", "peaceful", "serene", "tranquil", "calm", "intimate")
 LOUD_WORDS = ("noisy", "loud", "crowded", "bustling", "rowdy", "packed")
@@ -430,10 +443,21 @@ def best_for_line(venue: Venue, config: AppConfig, ranks: dict[str, int]) -> str
     return f"trying a new {(primary_cuisine(venue) or 'place').lower()} this month"
 
 
+MIN_TEXTS_FOR_AI = 2
+
+
 def analyse_venue(
-    venue: Venue, config: AppConfig, ranks: dict[str, int] | None = None, today: date | None = None
+    venue: Venue,
+    config: AppConfig,
+    ranks: dict[str, int] | None = None,
+    today: date | None = None,
+    ai: AiClient | None = None,
 ) -> None:
-    """Fill the stage 3 fields on ``venue`` in place (summary needs ranks, so it may run twice)."""
+    """Fill the stage 3 fields on ``venue`` in place (summary needs ranks, so it may run twice).
+
+    With ``ai`` (and ``ai.tasks.review_analysis``), Claude supplies the aspect scores, noise level
+    and summary from the same anonymised snippets; the lexicon path fills anything it leaves out.
+    """
     texts = _texts(venue)
     all_keywords = sorted({k for c in config.categories.categories for k in c.keywords})
     venue.keyword_counts = keyword_counts(texts, all_keywords)
@@ -441,6 +465,16 @@ def analyse_venue(
     venue.noise_level = noise_level(texts, venue.ambience_tags)
     venue.rating_trend = rating_trend(venue, today)
     venue.summary = summarise(venue, config)
+    if ai is not None and ai.task_enabled("review_analysis") and len(texts) >= MIN_TEXTS_FOR_AI:
+        analysis = ai_analyse_reviews(ai, venue.name, texts)
+        if analysis is not None:
+            venue.aspects = {**venue.aspects, **analysis.aspects}
+            venue.noise_level = analysis.noise_level or venue.noise_level
+            venue.summary = analysis.summary
+            venue.ai_dishes = analysis.signature_dishes
+            for tag in analysis.tags:
+                if tag in AMBIENCE_TAGS_ALLOWED and tag not in venue.ambience_tags:
+                    venue.ambience_tags.append(tag)
     venue.best_for = best_for_line(venue, config, ranks or {})
 
 

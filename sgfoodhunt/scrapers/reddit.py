@@ -12,6 +12,7 @@ import re
 from datetime import timedelta
 from typing import Any, ClassVar
 
+from sgfoodhunt.ai.tasks import extract_venues
 from sgfoodhunt.http.cache import CacheMiss
 from sgfoodhunt.http.client import AsyncApiClient, FetchError
 from sgfoodhunt.models import ScrapeResult, SearchQuery, SourcePage, clean_snippet
@@ -275,6 +276,36 @@ class RedditScraper(BaseScraper):
                     if isinstance(selftext, str):
                         bodies.insert(0, selftext)
                     seen: set[str] = set()
+                    ai = self.ctx.ai
+                    if ai is not None and ai.task_enabled("reddit_extraction"):
+                        found = extract_venues(
+                            ai, "\n\n".join(bodies), context=f"Reddit thread title: {title}"
+                        )
+                        if found is not None:
+                            for ev in found:
+                                key = ev.name.lower()
+                                if key in seen:
+                                    continue
+                                seen.add(key)
+                                cand = self.candidate(
+                                    ev.name,
+                                    source_ref=f"{url}#{key}",
+                                    name_zh=ev.name_zh,
+                                    snippet=clean_snippet(ev.note or title, 200),
+                                    confidence=max(0.5, min(0.95, ev.confidence)),
+                                    page=page,
+                                    extra={
+                                        "subreddit": sub,
+                                        "thread_title": title,
+                                        "area": ev.area,
+                                        "thread_score": thread.get("score"),
+                                        "thread_created_utc": thread.get("created_utc"),
+                                        "extracted_by": "ai",
+                                    },
+                                )
+                                if cand:
+                                    result.candidates.append(cand)
+                            bodies = []  # heuristics not needed when the model answered
                     for body in bodies:
                         for name, conf in extract_venue_names(body):
                             key = name.lower()

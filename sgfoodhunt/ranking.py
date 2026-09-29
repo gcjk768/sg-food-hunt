@@ -10,6 +10,7 @@ import logging
 from dataclasses import dataclass, field
 from typing import Any
 
+from sgfoodhunt.ai import AiClient, build_ai_client
 from sgfoodhunt.config import AppConfig
 from sgfoodhunt.dedup import Venue, build_venues
 from sgfoodhunt.dedup.registry import MatchStats
@@ -88,6 +89,7 @@ async def rank_run(
     cache: ResponseCache | None = None,
     social_offline: bool = False,
     social_exports_only: bool = False,
+    ai: AiClient | None = None,
 ) -> RankResult:
     """Dedup -> enrich -> analyse reviews -> score -> notes and exports for a stored run.
 
@@ -102,8 +104,11 @@ async def rank_run(
     for v in seen:
         record_rating_history(v, run_id)
     enrich_stats = await enrich_venues(seen, geocoder)
+    cache = cache or ResponseCache(config.resolve(config.settings.paths.cache_dir))
+    if ai is None:
+        ai = build_ai_client(config.settings.ai, cache, offline=social_offline)
     for v in venues.values():
-        analyse_venue(v, config)
+        analyse_venue(v, config, ai=ai if v.last_seen_run == run_id else None)
     social_stats = SocialStats(enabled=False)
     if config.settings.social.enabled:
         social_cache = cache or ResponseCache(config.resolve(config.settings.paths.cache_dir))
@@ -147,7 +152,7 @@ async def rank_run(
             if sv.rank:
                 ranks.setdefault(sv.venue_id, {})[key] = sv.rank
     for v in venues.values():
-        analyse_venue(v, config, ranks.get(v.id))
+        analyse_venue(v, config, ranks.get(v.id), ai=ai if v.last_seen_run == run_id else None)
     registry.save()
     write_json(run_dir / "venues.json", [v.to_dict() for v in seen])
     write_json(
@@ -183,6 +188,8 @@ async def rank_run(
     )
     record = store.load_run(run_id)
     record.stats["ranking"] = result.summary()
+    if ai is not None:
+        record.stats["ai"] = ai.stats.as_dict()
     record.stats["diff"] = {
         "prev_run_id": diff.prev_run_id,
         "empty": diff.is_empty,

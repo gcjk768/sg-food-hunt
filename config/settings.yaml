@@ -55,6 +55,22 @@ social:
   serp_endpoint: https://serpapi.com/search.json
   serp_max_results: 10
 
+ai:                               # optional: Claude via the Claude Code CLI (`claude -p`), off by default
+  enabled: false
+  provider: claude_cli            # the only provider; needs the `claude` binary and ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN
+  model: claude-opus-5-5          # e.g. claude-sonnet-5-5 to cut cost by half
+  effort: low                     # low | medium | high: extraction and matching are simple tasks
+  claude_bin: claude
+  timeout_seconds: 180
+  max_calls_per_run: 200          # hard cap on CLI calls per run (cached answers do not count)
+  max_budget_usd: 5.0             # stop calling once this much has been spent in one run
+  cache_ttl_days: 90              # identical prompts are served from data/cache
+  tasks:
+    reddit_extraction: true       # venue names from Reddit threads (replaces the regex heuristics)
+    article_extraction: true      # venue entries from articles the listicle parser could not split
+    review_analysis: true         # aspect scores, noise level and the summary in the tool's own words
+    social_matching: true         # match a social caption to a venue when fuzzy matching fails
+
 exports:
   google_sheets: false
   csv: true

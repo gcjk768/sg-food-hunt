@@ -434,6 +434,21 @@ def doctor(
         )
     if n.email and not (os.environ.get("SMTP_HOST") and os.environ.get("REPORT_EMAIL_TO")):
         problems.append("notifications.email is true but SMTP_HOST / REPORT_EMAIL_TO are not set")
+    if config.settings.ai.enabled:
+        import shutil as _shutil
+
+        if _shutil.which(config.settings.ai.claude_bin):
+            notes.append(
+                f"ai: `{config.settings.ai.claude_bin}` found, model {config.settings.ai.model}, budget ${config.settings.ai.max_budget_usd:.2f}/run"
+            )
+        else:
+            problems.append(
+                f"ai.enabled is true but `{config.settings.ai.claude_bin}` is not on PATH (npm install -g @anthropic-ai/claude-code)"
+            )
+        if not (os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("CLAUDE_CODE_OAUTH_TOKEN")):
+            notes.append(
+                "ai: neither ANTHROPIC_API_KEY nor CLAUDE_CODE_OAUTH_TOKEN is set; the CLI must already be logged in"
+            )
     runnable, skipped = select_sources(config, None)
     notes.append(
         f"{len(runnable)} sources will run, {len(skipped)} skipped ({', '.join(skipped) or 'none'})"

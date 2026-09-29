@@ -11,6 +11,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass, field
 from typing import Any
 
+from sgfoodhunt.ai import AiClient, build_ai_client
 from sgfoodhunt.config import AppConfig, Category, Source
 from sgfoodhunt.http.cache import ResponseCache
 from sgfoodhunt.http.client import AsyncApiClient, PoliteClient
@@ -98,6 +99,7 @@ class Collector:
         concurrency: int = 4,
         http: PoliteClient | None = None,
         api_factory: Any | None = None,
+        ai: AiClient | None = None,
     ) -> None:
         self.config = config
         self.store = store
@@ -106,6 +108,9 @@ class Collector:
         self.concurrency = concurrency
         self.http = http or PoliteClient(config.settings.http, cache, dry_run=dry_run)
         self._api_factory = api_factory or self._default_api_factory
+        self.ai = (
+            ai if ai is not None else build_ai_client(config.settings.ai, cache, offline=dry_run)
+        )
         self.stats = CollectStats()
 
     def _default_api_factory(self, name: str, headers: dict[str, str] | None) -> AsyncApiClient:
@@ -125,6 +130,7 @@ class Collector:
             http=self.http,
             api_factory=self._api_factory,
             dry_run=self.dry_run,
+            ai=self.ai,
         )
         return build_scraper(ctx)
 
@@ -213,6 +219,8 @@ class Collector:
         stats = self.stats.as_dict()
         stats["http"] = self.http.stats.as_dict()
         stats["cache"] = self.cache.stats()
+        if self.ai is not None:
+            stats["ai"] = self.ai.stats.as_dict()
         status = "ok" if self.stats.errors == 0 else "partial"
         self.store.finish_run(run, status, stats)
         log.info(

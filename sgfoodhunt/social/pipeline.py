@@ -6,6 +6,8 @@ import logging
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from sgfoodhunt.ai.client import AiClient
+from sgfoodhunt.ai.tasks import match_caption
 from sgfoodhunt.config import AppConfig
 from sgfoodhunt.dedup.venue import Venue
 from sgfoodhunt.http.cache import ResponseCache
@@ -78,6 +80,7 @@ async def run_social(
     serp_client: SerpClient | None = None,
     oembed: TikTokOEmbed | None = None,
     hashtag_client: InstagramHashtagClient | None = None,
+    ai: AiClient | None = None,
 ) -> SocialStats:
     """``offline`` uses cached responses only; ``exports_only`` (``--social-only``) parses the
     exports and secondhand mentions and makes no network calls at all."""
@@ -179,6 +182,15 @@ async def run_social(
             hit = matcher.match(m.caption, m.creator_handle)
             if hit:
                 m.venue_id, m.matched_by, m.match_score = hit.venue_id, hit.method, hit.score
+            elif m.caption and ai is not None and ai.task_enabled("social_matching"):
+                cands = [
+                    (c["venue_id"], venues[c["venue_id"]].name)
+                    for c in matcher.candidates(m.caption, m.creator_handle, n=8)
+                    if c["venue_id"] in venues
+                ]
+                picked = match_caption(ai, m.caption, cands) if cands else None
+                if picked:
+                    m.venue_id, m.matched_by, m.match_score = picked[0], "ai", picked[1] * 100
         if m.venue_id:
             stats.matched += 1
         else:

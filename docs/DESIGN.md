@@ -60,6 +60,7 @@ SG-Cafe-Food-Hunt/
 │   ├── diff.py                run-to-run diff (top list churn, ratings, closures, new venues/sources/mentions)
 │   ├── notify.py              Telegram bot and SMTP email delivery of the diff
 │   ├── schedule.py            weekly schedule parser for `sgfh serve` (Docker scheduler)
+│   ├── ai/                    optional Claude layer through `claude -p` (client.py: cache + budget; tasks.py: prompts)
 │   ├── sheets.py              optional Google Sheets export (gspread)
 │   └── dashboard/             Streamlit app (app.py) over data/venues.json + latest scores.json
 ├── tests/                     fixtures/ (saved HTML and JSON) + one test module per area

@@ -25,7 +25,11 @@ def main(path: str) -> None:
         desc = props.get("Description") or ""
         match = re.search(r"STATION_NA</th>\s*<td>([^<]+)</td>", desc)
         name = (match.group(1) if match else props.get("STATION_NA") or "").strip()
-        name = re.sub(r"\s+MRT STATION$", "", name, flags=re.I).title().replace("Harbourfront", "HarbourFront")
+        name = (
+            re.sub(r"\s+MRT STATION$", "", name, flags=re.I)
+            .title()
+            .replace("Harbourfront", "HarbourFront")
+        )
         coords = feature.get("geometry", {}).get("coordinates")
         if name and coords:
             points[name].append((float(coords[1]), float(coords[0])))
@@ -35,7 +39,13 @@ def main(path: str) -> None:
         lng = sum(p[1] for p in pts) / len(pts)
         lines = existing.get(name.lower(), {}).get("lines", [])
         stations.append({"name": name, "lines": lines, "lat": round(lat, 5), "lng": round(lng, 5)})
-    OUT.write_text(json.dumps({"note": "Built from data.gov.sg LTA MRT Station Exit", "stations": stations}, ensure_ascii=False, indent=1))
+    OUT.write_text(
+        json.dumps(
+            {"note": "Built from data.gov.sg LTA MRT Station Exit", "stations": stations},
+            ensure_ascii=False,
+            indent=1,
+        )
+    )
     print(f"wrote {len(stations)} stations to {OUT}")
 
 

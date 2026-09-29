@@ -8,6 +8,7 @@ from __future__ import annotations
 import re
 from typing import ClassVar
 
+from sgfoodhunt.ai.tasks import extract_listicle
 from sgfoodhunt.models import ScrapeResult, SearchQuery
 from sgfoodhunt.scrapers.base import BaseScraper
 from sgfoodhunt.scrapers.html import (
@@ -94,6 +95,31 @@ class ListicleBlogScraper(BaseScraper):
                 continue
             entries = extract_listicle_entries(container, self.heading_tags)
             venue_entries = [e for e in entries if looks_like_venue_entry(e)]
+            ai = self.ctx.ai
+            if not venue_entries and ai is not None and ai.task_enabled("article_extraction"):
+                found = extract_listicle(ai, apage.title, container.get_text(" ", strip=True))
+                if found:
+                    for ev in found:
+                        cand = self.candidate(
+                            ev.name,
+                            source_ref=f"{url}#{ev.name}",
+                            name_zh=ev.name_zh,
+                            address=ev.address,
+                            price_text=ev.price,
+                            opening_hours={"text": ev.hours} if ev.hours else None,
+                            snippet=ev.note,
+                            confidence=max(0.5, min(1.0, ev.confidence)),
+                            page=apage,
+                            extra={
+                                "article_title": apage.title,
+                                "published_at": apage.published_at,
+                                "area": ev.area,
+                                "extracted_by": "ai",
+                            },
+                        )
+                        if cand:
+                            result.candidates.append(cand)
+                    continue
             if entries and not venue_entries:
                 result.warnings.append(f"{len(entries)} headings but no venue details in {url}")
             for entry in venue_entries:

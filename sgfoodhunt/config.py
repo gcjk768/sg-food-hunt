@@ -94,6 +94,26 @@ class SocialSettings(BaseModel):
     serp_max_results: int = 10
 
 
+class AiTasks(BaseModel):
+    reddit_extraction: bool = True
+    article_extraction: bool = True
+    review_analysis: bool = True
+    social_matching: bool = True
+
+
+class AiSettings(BaseModel):
+    enabled: bool = False
+    provider: Literal["claude_cli"] = "claude_cli"
+    model: str = "claude-opus-5-5"
+    effort: Literal["low", "medium", "high", "xhigh", "max"] = "low"
+    claude_bin: str = "claude"
+    timeout_seconds: int = 180
+    max_calls_per_run: int = 200
+    max_budget_usd: float = 5.0
+    cache_ttl_days: int = 90
+    tasks: AiTasks = Field(default_factory=AiTasks)
+
+
 class ExportSettings(BaseModel):
     google_sheets: bool = False
     csv: bool = True
@@ -114,6 +134,7 @@ class Settings(BaseModel):
     api_rate_limits: dict[str, int] = Field(default_factory=dict)
     scoring: ScoringSettings = Field(default_factory=ScoringSettings)
     social: SocialSettings = Field(default_factory=SocialSettings)
+    ai: AiSettings = Field(default_factory=AiSettings)
     exports: ExportSettings = Field(default_factory=ExportSettings)
     notifications: NotificationSettings = Field(default_factory=NotificationSettings)
 
