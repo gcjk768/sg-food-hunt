@@ -1,0 +1,30 @@
+# docker compose up -d
+# Edit the paths on the left of each volume line to match your NAS. The vault folder must be
+# the Obsidian vault (the tool writes into the "SG Food Hunt" subfolder inside it).
+services:
+  sgfoodhunt:
+    build: .
+    image: sgfoodhunt:latest
+    container_name: sgfoodhunt
+    restart: unless-stopped
+    env_file: .env                    # API keys, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
+    environment:
+      TZ: Asia/Singapore
+      SGFH_SCHEDULE: "mon 03:17"      # weekly run time (local TZ); "daily 03:17" also works
+      SGFH_RUN_ON_START: "false"      # set "true" to run immediately when the container starts
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./social_exports:/app/social_exports
+      - /volume1/obsidian/MyVault:/app/vault     # CHANGE ME: your Obsidian vault on the NAS
+    # The dashboard is optional; uncomment to serve it on port 8501:
+    # ports:
+    #   - "8501:8501"
+    # command: ["dashboard"]
+
+  # One-off commands, e.g.:
+  #   docker compose run --rm sgfoodhunt doctor
+  #   docker compose run --rm sgfoodhunt notify-test
+  #   docker compose run --rm sgfoodhunt run --dry-run
+  #   docker compose run --rm sgfoodhunt run -c zichar_family -s michelin

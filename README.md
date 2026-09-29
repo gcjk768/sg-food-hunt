@@ -41,6 +41,10 @@ sgfh rank --offline               # also skip OneMap lookups (cached coordinates
 sgfh runs                          # list past runs
 sgfh show <run_id>                 # per source counts and sample candidates
 sgfh cache stats | sgfh cache purge
+sgfh doctor                        # deployment check: paths, keys, notification config
+sgfh notify-test                   # send a test message to Telegram / email
+sgfh serve                         # built-in weekly scheduler (used by the Docker image)
+sgfh dashboard                     # start the Streamlit dashboard
 ```
 
 `sgfh run --social-only` re-parses your Instagram / TikTok exports and secondhand mentions against
@@ -264,6 +268,41 @@ with booking links, a map of the filtered venues, and recent social mention coun
 Set `exports.google_sheets: true`, install `pip install -e ".[sheets]"`, share a spreadsheet
 with a service account and set `GOOGLE_SHEETS_CREDENTIALS_JSON` (path to its key file) and
 `GOOGLE_SHEETS_SPREADSHEET_ID`. Each run rewrites one worksheet per category.
+
+## Deploying on a NAS with Docker (with Telegram)
+
+Everything the container needs is mounted from the host, so the image is stateless and the data
+survives rebuilds.
+
+1. On the NAS, clone or copy the repo into a share (for example `/volume1/docker/SG-Cafe-Food-Hunt`).
+2. `cp .env.example .env` and fill in at least `GOOGLE_PLACES_API_KEY`, `TELEGRAM_BOT_TOKEN`
+   and `TELEGRAM_CHAT_ID` (create the bot with @BotFather, send it a message, then read your chat
+   id from `https://api.telegram.org/bot<TOKEN>/getUpdates`).
+3. In `config/settings.yaml` set `notifications.telegram: true`. Leave `paths.vault_dir: vault`;
+   the compose file mounts your real vault at `/app/vault`.
+4. In `docker-compose.yml` change the vault volume line to your Obsidian vault folder on the NAS
+   and, if you like, the `SGFH_SCHEDULE` (default Monday 03:17 Singapore time).
+5. Build and check:
+
+```bash
+docker compose build
+docker compose run --rm sgfoodhunt doctor          # paths writable, keys present, schedule valid
+docker compose run --rm sgfoodhunt notify-test     # a test message arrives in Telegram
+docker compose run --rm sgfoodhunt run -c zichar_family -s michelin -s sethlui   # small live run
+docker compose up -d                               # scheduler: runs weekly, sends the diff
+docker compose logs -f                             # watch it
+```
+
+`docker compose run --rm sgfoodhunt run --dry-run` reruns from the cache without network.
+Set `SGFH_RUN_ON_START: "true"` in the compose file to trigger a run when the container starts.
+The container's healthcheck runs `sgfh doctor --quiet` every five minutes.
+
+Synology users: Container Manager can build from the compose file (Project → Create → choose the
+folder). Make sure the shared folder holding the vault is mounted with write permission.
+
+For the dashboard, uncomment the `ports` and `command: ["dashboard"]` lines (the image would also
+need `pip install .[dashboard]`; add it to the Dockerfile's pip line) and open
+`http://<nas-ip>:8501`.
 
 ## Scheduling
 

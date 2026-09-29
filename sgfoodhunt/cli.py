@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
+import sys
 from pathlib import Path
 from typing import Annotated
 
@@ -25,6 +27,7 @@ from sgfoodhunt.reporting import (
     write_run_note,
     write_sources_note,
 )
+from sgfoodhunt.schedule import parse_schedule
 from sgfoodhunt.storage.runs import RunStore
 from sgfoodhunt.storage.vault import Vault
 
@@ -376,6 +379,191 @@ def cache_purge(config_dir: ConfigOpt = Path("config")) -> None:
     config = _load(config_dir)
     _, cache, _ = _paths(config)
     console.print(f"removed {cache.purge_expired()} expired entries")
+
+
+# --- deployment helpers -----------------------------------------------------------------------
+@app.command()
+def doctor(
+    config_dir: ConfigOpt = Path("config"),
+    quiet: Annotated[
+        bool, typer.Option("--quiet", help="Exit code only (used by the Docker healthcheck)")
+    ] = False,
+) -> None:
+    """Check config, folders, keys and notification settings before a deployment."""
+    problems: list[str] = []
+    notes: list[str] = []
+    try:
+        config = load_config(config_dir)
+    except (FileNotFoundError, ValueError) as exc:
+        if not quiet:
+            console.print(f"[red]config error:[/red] {exc}")
+        raise typer.Exit(code=1) from exc
+    p = config.settings.paths
+    for label, path in (
+        ("data_dir", p.data_dir),
+        ("logs_dir", p.logs_dir),
+        ("vault_dir", p.vault_dir),
+    ):
+        full = config.resolve(path)
+        try:
+            full.mkdir(parents=True, exist_ok=True)
+            probe = full / ".sgfh-write-test"
+            probe.write_text("ok")
+            probe.unlink()
+            notes.append(f"{label}: {full} (writable)")
+        except OSError as exc:
+            problems.append(f"{label}: {full} is not writable ({exc})")
+    vault_root = config.resolve(p.vault_dir)
+    if not any(vault_root.iterdir()) if vault_root.exists() else True:
+        notes.append("vault_dir is empty: is the Obsidian vault mounted at this path?")
+    secrets = config.secrets
+    if not secrets.google_places_api_key:
+        notes.append("GOOGLE_PLACES_API_KEY not set: Google Maps source will be skipped")
+    if not (secrets.reddit_client_id and secrets.reddit_client_secret):
+        notes.append(
+            "REDDIT_CLIENT_ID / REDDIT_CLIENT_SECRET not set: Reddit source will be skipped"
+        )
+    n = config.settings.notifications
+    if n.telegram and not (secrets.telegram_bot_token and secrets.telegram_chat_id):
+        problems.append(
+            "notifications.telegram is true but TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID are not set"
+        )
+    if not n.telegram and secrets.telegram_bot_token:
+        notes.append(
+            "TELEGRAM_BOT_TOKEN is set but notifications.telegram is false in settings.yaml"
+        )
+    if n.email and not (os.environ.get("SMTP_HOST") and os.environ.get("REPORT_EMAIL_TO")):
+        problems.append("notifications.email is true but SMTP_HOST / REPORT_EMAIL_TO are not set")
+    runnable, skipped = select_sources(config, None)
+    notes.append(
+        f"{len(runnable)} sources will run, {len(skipped)} skipped ({', '.join(skipped) or 'none'})"
+    )
+    notes.append(
+        f"{len(config.categories.categories)} categories; social module {'on' if config.settings.social.enabled else 'off'}"
+    )
+    schedule_text = os.environ.get("SGFH_SCHEDULE")
+    if schedule_text:
+        try:
+            notes.append(f"schedule: {parse_schedule(schedule_text).describe()}")
+        except ValueError as exc:
+            problems.append(str(exc))
+    if not quiet:
+        for line in notes:
+            console.print(f"[green]ok[/green]  {line}")
+        for line in problems:
+            console.print(f"[red]!![/red]  {line}")
+        console.print(
+            "[green]doctor: all good[/green]"
+            if not problems
+            else f"[red]doctor: {len(problems)} problem(s)[/red]"
+        )
+    raise typer.Exit(code=1 if problems else 0)
+
+
+@app.command("notify-test")
+def notify_test(config_dir: ConfigOpt = Path("config")) -> None:
+    """Send a test message through the configured Telegram bot / email."""
+    config = _load(config_dir)
+    n = config.settings.notifications
+    if not (n.telegram or n.email):
+        console.print(
+            "[yellow]both notifications.telegram and notifications.email are false[/yellow]"
+        )
+        raise typer.Exit(code=2)
+    text = (
+        "SG Food Hunt is connected.\n"
+        f"Config: {config.config_dir}\n"
+        f"Vault: {config.resolve(config.settings.paths.vault_dir)}\n"
+        "You will receive the diff report here after each run."
+    )
+    result = notify(config, text, subject="SG Food Hunt test message")
+    console.print(f"telegram: {result.telegram}, email: {result.email}")
+    for err in result.errors:
+        console.print(f"[red]{err}[/red]")
+    raise typer.Exit(code=1 if result.errors else 0)
+
+
+@app.command()
+def serve(
+    config_dir: ConfigOpt = Path("config"),
+    schedule: Annotated[
+        str | None, typer.Option("--schedule", help="e.g. 'mon 03:17' (default: $SGFH_SCHEDULE)")
+    ] = None,
+    run_on_start: Annotated[
+        bool | None,
+        typer.Option(
+            "--run-on-start/--no-run-on-start",
+            help="Run once immediately (default: $SGFH_RUN_ON_START)",
+        ),
+    ] = None,
+    once: Annotated[
+        bool, typer.Option("--once", help="Run the next scheduled job then exit (for tests)")
+    ] = False,
+) -> None:
+    """Long running scheduler for Docker: waits for the schedule, runs the pipeline, repeats."""
+    import subprocess
+    import time as _time
+    from datetime import datetime as _dt
+
+    config = _load(config_dir)
+    text = schedule or os.environ.get("SGFH_SCHEDULE", "mon 03:17")
+    try:
+        sched = parse_schedule(text)
+    except ValueError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(code=2) from exc
+    if run_on_start is None:
+        run_on_start = os.environ.get("SGFH_RUN_ON_START", "false").lower() in ("1", "true", "yes")
+    setup_logging(config.resolve(config.settings.paths.logs_dir), "serve", False)
+
+    def job() -> int:
+        log.info("scheduled run starting")
+        proc = subprocess.run(
+            [sys.executable, "-m", "sgfoodhunt.cli", "run", "-C", str(config_dir)], check=False
+        )
+        log.info("scheduled run finished with exit code %s", proc.returncode)
+        return proc.returncode
+
+    console.print(f"sgfh serve: schedule {sched.describe()} (TZ {os.environ.get('TZ', 'system')})")
+    if run_on_start:
+        job()
+        if once:
+            return
+    while True:
+        now = _dt.now().astimezone()
+        nxt = sched.next_after(now)
+        wait = (nxt - now).total_seconds()
+        console.print(f"next run at {nxt.isoformat(timespec='minutes')} (in {wait / 3600:.1f} h)")
+        while wait > 0:
+            step = min(wait, 300)
+            _time.sleep(step)
+            wait -= step
+        job()
+        if once:
+            return
+
+
+@app.command()
+def dashboard(config_dir: ConfigOpt = Path("config"), port: int = 8501) -> None:
+    """Start the Streamlit dashboard (pip install -e .[dashboard])."""
+    import subprocess
+
+    app_path = Path(__file__).resolve().parent / "dashboard" / "app.py"
+    cmd = [
+        sys.executable,
+        "-m",
+        "streamlit",
+        "run",
+        str(app_path),
+        "--server.port",
+        str(port),
+        "--server.address",
+        "0.0.0.0",
+        "--",
+        "--config",
+        str(config_dir),
+    ]
+    raise typer.Exit(code=subprocess.run(cmd, check=False).returncode)
 
 
 if __name__ == "__main__":

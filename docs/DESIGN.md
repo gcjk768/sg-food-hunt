@@ -59,11 +59,14 @@ SG-Cafe-Food-Hunt/
 │   │                          secondhand.py, matcher.py, store.py, buzz.py, pipeline.py
 │   ├── diff.py                run-to-run diff (top list churn, ratings, closures, new venues/sources/mentions)
 │   ├── notify.py              Telegram bot and SMTP email delivery of the diff
+│   ├── schedule.py            weekly schedule parser for `sgfh serve` (Docker scheduler)
 │   ├── sheets.py              optional Google Sheets export (gspread)
 │   └── dashboard/             Streamlit app (app.py) over data/venues.json + latest scores.json
 ├── tests/                     fixtures/ (saved HTML and JSON) + one test module per area
 ├── scripts/cron.example       weekly cron line
-└── .github/workflows/ci.yml   ruff, mypy, pytest on every push
+├── .github/workflows/ci.yml   ruff, mypy, pytest on every push
+├── .github/workflows/weekly.yml scheduled weekly run with cached registry, uploads exports
+└── Dockerfile, docker-compose.yml, docker/entrypoint.sh   NAS deployment (serve = scheduler)
 ```
 
 ## Config schema
