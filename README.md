@@ -236,11 +236,12 @@ venue id. No commenter or viewer data is ever stored.
 at most `scoring.buzz_bonus_max` (5% by default). A venue with at least
 `social.trending_threshold` mentions in the window gets `trending_social: true`.
 
-## Does it need AI? (optional Claude layer via `claude -p`)
+## Does it need AI? (Claude layer via `claude -p`, on by default)
 
 No. The whole pipeline runs on rules: regex and CSS selectors for extraction, fuzzy matching for
 dedup, lexicons for sentiment, templates for the summary. Four steps are clearly better with a
-model, and each has an optional AI path behind `ai.enabled: true` in `config/settings.yaml`:
+model, so the AI layer is **on by default** (`ai.enabled` in `config/settings.yaml`) with
+`claude-sonnet-5-5`; if the `claude` CLI is missing or fails, each step silently uses its rule-based path:
 
 | task | rule-based path | with AI |
 | --- | --- | --- |
@@ -254,9 +255,10 @@ Every call goes through the **Claude Code CLI in print mode** (`claude -p ... --
 are cached by prompt hash for `ai.cache_ttl_days`, and each run is capped by
 `ai.max_calls_per_run` and `ai.max_budget_usd` (the CLI reports the cost of every call, and the
 run note shows calls, cache hits and dollars). If the CLI is missing, fails, or the budget is
-spent, the rule-based path is used for that item. Default model is `claude-opus-5-5` at
-`effort: low`; set `ai.model: claude-sonnet-5-5` to roughly halve the cost. A typical weekly run
-with all four tasks on costs a few dollars; review analysis is the bulk of it.
+spent, the rule-based path is used for that item. Default model is `claude-sonnet-5-5` at
+`effort: low` to keep cost down; set `ai.model: claude-opus-5-5` for the strongest answers at
+about double the price. A typical weekly run with all four tasks on costs a dollar or two on
+Sonnet; review analysis is the bulk of it. Set `ai.enabled: false` to turn the layer off.
 
 Setup on the NAS:
 
@@ -264,10 +266,10 @@ Setup on the NAS:
 # local machine / venv
 npm install -g @anthropic-ai/claude-code
 claude          # log in once, or export ANTHROPIC_API_KEY
-sgfh doctor     # reports whether `claude` is on PATH when ai.enabled is true
+sgfh doctor     # warns if `claude` is not on PATH
 
-# docker: build with the CLI baked in and pass the key through .env
-docker compose build --build-arg WITH_CLAUDE=true
+# docker: the image includes the CLI by default (WITH_CLAUDE=true); pass the key through .env
+docker compose build
 echo "ANTHROPIC_API_KEY=sk-ant-..." >> .env      # or CLAUDE_CODE_OAUTH_TOKEN from `claude setup-token`
 ```
 

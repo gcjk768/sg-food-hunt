@@ -17,6 +17,11 @@ def test_real_config_loads(app_config: AppConfig) -> None:
     assert app_config.settings.scoring.top_n == 15
 
 
+def test_shipped_config_enables_ai_with_sonnet() -> None:
+    shipped = yaml.safe_load(Path("config/settings.yaml").read_text())["ai"]
+    assert shipped["enabled"] is True and shipped["model"] == "claude-sonnet-5-5"
+
+
 def test_category_defaults_are_merged(app_config: AppConfig) -> None:
     cat = app_config.categories.get("family_weekend")
     assert cat.weights["rating"] == 0.30  # from defaults

@@ -89,7 +89,7 @@ def test_client_caches_budgets_and_fails_soft(cache: ResponseCache) -> None:
     assert again == first and ai.stats.calls == 1 and ai.stats.cache_hits == 1
     assert (
         "--model" in fake.calls[0]
-        and fake.calls[0][fake.calls[0].index("--model") + 1] == "claude-opus-5-5"
+        and fake.calls[0][fake.calls[0].index("--model") + 1] == "claude-sonnet-5-5"
     )
     extract_venues(ai, "second")
     extract_venues(ai, "third")  # cost now 1.2 > budget
@@ -293,4 +293,4 @@ def test_doctor_reports_ai(app_config: AppConfig, monkeypatch: pytest.MonkeyPatc
     data["ai"] = {"enabled": True, "claude_bin": "definitely-not-installed-bin"}
     settings.write_text(yaml.safe_dump(data))
     res = runner.invoke(app, ["doctor", "-C", str(app_config.config_dir)])
-    assert res.exit_code == 1 and "not on PATH" in res.output
+    assert res.exit_code == 0 and "not on PATH" in res.output  # warning, not a failure

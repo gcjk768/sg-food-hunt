@@ -102,9 +102,9 @@ class AiTasks(BaseModel):
 
 
 class AiSettings(BaseModel):
-    enabled: bool = False
+    enabled: bool = True
     provider: Literal["claude_cli"] = "claude_cli"
-    model: str = "claude-opus-5-5"
+    model: str = "claude-sonnet-5-5"
     effort: Literal["low", "medium", "high", "xhigh", "max"] = "low"
     claude_bin: str = "claude"
     timeout_seconds: int = 180

@@ -10,7 +10,7 @@ ENV PYTHONUNBUFFERED=1 \
 
 # WITH_CLAUDE=true installs Node and the Claude Code CLI so the optional AI layer (`ai.enabled`)
 # can shell out to `claude -p`. Authenticate with ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN in .env.
-ARG WITH_CLAUDE=false
+ARG WITH_CLAUDE=true
 RUN apt-get update \
     && apt-get install -y --no-install-recommends tzdata ca-certificates curl gnupg \
     && if [ "$WITH_CLAUDE" = "true" ]; then \

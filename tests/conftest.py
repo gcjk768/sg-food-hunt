@@ -130,6 +130,7 @@ def app_config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> AppConfig:
         "exports_dir": str(tmp_path / "data" / "exports"),
         "logs_dir": str(tmp_path / "logs"),
     }
+    settings["ai"] = {"enabled": False}  # tests enable the AI layer explicitly where they need it
     settings["http"].update(
         {
             "min_delay_seconds": 0,

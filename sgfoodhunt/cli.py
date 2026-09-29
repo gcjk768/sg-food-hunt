@@ -391,6 +391,7 @@ def doctor(
 ) -> None:
     """Check config, folders, keys and notification settings before a deployment."""
     problems: list[str] = []
+    warnings: list[str] = []
     notes: list[str] = []
     try:
         config = load_config(config_dir)
@@ -442,8 +443,8 @@ def doctor(
                 f"ai: `{config.settings.ai.claude_bin}` found, model {config.settings.ai.model}, budget ${config.settings.ai.max_budget_usd:.2f}/run"
             )
         else:
-            problems.append(
-                f"ai.enabled is true but `{config.settings.ai.claude_bin}` is not on PATH (npm install -g @anthropic-ai/claude-code)"
+            warnings.append(
+                f"ai.enabled is true but `{config.settings.ai.claude_bin}` is not on PATH; AI tasks fall back to rules (npm install -g @anthropic-ai/claude-code)"
             )
         if not (os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("CLAUDE_CODE_OAUTH_TOKEN")):
             notes.append(
@@ -465,6 +466,8 @@ def doctor(
     if not quiet:
         for line in notes:
             console.print(f"[green]ok[/green]  {line}")
+        for line in warnings:
+            console.print(f"[yellow]--[/yellow]  {line}")
         for line in problems:
             console.print(f"[red]!![/red]  {line}")
         console.print(
