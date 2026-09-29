@@ -10,7 +10,7 @@ services:
     image: sgfoodhunt:latest
     container_name: sgfoodhunt
     restart: unless-stopped
-    env_file: .env                    # API keys, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
+    env_file: .env                    # API keys, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, TELEGRAM_THREAD_ID
     environment:
       TZ: Asia/Singapore
       SGFH_SCHEDULE: "mon 03:17"      # weekly run time (local TZ); "daily 03:17" also works
@@ -22,7 +22,8 @@ services:
       - ./logs:/app/logs
       - ./social_exports:/app/social_exports
       - ./claude-config:/app/claude-config   # Claude CLI login persists here (git ignored)
-      - /volume1/obsidian/MyVault:/app/vault     # CHANGE ME: your Obsidian vault on the NAS
+      - ./vault:/app/vault                   # CHANGE ME: point at your Obsidian vault on the NAS
+    mem_limit: 1536m                  # NAS has 8 GB shared with other stacks
     # The dashboard is optional; uncomment to serve it on port 8501:
     # ports:
     #   - "8501:8501"

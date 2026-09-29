@@ -70,7 +70,7 @@ def test_notify_test_command(app_config: AppConfig, monkeypatch: pytest.MonkeyPa
     monkeypatch.setenv("TELEGRAM_CHAT_ID", "42")
     sent: list[dict] = []  # type: ignore[type-arg]
 
-    def fake_send(token: str, chat_id: str, text: str, client=None) -> None:  # type: ignore[no-untyped-def]
+    def fake_send(token: str, chat_id: str, text: str, client=None, thread_id=None) -> None:  # type: ignore[no-untyped-def]
         sent.append({"token": token, "chat": chat_id, "text": text})
 
     import sgfoodhunt.notify as notify_module
@@ -80,7 +80,7 @@ def test_notify_test_command(app_config: AppConfig, monkeypatch: pytest.MonkeyPa
     assert res.exit_code == 0, res.output
     assert sent and sent[0]["chat"] == "42" and "SG Food Hunt is connected" in sent[0]["text"]
 
-    def failing(token: str, chat_id: str, text: str, client=None) -> None:  # type: ignore[no-untyped-def]
+    def failing(token: str, chat_id: str, text: str, client=None, thread_id=None) -> None:  # type: ignore[no-untyped-def]
         raise httpx.HTTPError("boom")
 
     monkeypatch.setattr(notify_module, "send_telegram", failing)

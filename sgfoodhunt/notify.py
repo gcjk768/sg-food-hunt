@@ -28,17 +28,27 @@ class NotifyResult:
     errors: list[str] = field(default_factory=list)
 
 
-def send_telegram(token: str, chat_id: str, text: str, client: httpx.Client | None = None) -> None:
+def send_telegram(
+    token: str,
+    chat_id: str,
+    text: str,
+    client: httpx.Client | None = None,
+    thread_id: str | None = None,
+) -> None:
     own = client is None
     client = client or httpx.Client(timeout=30)
     try:
         for i in range(0, len(text), TELEGRAM_MAX):
-            chunk = text[i : i + TELEGRAM_MAX]
-            resp = client.post(
-                f"https://api.telegram.org/bot{token}/sendMessage",
-                json={"chat_id": chat_id, "text": chunk, "disable_web_page_preview": True},
-            )
-            resp.raise_for_status()
+            payload: dict[str, Any] = {
+                "chat_id": chat_id,
+                "text": text[i : i + TELEGRAM_MAX],
+                "disable_web_page_preview": True,
+            }
+            if thread_id:
+                payload["message_thread_id"] = int(thread_id)
+            resp = client.post(f"https://api.telegram.org/bot{token}/sendMessage", json=payload)
+            if resp.is_error:  # Telegram's "description" says why (bad chat, bot not in group, ...)
+                raise RuntimeError(f"{resp.status_code} {resp.text[:200]}")
     finally:
         if own:
             client.close()
@@ -79,7 +89,9 @@ def notify(
         token, chat = config.secrets.telegram_bot_token, config.secrets.telegram_chat_id
         if token and chat:
             try:
-                send_telegram(token, chat, text, client=client)
+                send_telegram(
+                    token, chat, text, client=client, thread_id=config.secrets.telegram_thread_id
+                )
                 result.telegram = "sent"
             except Exception as exc:
                 result.errors.append(f"telegram: {exc}")

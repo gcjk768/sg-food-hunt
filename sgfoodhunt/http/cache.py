@@ -92,6 +92,7 @@ class ResponseCache:
         return None
 
     def _paths(self, key: str) -> tuple[Path, Path]:
+        key = key.replace(":", "_")  # "ai:<hash>" keys: ':' is not a legal filename char on Windows
         base = self.dir / "http" / key[:2]
         return base / f"{key}.meta.json", base / f"{key}.body"
 

@@ -263,6 +263,7 @@ class Secrets(BaseModel):
     instagram_business_account_id: str | None = None
     telegram_bot_token: str | None = None
     telegram_chat_id: str | None = None
+    telegram_thread_id: str | None = None  # forum topic id (the last number in a t.me/c/... link)
 
     @classmethod
     def from_env(cls) -> Secrets:
@@ -280,6 +281,7 @@ class Secrets(BaseModel):
             instagram_business_account_id=get("INSTAGRAM_BUSINESS_ACCOUNT_ID"),
             telegram_bot_token=get("TELEGRAM_BOT_TOKEN"),
             telegram_chat_id=get("TELEGRAM_CHAT_ID"),
+            telegram_thread_id=get("TELEGRAM_THREAD_ID"),
         )
 
 

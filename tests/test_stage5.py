@@ -175,6 +175,9 @@ def test_notify_telegram_and_email(app_config: AppConfig, monkeypatch) -> None: 
     client = httpx.Client(transport=httpx.MockTransport(handler))
     send_telegram("123:abc", "42", "x" * 5000, client=client)
     assert len(posts) == 2 and posts[0]["chat_id"] == "42"
+    assert "message_thread_id" not in posts[0]
+    send_telegram("123:abc", "<TELEGRAM_CHAT_ID>", "hi", client=client, thread_id="<THREAD_ID>")
+    assert posts[-1]["message_thread_id"] == 2765
 
     sent: list[Any] = []
 
