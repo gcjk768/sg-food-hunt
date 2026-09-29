@@ -32,8 +32,8 @@ NEWS_PREFIX_RE = re.compile(
 )
 # "Molly Tea is opening at Hillion Mall on 9 October", "Noci opens second outlet at ..." -> name
 NEWS_SUFFIX_RE = re.compile(
-    r"\s+(?:is\s+)?(?:opening|opens|opened|now open|reopens|launches)(?:\s+[a-z]+){0,2}?\s+"
-    r"(?:at|in|on|this|its|a|an|the|with|soon|today)(?:\s.*)?$",
+    r"\s+(?:is\s+)?(?:opening|opens|opened|now open|reopens|launches)"
+    r"(?:(?:\s+[a-z]+){0,2}?\s+(?:at|in|on|this|its|a|an|the|with|soon|today)(?:\s.*)?)?$",
     re.IGNORECASE,
 )
 CJK_RE = re.compile(r"[一-鿿]{2,}")

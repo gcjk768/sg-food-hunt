@@ -66,16 +66,16 @@ async def test_collector_end_to_end(
     assert stats["sources_run"] == ["sethlui"]
     assert stats["sources_skipped"]["google_places"] == "GOOGLE_PLACES_API_KEY is not set"
     assert "tripadvisor" in stats["sources_skipped"]
-    assert (
-        stats["queries"] == 6 and stats["candidates"] == 10
-    )  # 2 venues x 5 query variants (the Chinese one matches no slug)
-    assert stats["candidates_by_source"] == {"sethlui": 10}
+    # 2 venues x 4 queries (the Chinese and "cosy" queries match no slug)
+    assert stats["queries"] == 6 and stats["candidates"] == 8
+    assert stats["candidates_by_source"] == {"sethlui": 8}
     assert stats["requests"] == 7  # 6 searches + 1 relevant article; the rest are cache hits
-    assert stats["cache_hits"] == 4
-    assert run_store.candidate_counts(run.run_id) == {"sethlui": 10}
+    assert stats["cache_hits"] == 3
+    assert run_store.candidate_counts(run.run_id) == {"sethlui": 8}
     rows = list(run_store.iter_candidates(run.run_id))
     assert {r["query"] for r in rows} == set(app_config.categories.get("cafes_date").queries) - {
-        "新加坡 约会 咖啡馆"  # English blog: no slug can match a Chinese query
+        "新加坡 约会 咖啡馆",  # English blog: no slug can match a Chinese query
+        "cosy cafes Singapore couples",  # slug says romantic, not cosy
     }
     events = list(run_store.iter_events(run.run_id))
     assert any("GOOGLE_PLACES_API_KEY" in e["message"] for e in events)
@@ -84,14 +84,14 @@ async def test_collector_end_to_end(
         run_store, run.run_id, app_config.settings.paths.exports_dir
     )
     assert csv_path.read_text().splitlines()[0].startswith("source_key,category_key,query,name")
-    assert len(json.loads(json_path.read_text())) == 10
+    assert len(json.loads(json_path.read_text())) == 8
 
     link = write_run_note(vault, run_store, run, app_config)
     note_path = vault.note_path("Runs", run.run_id)
     text = note_path.read_text()
     assert link.endswith(run.run_id) and text.startswith("---\ntype: run\n")
-    assert "| Tiong Bahru Bakery | 5 |" in text
-    assert "Seth Lui | blog | 10 | ran" in text
+    assert "| Tiong Bahru Bakery | 4 |" in text
+    assert "Seth Lui | blog | 8 | ran" in text
     assert "skipped: GOOGLE_PLACES_API_KEY is not set" in text
     write_home_note(vault, app_config, link)
     home = (vault.root / "Home.md").read_text()
@@ -125,7 +125,7 @@ async def test_collector_dry_run_uses_cache_only(
             http_settings, cache, lambda r: httpx.Response(404), dry_run=True
         ),
     ).collect(["cafes_date"], ["sethlui"])
-    assert run.mode == "dry_run" and run.stats["candidates"] == 10 and run.stats["requests"] == 0
+    assert run.mode == "dry_run" and run.stats["candidates"] == 8 and run.stats["requests"] == 0
     assert len(fake_session.calls) == calls_before
 
 

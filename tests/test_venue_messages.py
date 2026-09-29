@@ -9,7 +9,7 @@ from sgfoodhunt.config import load_config
 from sgfoodhunt.diff import RunDiff, venue_messages
 from sgfoodhunt.notify import send_telegram
 from sgfoodhunt.scrapers.blogs import relevant_article
-from sgfoodhunt.scrapers.html import clean_venue_heading
+from sgfoodhunt.scrapers.html import clean_venue_heading, strip_news_wording
 from sgfoodhunt.storage.runs import RunStore
 
 CONFIG = Path(__file__).resolve().parents[1] / "config"
@@ -121,3 +121,50 @@ def test_stored_names_keep_leading_numbers() -> None:
     assert strip_news_wording("Noci Bakehouse opens second outlet at Orchard Gateway") == (
         "Noci Bakehouse"
     )
+
+
+def test_query_relevance_is_strict() -> None:
+    # a shared generic word ("brunch", "restaurant") is not enough when the query is specific
+    assert not relevant_article(
+        "https://sethlui.com/best-hotel-buffets-champagne-brunch-singapore/",
+        "weekend dim sum brunch Singapore",
+    )
+    assert relevant_article(
+        "https://sethlui.com/best-dim-sum-brunch-singapore/", "weekend dim sum brunch Singapore"
+    )
+    assert not relevant_article(
+        "https://thehoneycombers.com/singapore/best-steak-restaurant-in-singapore/",
+        "new restaurants Singapore 2026",
+    )
+    assert relevant_article(
+        "https://thehoneycombers.com/singapore/new-restaurants-menus-singapore/",
+        "new restaurants Singapore 2026",
+    )
+    assert relevant_article(
+        "https://sethlui.com/most-instagrammable-cafes-singapore/", "instagrammable cafe Singapore"
+    )
+
+
+def test_stale_blog_evidence_pruned(tmp_path: Path) -> None:
+    from sgfoodhunt.dedup.registry import VenueRegistry, prune_blog_evidence
+    from sgfoodhunt.dedup.venue import Evidence, Venue
+
+    config = load_config(CONFIG)
+    reg = VenueRegistry(tmp_path / "venues.json")
+    sidebar = Evidence(
+        "sethlui",
+        "https://sethlui.com/best-mooncakes-singapore-2026/",
+        category_keys=["hawker_family", "zichar_family"],
+        queries=["best hawker centres Singapore", "best zi char Singapore"],
+    )
+    real = Evidence(
+        "sethlui",
+        "https://sethlui.com/best-hawker-centres-food-guide-singapore/",
+        category_keys=["hawker_family", "cafes_date"],
+        queries=["best hawker centres Singapore", "romantic cafes Singapore"],
+    )
+    reg.venues["v1"] = Venue(id="v1", name="X", evidence=[sidebar, real])
+    assert prune_blog_evidence(reg, config) == 1
+    [ev] = reg.venues["v1"].evidence
+    assert ev.queries == ["best hawker centres Singapore"] and ev.category_keys == ["hawker_family"]
+    assert strip_news_wording("ION Orchard Food Opera reopens") == "ION Orchard Food Opera"

@@ -412,6 +412,35 @@ class VenueRegistry:
         return stats
 
 
+def prune_blog_evidence(registry: VenueRegistry, config: AppConfig) -> int:
+    """Re-check stored blog evidence with today's relevance rule. Evidence persists across runs,
+    so articles an older scraper opened for every query (sidebar posts) kept putting hotels in the
+    hawker list. Keeps the queries the article really matches, re-derives its categories from
+    them, and drops evidence that matches none. Returns the number dropped."""
+    from sgfoodhunt.scrapers.blogs import relevant_article
+
+    blogs = {s.key for s in config.sources.sources if s.kind == "blog"}
+    cats_of: dict[str, set[str]] = {}
+    for cat in config.categories.categories:
+        for q in cat.queries:
+            cats_of.setdefault(q, set()).add(cat.key)
+    dropped = 0
+    for venue in registry.venues.values():
+        kept = []
+        for ev in venue.evidence:
+            if ev.source_key in blogs and ev.url and ev.queries:
+                queries = [q for q in ev.queries if relevant_article(ev.url, q)]
+                if not queries:
+                    dropped += 1
+                    continue
+                ev.queries = queries
+                cats = sorted({c for q in queries for c in cats_of.get(q, ())})
+                ev.category_keys = cats or ev.category_keys
+            kept.append(ev)
+        venue.evidence = kept
+    return dropped
+
+
 def build_venues(
     config: AppConfig, rows: Iterable[dict[str, Any]], run_id: str, run_dir: Path
 ) -> tuple[VenueRegistry, MatchStats]:
@@ -422,6 +451,9 @@ def build_venues(
     )
     independent = {s.key for s in config.sources.sources if s.independent}
     stats = registry.ingest(rows, run_id, independent)
+    pruned = prune_blog_evidence(registry, config)
+    if pruned:
+        log.info("dedup: dropped %d blog evidence entries that match none of their queries", pruned)
     registry.save()
     seen = [v for v in registry.venues.values() if v.last_seen_run == run_id]
     write_json(run_dir / "venues.json", [v.to_dict() for v in seen])

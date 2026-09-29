@@ -65,26 +65,52 @@ _GENERIC_WORDS = frozenset(
         "instagrammable",
         "tiktok",
         "viral",
+        "group",
+        "latest",
+        "newly",
+        "opened",
+        "openings",
+        "this",
+        "month",
     ]
 )
+NEWNESS_QUERY_RE = re.compile(r"(?i)(?:^|\s)(?:new|newly|latest|openings?|opened)(?=\s|$)")
+NEWNESS_SLUG_RE = re.compile(
+    r"(?:^|[-/])(?:new|opening|openings|opened|latest|january|february|march|april|may|june|"
+    r"july|august|september|october|november|december|20\d\d)(?=[-/]|$)"
+)
+#: food words every food listicle shares; a match on these alone says nothing about the query
+_FOOD_WORDS = frozenset(["restaurant", "food", "cafe", "place", "spot", "dining", "eat", "eatery"])
 
 
 def _stem(word: str) -> str:
     return word[:-1] if len(word) > 3 and word.endswith("s") else word
 
 
+def _words(text: str) -> set[str]:
+    return {_stem(w) for w in re.findall(r"[a-z]+", text.lower())} - _STEMMED_GENERIC
+
+
+_STEMMED_GENERIC = frozenset(_stem(w) for w in _GENERIC_WORDS)
+
+
 def relevant_article(url: str, query: str) -> bool:
     """A search page also links sidebar/"latest" posts that ignore the query; those came back for
     every query and put the same unrelated article in every category. Keep a link only when its
-    slug names food and shares a meaningful word with the query."""
+    slug names food and matches the query's distinctive words: both of them when it has two or
+    more ("weekend dim sum brunch" needs dim+sum, not just "brunch"), else the one it has."""
     slug = urlsplit(url).path.lower()
     if not FOOD_SLUG_RE.search(slug) or OVERSEAS_SLUG_RE.search(slug):
         return False
-    words = {_stem(w) for w in re.findall(r"[a-z]+", query.lower())} - _GENERIC_WORDS
+    words = _words(query)
     if not words:  # a Chinese query on an English blog: its search can't have matched anything
         return False
-    slug_words = {_stem(w) for w in re.findall(r"[a-z]+", slug)}
-    return bool(words & slug_words) or any(w in slug for w in words if len(w) > 4)
+    if NEWNESS_QUERY_RE.search(query) and not NEWNESS_SLUG_RE.search(slug):
+        return False  # "new restaurants" wants an openings roundup, not an evergreen best-of
+    distinctive = words - _FOOD_WORDS or words  # "instagrammable cafe" -> {"cafe"}
+    slug_words = _words(slug)
+    hits = {w for w in distinctive if w in slug_words or (len(w) > 4 and w in slug)}
+    return len(hits) >= min(2, len(distinctive))
 
 
 DEFAULT_CONTENT_SELECTORS = (
