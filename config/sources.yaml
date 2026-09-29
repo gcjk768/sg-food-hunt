@@ -1,0 +1,313 @@
+# One entry per source. `scraper` names a class registered in sgfoodhunt.scrapers.
+#
+# Fields
+#   key              stable identifier
+#   name             display name
+#   kind             api | booking | aggregator | blog | guide | community | government | review_site
+#   scraper          registered scraper class name
+#   enabled          master switch; disabled sources are never contacted
+#   priority         lower runs first (matches the priority order in the brief)
+#   base_url         used for robots.txt and rate limiting
+#   search_url       template for site search pages; {query} is URL encoded at run time
+#   cache_ttl_hours  raw response reuse window for this source
+#   fetch            static (requests + BeautifulSoup) | browser (Playwright) | api
+#   independent      counts towards the "independent source recommendation" bonus
+#   tos_status       verified_ok | unverified | disallowed. `unverified` sources still run, but
+#                    only after the live robots.txt check passes. `disallowed` sources are skipped
+#                    even if enabled. Review each site's terms yourself before enabling.
+#   notes            legal / practical caveats surfaced by `sgfh sources`
+#   options          scraper specific settings
+sources:
+  - key: google_places
+    name: Google Maps (Places API)
+    kind: api
+    scraper: GooglePlacesScraper
+    enabled: true
+    priority: 10
+    base_url: https://places.googleapis.com
+    fetch: api
+    independent: false
+    tos_status: verified_ok
+    cache_ttl_hours: 72
+    notes: >
+      Official Places API (New). Needs GOOGLE_PLACES_API_KEY. Popular times are not exposed by the
+      official API and are not collected. Review author data is discarded on ingest.
+    options:
+      region_code: SG
+      language_code: en
+      location_bias: {lat: 1.3521, lng: 103.8198, radius_m: 30000}
+      max_pages: 3
+
+  - key: chope
+    name: Chope
+    kind: booking
+    scraper: ChopeScraper
+    enabled: true
+    priority: 20
+    base_url: https://www.chope.co
+    search_url: https://www.chope.co/singapore-restaurants/search?q={query}
+    fetch: browser
+    independent: false
+    tos_status: unverified
+    cache_ttl_hours: 168
+    notes: JavaScript rendered search; runs through Playwright only if robots.txt allows the path.
+
+  - key: quandoo
+    name: Quandoo
+    kind: booking
+    scraper: QuandooScraper
+    enabled: true
+    priority: 21
+    base_url: https://www.quandoo.sg
+    search_url: https://www.quandoo.sg/en/result?destination=singapore&query={query}
+    fetch: static
+    independent: false
+    tos_status: unverified
+    cache_ttl_hours: 168
+
+  - key: tablecheck
+    name: TableCheck
+    kind: booking
+    scraper: TableCheckScraper
+    enabled: true
+    priority: 22
+    base_url: https://www.tablecheck.com
+    search_url: https://www.tablecheck.com/en/singapore/search?q={query}
+    fetch: static
+    independent: false
+    tos_status: unverified
+    cache_ttl_hours: 168
+
+  - key: google_reserve
+    name: Google Reserve
+    kind: booking
+    scraper: GoogleReserveScraper
+    enabled: true
+    priority: 23
+    base_url: https://places.googleapis.com
+    fetch: api
+    independent: false
+    tos_status: verified_ok
+    cache_ttl_hours: 72
+    notes: >
+      Derived from the Places API `reservable` flag and Google Maps URI; Google Maps itself is never
+      scraped. Produces booking links only for venues already found by google_places.
+
+  - key: burpple
+    name: Burpple
+    kind: aggregator
+    scraper: BurppleScraper
+    enabled: true
+    priority: 30
+    base_url: https://www.burpple.com
+    search_url: https://www.burpple.com/search/sg?q={query}
+    fetch: static
+    independent: true
+    tos_status: unverified
+    cache_ttl_hours: 168
+
+  - key: hungrygowhere
+    name: HungryGoWhere
+    kind: aggregator
+    scraper: HungryGoWhereScraper
+    enabled: true
+    priority: 31
+    base_url: https://www.hungrygowhere.com
+    search_url: https://www.hungrygowhere.com/search?q={query}
+    fetch: static
+    independent: true
+    tos_status: unverified
+    cache_ttl_hours: 168
+
+  - key: eatbook
+    name: Eatbook.sg
+    kind: blog
+    scraper: EatbookScraper
+    enabled: true
+    priority: 32
+    base_url: https://eatbook.sg
+    search_url: https://eatbook.sg/?s={query}
+    fetch: static
+    independent: true
+    tos_status: unverified
+    cache_ttl_hours: 336
+
+  - key: sethlui
+    name: Seth Lui
+    kind: blog
+    scraper: SethLuiScraper
+    enabled: true
+    priority: 40
+    base_url: https://sethlui.com
+    search_url: https://sethlui.com/?s={query}
+    fetch: static
+    independent: true
+    tos_status: unverified
+    cache_ttl_hours: 336
+
+  - key: danielfooddiary
+    name: Daniel Food Diary
+    kind: blog
+    scraper: DanielFoodDiaryScraper
+    enabled: true
+    priority: 41
+    base_url: https://danielfooddiary.com
+    search_url: https://danielfooddiary.com/?s={query}
+    fetch: static
+    independent: true
+    tos_status: unverified
+    cache_ttl_hours: 336
+
+  - key: misstamchiak
+    name: Miss Tam Chiak
+    kind: blog
+    scraper: MissTamChiakScraper
+    enabled: true
+    priority: 42
+    base_url: https://www.misstamchiak.com
+    search_url: https://www.misstamchiak.com/?s={query}
+    fetch: static
+    independent: true
+    tos_status: unverified
+    cache_ttl_hours: 336
+
+  - key: timeout
+    name: Time Out Singapore
+    kind: blog
+    scraper: TimeOutScraper
+    enabled: true
+    priority: 43
+    base_url: https://www.timeout.com
+    search_url: https://www.timeout.com/singapore/search?q={query}
+    fetch: static
+    independent: true
+    tos_status: unverified
+    cache_ttl_hours: 336
+
+  - key: honeycombers
+    name: Honeycombers
+    kind: blog
+    scraper: HoneycombersScraper
+    enabled: true
+    priority: 44
+    base_url: https://thehoneycombers.com
+    search_url: https://thehoneycombers.com/singapore/?s={query}
+    fetch: static
+    independent: true
+    tos_status: unverified
+    cache_ttl_hours: 336
+
+  - key: thesmartlocal
+    name: The Smart Local
+    kind: blog
+    scraper: TheSmartLocalScraper
+    enabled: true
+    priority: 45
+    base_url: https://thesmartlocal.com
+    search_url: https://thesmartlocal.com/?s={query}
+    fetch: static
+    independent: true
+    tos_status: unverified
+    cache_ttl_hours: 336
+
+  - key: sassymama
+    name: Sassy Mama Singapore
+    kind: blog
+    scraper: SassyMamaScraper
+    enabled: true
+    priority: 46
+    base_url: https://www.sassymamasg.com
+    search_url: https://www.sassymamasg.com/?s={query}
+    fetch: static
+    independent: true
+    tos_status: unverified
+    cache_ttl_hours: 336
+    options:
+      groups: [family]          # only run for family categories
+
+  - key: tatler
+    name: Tatler Dining Singapore
+    kind: blog
+    scraper: TatlerDiningScraper
+    enabled: true
+    priority: 47
+    base_url: https://www.tatlerasia.com
+    search_url: https://www.tatlerasia.com/search?q={query}&section=dining
+    fetch: static
+    independent: true
+    tos_status: unverified
+    cache_ttl_hours: 336
+
+  - key: michelin
+    name: Michelin Guide Singapore
+    kind: guide
+    scraper: MichelinScraper
+    enabled: true
+    priority: 50
+    base_url: https://guide.michelin.com
+    fetch: static
+    independent: true
+    tos_status: unverified
+    cache_ttl_hours: 720
+    notes: Crawls the Singapore selection listing (stars and Bib Gourmand); not query driven.
+    options:
+      listing_url: https://guide.michelin.com/sg/en/selection/singapore/restaurants
+      max_pages: 20
+
+  - key: reddit
+    name: Reddit (r/singapore, r/singaporeeats)
+    kind: community
+    scraper: RedditScraper
+    enabled: true
+    priority: 60
+    base_url: https://oauth.reddit.com
+    fetch: api
+    independent: true
+    tos_status: verified_ok
+    cache_ttl_hours: 168
+    notes: >
+      Official API with OAuth client credentials. Usernames are never stored; only thread titles,
+      URLs and extracted venue candidates. Needs REDDIT_CLIENT_ID / REDDIT_CLIENT_SECRET.
+    options:
+      subreddits: [singaporeeats, singapore]
+      max_threads_per_query: 10
+      max_comments_per_thread: 100
+      time_filter: year
+
+  - key: sfa
+    name: Singapore Food Agency hygiene grades
+    kind: government
+    scraper: SfaHygieneScraper
+    enabled: true
+    priority: 70
+    base_url: https://api-open.data.gov.sg
+    fetch: api
+    independent: false
+    tos_status: verified_ok
+    cache_ttl_hours: 720
+    notes: >
+      Uses the data.gov.sg open data API (Singapore Open Data Licence). The dataset id below must
+      point at a current SFA/NEA "eating establishments" dataset that carries a grade column; if the
+      dataset is retired the scraper logs a warning and yields nothing.
+    options:
+      dataset_id: d_1234567890abcdef_replace_me
+      name_column: licensee_name
+      address_column: premises_address
+      postal_column: postal_code
+      grade_column: grade
+
+  - key: tripadvisor
+    name: TripAdvisor
+    kind: review_site
+    scraper: TripAdvisorScraper
+    enabled: false
+    priority: 80
+    base_url: https://www.tripadvisor.com.sg
+    search_url: https://www.tripadvisor.com.sg/Search?q={query}&geo=294265
+    fetch: static
+    independent: true
+    tos_status: disallowed
+    cache_ttl_hours: 168
+    notes: >
+      TripAdvisor's terms prohibit automated access without a Content API licence. Disabled and marked
+      disallowed until you hold a licence; set tos_status to verified_ok and enabled to true to run it.

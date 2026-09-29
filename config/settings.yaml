@@ -1,0 +1,62 @@
+# Global settings. Secrets never go here; they live in .env (see .env.example).
+home:
+  postal_code: "520123"          # CHANGE ME: used for driving distance / travel time (stage 3)
+
+paths:
+  # Everything is plain files so the project can live on a NAS share (no SQLite, no locks).
+  vault_dir: vault                # CHANGE ME: path to your Obsidian vault (absolute or relative)
+  vault_folder: SG Food Hunt      # subfolder inside the vault that this tool owns
+  data_dir: data                  # machine state: runs/, cache/ (JSON and JSONL files)
+  cache_dir: data/cache
+  exports_dir: data/exports       # CSV / JSON exports
+  logs_dir: logs
+
+http:
+  user_agent: "sgfoodhunt/0.1 (+https://github.com/gcjk768/SG-Cafe-Food-Hunt; personal research crawler; respects robots.txt)"
+  min_delay_seconds: 2.0          # polite delay between requests to the same domain
+  max_delay_seconds: 5.0
+  timeout_seconds: 30
+  max_retries: 4
+  backoff_base_seconds: 1.5       # exponential backoff: base * 2**attempt, capped below
+  backoff_max_seconds: 60
+  robots_cache_ttl_hours: 168     # robots.txt is re-fetched weekly
+  respect_robots: true
+  default_cache_ttl_hours: 168    # raw responses are reused for a week unless the source overrides
+
+api_rate_limits:                  # requests per minute per API (official APIs only)
+  google_places: 60
+  reddit: 30
+  data_gov_sg: 60
+
+scoring:                          # global parameters; per-category weights live in categories.yaml
+  bayesian_prior_reviews: 100     # C in the Bayesian average
+  bayesian_prior_rating: 4.2      # m in the Bayesian average
+  recommendation_half_life_months: 18
+  recommendation_stale_after_years: 4
+  michelin_bonus: 0.03
+  multi_source_bonus: 0.03        # applied when >= multi_source_threshold independent sources
+  multi_source_threshold: 3
+  declining_trend_penalty: 0.05
+  poor_hygiene_penalty: 0.10      # SFA grade C or worse
+  temporarily_closed_penalty: 0.50
+  buzz_bonus_max: 0.05            # social buzz can add at most 5% of the total score
+  personal_rating_weight: 0.15
+
+social:
+  enabled: false
+  exports_dir: social_exports
+  buzz_window_months: 6
+  buzz_half_life_days: 60
+  trending_threshold: 5
+  hashtags: []                    # max 25, only used with an Instagram Business token
+  serp_sites: ["instagram.com", "tiktok.com"]
+
+exports:
+  google_sheets: false
+  csv: true
+  json: true
+
+notifications:
+  telegram: false
+  email: false
+  rating_change_threshold: 0.2

@@ -1,0 +1,5 @@
+{"success":true,"result":{"total":3,"records":[
+{"_id":1,"licensee_name":"KENG ENG KEE SEAFOOD","premises_address":"124 BUKIT MERAH LANE 1 #01-136","postal_code":"150124","grade":"A"},
+{"_id":2,"licensee_name":"Tiong Bahru Bakery","premises_address":"56 ENG HOON STREET #01-70","postal_code":"160056","grade":"B"},
+{"_id":3,"licensee_name":"","premises_address":"x","postal_code":"","grade":"C"}
+]}}

@@ -1,0 +1,192 @@
+# SG Food Hunt
+
+Collects, ranks and keeps fresh a list of dining venues in Singapore for dates and family
+occasions, and writes the results into an Obsidian vault. Everything is plain files (JSON,
+JSONL, Markdown) so the project can live on a NAS share. There is no database.
+
+**Status: stage 1 of 5 (sources and storage).** See [docs/DESIGN.md](docs/DESIGN.md) for the
+full outline, config schema and storage schema, and the stage plan at the bottom of this file.
+
+## Setup
+
+```bash
+git clone https://github.com/gcjk768/SG-Cafe-Food-Hunt.git
+cd SG-Cafe-Food-Hunt
+python3.11 -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"            # add ,browser for Playwright, ,dashboard for Streamlit
+cp .env.example .env               # fill in keys; .env is git ignored
+```
+
+Edit `config/settings.yaml`:
+
+- `home.postal_code`: your home postal code (driving distance, stage 3)
+- `paths.vault_dir`: the path of your Obsidian vault (absolute path on the NAS is fine)
+- `paths.vault_folder`: the subfolder inside the vault the tool owns (default `SG Food Hunt`)
+
+Then:
+
+```bash
+sgfh init                          # creates data/, logs/, the vault folder, Home.md, Sources.md
+sgfh sources                       # what will run and why
+sgfh categories                    # the 15 categories and their query variants
+sgfh run                           # full collection run (stage 1)
+sgfh run -c zichar_family -s sethlui -s michelin   # one category, two sources
+sgfh run --dry-run                 # cached responses only, no network
+sgfh runs                          # list past runs
+sgfh show <run_id>                 # per source counts and sample candidates
+sgfh cache stats | sgfh cache purge
+```
+
+`--diff-only` and `--social-only` are wired in the CLI and arrive with stages 5 and 4.
+`--hide-visited` is accepted now and applies to ranked outputs from stage 2.
+
+### Keys
+
+| variable | used by | how to get it |
+| --- | --- | --- |
+| `GOOGLE_PLACES_API_KEY` | Google Maps via Places API (New) | Google Cloud console, enable "Places API (New)", restrict the key to it |
+| `REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET`, `REDDIT_USER_AGENT` | Reddit | reddit.com/prefs/apps, "script" app; user agent like `sgfoodhunt/0.1 by u/yourname` |
+
+Without a key the source is skipped and the run note says so. Blogs, Michelin and the booking
+platforms need no keys.
+
+## What a run produces
+
+```
+data/runs/<run_id>/run.json          manifest and stats
+data/runs/<run_id>/raw/<source>.jsonl raw sightings, one per (source, query, venue)
+data/runs/<run_id>/pages.jsonl        every page that produced evidence, with publication date
+data/runs/<run_id>/events.jsonl       warnings, skipped sources, errors
+data/exports/<run_id>/raw_candidates.{csv,json}
+logs/<timestamp>-run.jsonl            structured per run log
+<vault>/SG Food Hunt/Runs/<run_id>.md run note: sources, categories, most surfaced names, warnings
+<vault>/SG Food Hunt/Home.md, Sources.md
+```
+
+From stage 2 the vault also gets `Venues/<Venue>.md` (one note per venue, data in frontmatter
+properties) and `Categories/<Category>.md` (top 15 and full ranking). Your edits to a venue note
+survive regeneration: the properties `status` (`visited` | `wishlist` | `excluded`),
+`my_rating`, `my_comment`, `tags`, and any section whose heading starts with `## My`.
+
+## Adding a category
+
+Add an entry to `config/categories.yaml`. No code changes are needed.
+
+```yaml
+  - key: supper_date
+    display_name: Best late night supper spots for a date
+    group: dating              # dating | family | general (picks the keyword lexicon)
+    party_size: 2
+    queries:
+      - "best late night supper Singapore"
+      - "新加坡 宵夜 推荐"
+    keywords: ["supper", "late night"]
+    weights: {ambience: 0.15, quiet: 0.05}   # merged over defaults, normalised at run time
+    hard_filters: {open_weekends: true}
+```
+
+## Adding a source
+
+1. Add an entry to `config/sources.yaml` with `scraper` naming a class in
+   `sgfoodhunt/scrapers/__init__.py`'s registry.
+2. For a WordPress style blog, a subclass of `ListicleBlogScraper` with an `article_pattern`
+   regex is usually all that is needed (or just set `options.article_pattern` and
+   `options.content_selectors` in YAML on an existing class).
+3. For a site with result cards, subclass `CardSearchScraper` and set `default_selectors`;
+   JSON-LD `Restaurant` data is used automatically when present. Selectors can be overridden per
+   site from YAML with `options.selectors`.
+4. For an API, subclass `BaseScraper`, use `self.ctx.api_factory(...)` for an `AsyncApiClient`,
+   and implement `missing_credentials()`.
+5. Save a fixture under `tests/fixtures/` and add a test; every parser is tested offline.
+
+Set `tos_status` honestly. `disallowed` sources never run. `unverified` sources run only after
+the live robots.txt check passes.
+
+## Ranking (stage 2; the formula is documented now so the config is stable)
+
+For each category, every venue gets a score in `[0, 1]`:
+
+```
+score = Σ_c  w_c · component_c            (weights from categories.yaml, normalised)
+      + michelin_bonus                    (if any Michelin distinction)
+      + multi_source_bonus                (if ≥ multi_source_threshold independent sources)
+      + min(buzz_bonus_max, buzz)         (social buzz, capped at 5% by default)
+      − declining_trend_penalty           (rating trend = declining)
+      − poor_hygiene_penalty              (SFA grade C or worse)
+      − temporarily_closed_penalty        (business status CLOSED_TEMPORARILY)
+closed permanently → excluded; hard filters → excluded; status: excluded → excluded
+personal blend: score = (1 − p) · score + p · my_rating / 5    (p = personal_rating_weight)
+```
+
+Components:
+
+- `rating`: Bayesian average `(C·m + n·r) / (C + n)` scaled to `[0, 1]`, with `C =
+  bayesian_prior_reviews` and `m = bayesian_prior_rating`, so 4.9 with 12 reviews does not beat
+  4.6 with 2,000.
+- `recommendations`: Σ over independent sources of `0.5^(age_months / half_life)`, with anything
+  older than `recommendation_stale_after_years` weighted at 0.05, normalised by the category's
+  best venue.
+- `keyword_match`: category keyword mentions in review text and articles, log scaled.
+- `food`, `service`, `ambience`, `value`: aspect sentiment scores from review text.
+- `space`, `kid_friendly`, `parking`, `weekend_open`, `quiet`: 0/1 flags (or graded where the
+  data allows, e.g. parking own carpark 1.0, public nearby 0.7, street 0.4, none 0).
+
+Tune the weights per category in `config/categories.yaml` and the global constants under
+`scoring` in `config/settings.yaml`.
+
+## Scheduling
+
+Weekly cron on the NAS (see `scripts/cron.example`):
+
+```
+17 3 * * 1  cd /volume1/SG-Cafe-Food-Hunt && .venv/bin/sgfh run >> logs/cron.log 2>&1
+```
+
+A GitHub Actions weekly workflow and Telegram/email notification of the diff arrive with stage 5.
+
+## Politeness, legal and ethical notes
+
+- robots.txt is fetched, cached for a week and obeyed for every static page and browser fetch.
+  A 401/403 on robots.txt is treated as "disallow everything". `Crawl-delay` is honoured.
+- Every request waits a random 2–5 s per domain, identifies itself with a descriptive
+  `User-Agent`, and retries with exponential backoff only on transient errors.
+- Raw responses are cached with an expiry so reruns skip unchanged pages.
+- **No personal data is stored** (PDPA): review author names, profile links, Reddit usernames,
+  commenter data and photo attributions are dropped on ingest. Only ratings, dates and short
+  anonymised snippets (≤ 300 characters) are kept.
+- **Google Maps** is only accessed through the official Places API. Popular times are not in the
+  official API and are not collected. Google Reserve links are not discoverable without scraping
+  Google Maps, so the tool records the `reservable` flag and the Google Maps listing link instead.
+- **Instagram and TikTok** are never scraped. Social signals (stage 4) come only from your own
+  data exports, the public TikTok oEmbed endpoint, a SERP API, and the official Instagram Hashtag
+  Search API.
+- **TripAdvisor** is disabled and marked `disallowed`: its terms prohibit automated access
+  without a Content API licence.
+- **Burpple, HungryGoWhere, Chope, Quandoo, TableCheck, the blogs, Michelin**: their terms were
+  not verified from the build environment (outbound access to those hosts was blocked). They
+  ship as `tos_status: unverified`: review each site's terms yourself before your first live
+  run, and set `disallowed` for any that forbid crawling. Parsers were written against saved
+  fixtures, so a live page may need selector updates; a source that parses nothing logs a
+  warning in the run note rather than failing.
+- **SFA hygiene grades** use data.gov.sg under the Singapore Open Data Licence; set
+  `options.dataset_id` in `sources.yaml` to the current dataset (the placeholder is skipped).
+- Blog text is never copied into outputs beyond short snippets; summaries (stage 3) are
+  generated in the tool's own words.
+
+## Development
+
+```bash
+ruff check . && ruff format --check .
+mypy
+pytest
+```
+
+CI runs the same three on every push (`.github/workflows/ci.yml`).
+
+## Stage plan
+
+1. Sources and storage (this release)
+2. Normalisation, dedup, scoring, venue and category notes
+3. Enrichment (OneMap, MRT, driving time, parking) and review analysis
+4. Social buzz module (exports, oEmbed, SERP, hashtag API)
+5. Diff report, notifications, Streamlit dashboard, weekly workflow, Sheets export

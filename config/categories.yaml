@@ -1,0 +1,262 @@
+# One entry per category. Adding a category = adding an entry here; no code change needed.
+#
+# Fields
+#   key            stable identifier used in the database and file names
+#   display_name   human label
+#   group          dating | family | general   (drives default keyword lexicons and summaries)
+#   party_size     assumed head count for the bill estimate
+#   queries        search query variants; every variant is run against every enabled source
+#   keywords       review keywords counted for this category (in addition to the group lexicon)
+#   weights        ranking component weights; they are normalised at run time so they need not sum to 1
+#   hard_filters   venues failing a hard filter are excluded from this category's ranking
+#                  (exclude_closed, open_weekends, requires_private_room, halal_only,
+#                   max_price_level, opened_within_months)
+#
+# Weight component names (see README "Ranking"):
+#   rating, recommendations, ambience, service, food, value, space, kid_friendly,
+#   parking, weekend_open, quiet, keyword_match, michelin
+defaults:
+  weights:
+    rating: 0.30
+    recommendations: 0.30
+    keyword_match: 0.10
+    food: 0.10
+    service: 0.05
+    value: 0.05
+    ambience: 0.05
+    space: 0.00
+    kid_friendly: 0.00
+    parking: 0.00
+    weekend_open: 0.05
+    quiet: 0.00
+  hard_filters:
+    exclude_closed: true
+  group_keywords:
+    dating: ["romantic", "date night", "date", "anniversary", "cosy", "cozy", "intimate", "couple", "proposal", "valentine"]
+    family: ["family", "kids", "children", "elderly", "grandparents", "parents", "birthday", "reunion", "gathering", "toddler", "high chair"]
+    general: ["new", "newly opened", "just opened", "opening", "opened", "latest", "soft launch", "新开", "新店"]
+
+categories:
+  - key: cafes_date
+    display_name: Best cafes for a date
+    group: dating
+    party_size: 2
+    queries:
+      - "best cafes for a date Singapore"
+      - "romantic cafes Singapore"
+      - "cosy cafes Singapore couples"
+      - "instagrammable cafe Singapore"
+      - "tiktok viral cafe Singapore"
+      - "新加坡 约会 咖啡馆"
+    keywords: ["coffee", "latte", "quiet corner"]
+    weights: {ambience: 0.20, service: 0.10, quiet: 0.10, space: 0.0, value: 0.05}
+    hard_filters: {open_weekends: true}
+
+  - key: restaurants_date
+    display_name: Best restaurants for a date
+    group: dating
+    party_size: 2
+    queries:
+      - "best restaurants for a date night Singapore"
+      - "romantic restaurants Singapore"
+      - "anniversary dinner restaurants Singapore"
+      - "best fine dining for couples Singapore"
+      - "instagrammable restaurant Singapore"
+      - "新加坡 浪漫 餐厅"
+    keywords: ["wine", "tasting menu", "candlelight", "view"]
+    weights: {ambience: 0.20, service: 0.15, quiet: 0.10, food: 0.15}
+    hard_filters: {}
+
+  - key: family_occasion
+    display_name: Best restaurants or buffets for a family occasion
+    group: family
+    party_size: 6
+    queries:
+      - "best restaurants for family celebration Singapore"
+      - "best buffets for birthday celebration Singapore"
+      - "reunion dinner restaurants Singapore"
+      - "restaurants for elderly parents Singapore"
+      - "best anniversary dinner with family Singapore"
+      - "新加坡 团圆饭 餐厅"
+      - "新加坡 家庭聚餐 自助餐"
+    keywords: ["buffet", "celebration", "cake", "big group"]
+    weights: {space: 0.15, kid_friendly: 0.05, parking: 0.10, value: 0.10, service: 0.10}
+    hard_filters: {open_weekends: true}
+
+  - key: family_weekend
+    display_name: Best restaurants for a family weekend meal
+    group: family
+    party_size: 4
+    queries:
+      - "best family restaurants Singapore weekend"
+      - "kid friendly restaurants Singapore"
+      - "family friendly restaurants with playground Singapore"
+      - "best restaurants for family lunch Singapore"
+      - "新加坡 亲子 餐厅"
+    keywords: ["playground", "kids menu", "high chair", "stroller"]
+    weights: {space: 0.10, kid_friendly: 0.15, parking: 0.10, value: 0.15, weekend_open: 0.10}
+    hard_filters: {open_weekends: true}
+
+  - key: zichar_family
+    display_name: Best zi char places for a family weekend meal
+    group: family
+    party_size: 5
+    queries:
+      - "best zi char Singapore"
+      - "best zichar restaurants Singapore family"
+      - "cze char Singapore"
+      - "best tze char Singapore"
+      - "新加坡 煮炒 推荐"
+      - "新加坡 最好 煮炒"
+    keywords: ["zi char", "zichar", "tze char", "cze char", "煮炒", "cereal prawn", "chilli crab", "har cheong gai"]
+    weights: {food: 0.20, value: 0.20, space: 0.10, parking: 0.10, ambience: 0.0, weekend_open: 0.10}
+    hard_filters: {open_weekends: true}
+
+  - key: brunch_date
+    display_name: Best brunch cafes for a weekend date
+    group: dating
+    party_size: 2
+    queries:
+      - "best brunch cafes Singapore"
+      - "best weekend brunch Singapore couples"
+      - "brunch spots Singapore date"
+      - "tiktok viral brunch Singapore"
+      - "新加坡 早午餐 咖啡馆"
+    keywords: ["brunch", "eggs benedict", "pancakes", "weekend"]
+    weights: {ambience: 0.15, food: 0.15, service: 0.10, weekend_open: 0.15}
+    hard_filters: {open_weekends: true}
+
+  - key: rooftop_waterfront_date
+    display_name: Best rooftop or waterfront bars and restaurants for a date
+    group: dating
+    party_size: 2
+    queries:
+      - "best rooftop bars Singapore date"
+      - "best waterfront restaurants Singapore"
+      - "restaurants with a view Singapore romantic"
+      - "rooftop restaurants Singapore couples"
+      - "新加坡 天台 酒吧"
+      - "新加坡 海边 餐厅 浪漫"
+    keywords: ["rooftop", "waterfront", "view", "skyline", "sunset", "marina", "riverside"]
+    weights: {ambience: 0.30, service: 0.10, quiet: 0.05, food: 0.05}
+    hard_filters: {}
+
+  - key: dimsum_family
+    display_name: Best dim sum restaurants for a family weekend meal
+    group: family
+    party_size: 5
+    queries:
+      - "best dim sum Singapore"
+      - "best dim sum restaurants Singapore family"
+      - "weekend dim sum brunch Singapore"
+      - "新加坡 点心 推荐"
+      - "新加坡 最好 点心 餐厅"
+    keywords: ["dim sum", "点心", "siew mai", "har gow", "char siew bao", "yum cha"]
+    weights: {food: 0.20, value: 0.15, space: 0.10, parking: 0.05, weekend_open: 0.10}
+    hard_filters: {open_weekends: true}
+
+  - key: steamboat_family
+    display_name: Best steamboat, hotpot or mookata places for a family gathering
+    group: family
+    party_size: 6
+    queries:
+      - "best steamboat Singapore family"
+      - "best hotpot restaurants Singapore"
+      - "best mookata Singapore"
+      - "hotpot buffet Singapore group"
+      - "新加坡 火锅 推荐"
+      - "新加坡 最好 火锅"
+    keywords: ["steamboat", "hotpot", "hot pot", "mookata", "火锅", "soup base", "free flow"]
+    weights: {food: 0.15, value: 0.20, space: 0.15, parking: 0.05, weekend_open: 0.05}
+    hard_filters: {open_weekends: true}
+
+  - key: hawker_family
+    display_name: Best hawker centres and food courts for a casual family meal
+    group: family
+    party_size: 4
+    queries:
+      - "best hawker centres Singapore"
+      - "best food courts Singapore family"
+      - "hawker centre with parking Singapore"
+      - "best hawker centres for families Singapore"
+      - "新加坡 小贩中心 推荐"
+    keywords: ["hawker", "food court", "kopitiam", "stalls", "小贩"]
+    weights: {food: 0.15, value: 0.30, space: 0.10, parking: 0.15, ambience: 0.0, service: 0.0}
+    hard_filters: {}
+
+  - key: hightea_dessert_date
+    display_name: Best high tea or dessert cafes for a date
+    group: dating
+    party_size: 2
+    queries:
+      - "best high tea Singapore"
+      - "best afternoon tea Singapore couples"
+      - "best dessert cafes Singapore date"
+      - "instagrammable dessert cafe Singapore"
+      - "新加坡 下午茶 推荐"
+      - "新加坡 甜品 咖啡馆"
+    keywords: ["high tea", "afternoon tea", "dessert", "scones", "cake", "pastry"]
+    weights: {ambience: 0.20, service: 0.10, food: 0.10, quiet: 0.05}
+    hard_filters: {}
+
+  - key: private_room_family
+    display_name: Best restaurants with private rooms for a family celebration
+    group: family
+    party_size: 8
+    queries:
+      - "restaurants with private rooms Singapore"
+      - "private dining rooms Singapore family celebration"
+      - "restaurants with private room for birthday Singapore"
+      - "新加坡 包厢 餐厅"
+      - "新加坡 私人 包间 餐厅 生日"
+    keywords: ["private room", "private dining", "包厢", "包间", "function room"]
+    weights: {space: 0.25, service: 0.10, parking: 0.10, food: 0.10, value: 0.05}
+    hard_filters: {open_weekends: true, requires_private_room: true}
+
+  # --- "what's new" categories: recency matters more than review volume, so the rating weight
+  # is lowered and recommendations (recent articles) raised. opened_within_months keeps only
+  # venues whose earliest evidence (article date, first Google review, first seen by this tool)
+  # falls inside the window; tune it as you like.
+  - key: new_cafes
+    display_name: Newly opened cafes
+    group: general
+    party_size: 2
+    queries:
+      - "new cafes Singapore 2026"
+      - "newly opened cafes Singapore"
+      - "new cafe openings Singapore this month"
+      - "latest cafes to check out Singapore"
+      - "tiktok viral new cafe Singapore"
+      - "新加坡 新开 咖啡馆"
+    keywords: ["cafe", "coffee", "brunch"]
+    weights: {rating: 0.15, recommendations: 0.40, keyword_match: 0.15, ambience: 0.10, food: 0.10}
+    hard_filters: {opened_within_months: 12}
+
+  - key: new_restaurants
+    display_name: Newly opened restaurants
+    group: general
+    party_size: 2
+    queries:
+      - "new restaurants Singapore 2026"
+      - "newly opened restaurants Singapore"
+      - "new restaurant openings Singapore this month"
+      - "best new restaurants Singapore"
+      - "instagrammable new restaurant Singapore"
+      - "新加坡 新开 餐厅"
+    keywords: ["restaurant", "tasting menu", "chef"]
+    weights: {rating: 0.15, recommendations: 0.40, keyword_match: 0.15, food: 0.15, service: 0.05}
+    hard_filters: {opened_within_months: 12}
+
+  - key: new_zichar
+    display_name: Newly opened zi char places
+    group: general
+    party_size: 4
+    queries:
+      - "new zi char Singapore 2026"
+      - "newly opened zi char Singapore"
+      - "new zichar stall Singapore"
+      - "new tze char Singapore"
+      - "新加坡 新开 煮炒"
+    keywords: ["zi char", "zichar", "tze char", "cze char", "煮炒", "hor fun", "cereal prawn"]
+    weights: {rating: 0.15, recommendations: 0.40, keyword_match: 0.15, food: 0.20, value: 0.10}
+    hard_filters: {opened_within_months: 12}
