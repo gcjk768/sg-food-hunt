@@ -10,7 +10,7 @@ Pipeline: scrape (`sgfoodhunt/scrapers/`) → dedup (`sgfoodhunt/dedup/registry.
 `Dockerfile` + `docker-compose.yml`; `docker/entrypoint.sh` (`serve` = weekly scheduler, default `mon 03:17` SGT). State in bind mounts: `config/ data/ logs/ vault/ social_exports/ claude-config/`. `.gitattributes` forces LF on `*.sh` so Windows builds work.
 
 ## Sources (live status 2026-09-29)
-Working: Eatbook, Honeycombers, The Smart Local, Sassy Mama (family only), Seth Lui, Miss Tam Chiak, Burpple. Need keys: Google Places (`GOOGLE_PLACES_API_KEY`, best single source), Reddit. SFA needs a real `dataset_id`. Everything else is disabled in `config/sources.yaml` with the reason next to it — re-check those before re-enabling.
+Working: Eatbook, Honeycombers, The Smart Local, Sassy Mama (family only), Seth Lui, Miss Tam Chiak, Burpple. Google Places/Reserve disabled by choice (paid API; ~370 req/month at `max_pages: 1` would fit the free cap if ever wanted). Reddit needs keys. SFA needs a real `dataset_id`. Everything else is disabled in `config/sources.yaml` with the reason next to it — re-check those before re-enabling.
 
 ## Telegram
 `.env`: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID=<TELEGRAM_CHAT_ID>` (the owner Channel), `TELEGRAM_THREAD_ID=<THREAD_ID>` (topic "Food Hunt"; 2765 is the recipe bot's "Recipe" topic) → `message_thread_id` in `sgfoodhunt/notify.py`. Needs `notifications.telegram: true` in `config/settings.yaml`. Test: `docker compose run --rm sgfoodhunt notify-test`.

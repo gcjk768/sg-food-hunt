@@ -50,6 +50,7 @@ async def test_collector_end_to_end(
     vault: Vault,
 ) -> None:
     _wire_blog(app_config, fake_session)
+    app_config.sources.get("google_places").enabled = True  # shipped off; test the no-key path
     cache = ResponseCache(app_config.settings.paths.cache_dir)
     http = PoliteClient(http_settings, cache, session=fake_session, sleep=lambda _s: None)
     factory = MockApiFactory(http_settings, cache, lambda r: httpx.Response(404))

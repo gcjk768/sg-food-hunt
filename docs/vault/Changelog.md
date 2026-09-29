@@ -5,6 +5,7 @@ updated: 2026-09-29
 # Changelog
 
 ## 2026-09-29 (live-run fixes)
+- chore: Google Places + Reserve disabled (owner skipped the paid API).
 - fix: container-written files were 0600 root (tempfile.mkstemp) → vault notes unreadable in Obsidian; `sgfoodhunt/http/cache.py` now applies umask perms, `docker/entrypoint.sh` sets `umask 000`.
 - fix: Seth Lui (Elementor) had no content container → `.elementor-widget-theme-post-content` in `sgfoodhunt/scrapers/blogs.py`; search links scoped to `.e-loop-item`.
 - fix: single-venue "Name: address | Tel | Hours" headings now parsed (`sgfoodhunt/scrapers/html.py`).

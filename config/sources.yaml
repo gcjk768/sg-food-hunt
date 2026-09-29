@@ -22,7 +22,7 @@ sources:
     name: Google Maps (Places API)
     kind: api
     scraper: GooglePlacesScraper
-    enabled: true
+    enabled: false             # 2026-09-29: owner opted out (paid API, needs billing); re-enable with GOOGLE_PLACES_API_KEY
     priority: 10
     base_url: https://places.googleapis.com
     fetch: api
@@ -82,7 +82,7 @@ sources:
     name: Google Reserve
     kind: booking
     scraper: GoogleReserveScraper
-    enabled: true
+    enabled: false             # 2026-09-29: owner opted out (paid API, needs billing); re-enable with GOOGLE_PLACES_API_KEY
     priority: 23
     base_url: https://places.googleapis.com
     fetch: api
