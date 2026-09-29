@@ -51,7 +51,7 @@ async def test_blog_scraper_extracts_venues(make_scraper, fake_session: FakeSess
         "text": "7.30am to 8pm daily Tel: +65 6220 3430"[:120]
     } or "7.30am" in str(tbb.opening_hours)
     assert result.candidates[1].name_zh == "琼荣记海鲜"
-    assert len(result.pages) == 3 and result.requests_made == 3
+    assert len(result.pages) == 2 and result.requests_made == 2  # off-query hawker guide skipped
     assert not any("no article links" in w for w in result.warnings)
 
 

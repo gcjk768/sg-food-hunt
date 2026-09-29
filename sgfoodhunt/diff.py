@@ -273,3 +273,52 @@ def diff_plain_text(diff: RunDiff, title: str = "SG Food Hunt weekly diff") -> s
         md.replace("**", "").replace("`", "").replace("▲", "+").replace("▼", "-").replace("→", "->")
     )
     return f"{title} ({diff.run_id})\n\n{text}"
+
+
+def _card(v: dict[str, Any], tops: list[tuple[int, str]]) -> str:
+    name = v["name"] + (f" ({v['name_zh']})" if v.get("name_zh") else "")
+    lines = [f"🍽 {name}"]
+    ranked = sorted(tops)
+    lines += [f"#{rank} · {label}" for rank, label in ranked[:3]]
+    if len(ranked) > 3:
+        lines.append(f"…and top 3 in {len(ranked) - 3} more lists")
+    where = v.get("address") or v.get("district") or v.get("region")
+    if where:
+        mrt = f" · near {v['nearest_mrt']} MRT" if v.get("nearest_mrt") else ""
+        lines.append(f"📍 {where}{mrt}")
+    g = (v.get("ratings") or {}).get("google_places") or {}
+    facts = [
+        ", ".join(v.get("cuisine") or []),
+        (v.get("price_text") or "").strip(" ·|"),
+        f"★ {g['rating']} ({g.get('review_count', '?')})" if g.get("rating") else "",
+    ]
+    if any(facts):
+        lines.append(" · ".join(f for f in facts if f))
+    if v.get("summary"):
+        lines.append(v["summary"])
+    link = v.get("booking_url") or v.get("website")
+    if link:
+        lines.append(f"🔗 {link}")
+    urls = list(dict.fromkeys(e["url"] for e in v.get("evidence", []) if e.get("url")))[:3]
+    if urls:
+        lines.append("Sources: " + " | ".join(urls))
+    return "\n".join(lines)
+
+
+def venue_messages(
+    config: AppConfig, store: RunStore, diff: RunDiff, per_category: int = 3
+) -> list[str]:
+    """One message per venue that is newly in a category's top ``per_category`` (every top pick on
+    the first run), best rank first. Venues in several top lists get one message listing them."""
+    cur_dir = store.run_dir(diff.run_id)
+    cur_scores, venues = _load_scores(cur_dir), _load_venues(cur_dir)
+    prev_scores = _load_scores(store.run_dir(diff.prev_run_id)) if diff.prev_run_id else {}
+    tops: dict[str, list[tuple[int, str]]] = {}
+    for key, scored in cur_scores.items():
+        label = config.categories.get(key).display_name
+        prev_top = _top(prev_scores.get(key, []), per_category)
+        for vid, s in _top(scored, per_category).items():
+            if vid not in prev_top and not s.get("hidden"):
+                tops.setdefault(vid, []).append((s["rank"], label))
+    order = sorted(tops, key=lambda vid: (min(tops[vid])[0], -len(tops[vid])))
+    return [_card(venues[vid], tops[vid]) for vid in order if vid in venues]

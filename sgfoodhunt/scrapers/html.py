@@ -25,6 +25,11 @@ HOURS_STOP_RE = re.compile(
 PRICE_RE = re.compile(r"(\${1,4})(?![\d\w])")
 LEADING_NUMBER_RE = re.compile(r"^\s*(?:#?\d{1,3}[.):\-–—]?\s*)")
 TRAILING_SEP_RE = re.compile(r"\s*[|–—-]\s*(?:best|top|the|a|an|for|our|where)\b.*$", re.IGNORECASE)
+# "New menu: Maggie's", "New restaurant: Yanhuo" -> the venue name only
+NEWS_PREFIX_RE = re.compile(
+    r"^(?:new|just opened|now open|opening)\s*(?:menu|restaurant|cafe|bar|opening|outlet)?\s*:\s*",
+    re.IGNORECASE,
+)
 CJK_RE = re.compile(r"[一-鿿]{2,}")
 PAREN_ZH_RE = re.compile(r"[(（]\s*([一-鿿][一-鿿\s]*)\s*[)）]")
 
@@ -145,6 +150,7 @@ def page_title(soup: BeautifulSoup) -> str | None:
 def clean_venue_heading(text: str) -> str:
     text = re.sub(r"\s+", " ", text).strip()
     text = LEADING_NUMBER_RE.sub("", text)
+    text = NEWS_PREFIX_RE.sub("", text)
     text = TRAILING_SEP_RE.sub("", text)
     text = re.sub(r"\s*[\[(]\s*(?:closed|permanently closed|new)\s*[\])]\s*$", "", text, flags=re.I)
     return text.strip(" -–—:|")

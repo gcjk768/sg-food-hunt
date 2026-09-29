@@ -13,7 +13,7 @@ Pipeline: scrape (`sgfoodhunt/scrapers/`) → dedup (`sgfoodhunt/dedup/registry.
 Working: Eatbook, Honeycombers, The Smart Local, Sassy Mama (family only), Seth Lui, Miss Tam Chiak, Burpple. Google Places/Reserve disabled by choice (paid API; ~370 req/month at `max_pages: 1` would fit the free cap if ever wanted). Reddit needs keys. SFA needs a real `dataset_id`. Everything else is disabled in `config/sources.yaml` with the reason next to it — re-check those before re-enabling.
 
 ## Telegram
-`.env`: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID=<TELEGRAM_CHAT_ID>` (the owner Channel), `TELEGRAM_THREAD_ID=<THREAD_ID>` (topic "Food Hunt"; 2765 is the recipe bot's "Recipe" topic) → `message_thread_id` in `sgfoodhunt/notify.py`. Needs `notifications.telegram: true` in `config/settings.yaml`. Test: `docker compose run --rm sgfoodhunt notify-test`.
+`.env`: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID=<TELEGRAM_CHAT_ID>` (the owner Channel), `TELEGRAM_THREAD_ID=<THREAD_ID>` (topic "Food Hunt"; 2765 is the recipe bot's "Recipe" topic) → `message_thread_id` in `sgfoodhunt/notify.py`. Needs `notifications.telegram: true` in `config/settings.yaml`. Test: `docker compose run --rm sgfoodhunt notify-test`. Format: one message per venue newly in a category's top 3 (`venue_messages()` in `sgfoodhunt/diff.py`), not the diff text.
 
 ## AI layer
 `sgfoodhunt/ai/client.py` shells out to `claude -p`; needs `CLAUDE_CODE_OAUTH_TOKEN` or a CLI login in `claude-config/`. Falls back to rules without it.

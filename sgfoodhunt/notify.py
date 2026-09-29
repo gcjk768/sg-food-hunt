@@ -6,6 +6,7 @@ from __future__ import annotations
 import logging
 import os
 import smtplib
+import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from email.message import EmailMessage
@@ -19,6 +20,8 @@ SmtpFactory = Callable[[], Any]
 
 log = logging.getLogger(__name__)
 TELEGRAM_MAX = 3900
+#: Telegram allows ~20 messages a minute into one group
+TELEGRAM_GAP_SECONDS = 3.1
 
 
 @dataclass(slots=True)
@@ -31,22 +34,33 @@ class NotifyResult:
 def send_telegram(
     token: str,
     chat_id: str,
-    text: str,
+    text: str | list[str],
     client: httpx.Client | None = None,
     thread_id: str | None = None,
+    gap_seconds: float = TELEGRAM_GAP_SECONDS,
 ) -> None:
+    """Send ``text`` (split at TELEGRAM_MAX), or each item of a list as its own message."""
+    texts = [text] if isinstance(text, str) else text
+    chunks = [t[i : i + TELEGRAM_MAX] for t in texts for i in range(0, len(t), TELEGRAM_MAX)]
     own = client is None
     client = client or httpx.Client(timeout=30)
     try:
-        for i in range(0, len(text), TELEGRAM_MAX):
+        for n, chunk in enumerate(chunks):
+            if n:
+                time.sleep(gap_seconds)
             payload: dict[str, Any] = {
                 "chat_id": chat_id,
-                "text": text[i : i + TELEGRAM_MAX],
+                "text": chunk,
                 "disable_web_page_preview": True,
             }
             if thread_id:
                 payload["message_thread_id"] = int(thread_id)
-            resp = client.post(f"https://api.telegram.org/bot{token}/sendMessage", json=payload)
+            url = f"https://api.telegram.org/bot{token}/sendMessage"
+            resp = client.post(url, json=payload)
+            if resp.status_code == 429:  # flood control: wait as told, retry once
+                wait = resp.json().get("parameters", {}).get("retry_after", 30)
+                time.sleep(float(wait) + 1)
+                resp = client.post(url, json=payload)
             if resp.is_error:  # Telegram's "description" says why (bad chat, bot not in group, ...)
                 raise RuntimeError(f"{resp.status_code} {resp.text[:200]}")
     finally:
@@ -82,7 +96,9 @@ def notify(
     subject: str,
     client: httpx.Client | None = None,
     smtp_factory: SmtpFactory | None = None,
+    messages: list[str] | None = None,
 ) -> NotifyResult:
+    """``messages``, when given, go to Telegram one per message instead of ``text``."""
     result = NotifyResult()
     n = config.settings.notifications
     if n.telegram:
@@ -90,7 +106,11 @@ def notify(
         if token and chat:
             try:
                 send_telegram(
-                    token, chat, text, client=client, thread_id=config.secrets.telegram_thread_id
+                    token,
+                    chat,
+                    messages if messages is not None else text,
+                    client=client,
+                    thread_id=config.secrets.telegram_thread_id,
                 )
                 result.telegram = "sent"
             except Exception as exc:

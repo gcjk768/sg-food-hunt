@@ -6,6 +6,9 @@ updated: 2026-09-30
 
 ## 2026-09-30
 - docs: README rewritten (highlights, flow, stack, limitations; fixed stale clone URL); architecture diagram added as `docs/architecture.drawio` + `.drawio.svg` + `.png`.
+- fix: blog search pages also link sidebar/"latest" posts that ignore the query; they came back for every query (~85x), so baby classes, cruises, JB guides etc. landed as venues in all 15 categories. `relevant_article()` in `sgfoodhunt/scrapers/blogs.py` now opens a link only if its slug names food, isn't an overseas guide, and shares a word with the query (Chinese queries on these English blogs are dropped).
+- fix: "New menu: X" / "New restaurant: X" headings → "X" (`NEWS_PREFIX_RE`, `sgfoodhunt/scrapers/html.py`).
+- feat: Telegram gets one message per restaurant — every venue newly in a category's top 3 (all top 3s on a first run), with ranks, address/MRT, summary, link, sources (`venue_messages()` in `sgfoodhunt/diff.py`). Sends are paced ~3 s apart and retry once on 429 (`sgfoodhunt/notify.py`). Email still gets the full diff + cards.
 
 ## 2026-09-29 (live-run fixes)
 - chore: Google Places + Reserve disabled (owner skipped the paid API).

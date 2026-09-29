@@ -16,7 +16,7 @@ from rich.table import Table
 from sgfoodhunt import __version__
 from sgfoodhunt.ai.client import claude_config_dir, claude_logged_in
 from sgfoodhunt.config import AppConfig, load_config
-from sgfoodhunt.diff import compute_diff, diff_markdown, diff_plain_text
+from sgfoodhunt.diff import compute_diff, diff_markdown, diff_plain_text, venue_messages
 from sgfoodhunt.http.cache import ResponseCache
 from sgfoodhunt.logging_setup import setup_logging
 from sgfoodhunt.notify import notify
@@ -207,7 +207,13 @@ def _notify(config: AppConfig, diff) -> None:  # type: ignore[no-untyped-def]
     if diff.is_empty and diff.prev_run_id is not None:
         log.info("diff is empty; notifications skipped")
         return
-    result = notify(config, diff_plain_text(diff), subject=f"SG Food Hunt diff {diff.run_id}")
+    store, _, _ = _paths(config)
+    cards = venue_messages(config, store, diff)
+    if not cards and n.telegram and not n.email:
+        log.info("no new top picks; notifications skipped")
+        return
+    text = "\n\n".join([diff_plain_text(diff), *cards])
+    result = notify(config, text, subject=f"SG Food Hunt diff {diff.run_id}", messages=cards)
     console.print(f"notifications: telegram {result.telegram}, email {result.email}")
 
 
