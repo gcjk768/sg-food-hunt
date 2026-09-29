@@ -1,8 +1,11 @@
 ---
 tags: [active]
-updated: 2026-09-29
+updated: 2026-09-30
 ---
 # Changelog
+
+## 2026-09-30
+- docs: README rewritten (highlights, flow, stack, limitations; fixed stale clone URL); architecture diagram added as `docs/architecture.drawio` + `.drawio.svg` + `.png`.
 
 ## 2026-09-29 (live-run fixes)
 - chore: Google Places + Reserve disabled (owner skipped the paid API).
