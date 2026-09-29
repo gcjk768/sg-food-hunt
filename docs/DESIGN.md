@@ -46,11 +46,13 @@ SG-Cafe-Food-Hunt/
 │   │   └── vault.py           Vault: paths and note writing inside the Obsidian folder
 │   ├── reporting/
 │   │   ├── notes.py           Home, Sources and Runs/<run_id> notes
-│   │   └── exports.py         CSV / JSON exports
-│   ├── normalise/             stage 2: price levels, cuisine labels, opening hours, regions
-│   ├── dedup/                 stage 2: name+postal match, fuzzy fallback, phone/booking-link relink, merge log
-│   ├── scoring/               stage 2: Bayesian rating, recency-decayed recommendations, weights, penalties
-│   ├── enrich/                stage 3: OneMap geocoding, nearest MRT, driving time, parking
+│   │   ├── venue_notes.py     Venues/<Venue>.md and Categories/<Category>.md, personal layer reader
+│   │   └── exports.py         CSV / JSON exports (raw, per category, merged)
+│   ├── ranking.py             stage 2 driver: raw rows -> venues -> scores -> notes and exports
+│   ├── normalise/             names, price levels, cuisine labels, opening hours, region from postal code
+│   ├── dedup/                 venue model + registry (place id, name+postal, phone/booking link, fuzzy)
+│   ├── scoring/               Bayesian rating, recency-decayed recommendations, weights, filters, penalties
+│   ├── enrich/                stage 3: OneMap postal geocoding, nearest MRT station / line / walk minutes
 │   ├── reviews/               stage 3: keyword counts, aspect scores, rating trend, summaries
 │   ├── social/                stage 4: IG/TikTok export parsers, oEmbed, SERP, hashtag API, buzz score
 │   └── dashboard/             stage 5: Streamlit app reading the vault + data/
@@ -65,12 +67,11 @@ SG-Cafe-Food-Hunt/
 
 | key | purpose |
 | --- | --- |
-| `home.postal_code` | origin for driving distance / time (stage 3) |
 | `paths.vault_dir`, `paths.vault_folder` | Obsidian vault and the subfolder this tool owns |
 | `paths.data_dir`, `paths.cache_dir`, `paths.exports_dir`, `paths.logs_dir` | machine state |
 | `http.*` | user agent, polite delay range (2–5 s), timeout, retries, backoff, robots TTL, cache TTL |
 | `api_rate_limits` | requests per minute per official API |
-| `scoring.*` | Bayesian prior, recency half-life, bonuses and penalties, buzz cap, personal weight |
+| `scoring.*` | top_n, fuzzy threshold, per-pax prices, new-venue window, Bayesian prior, recency half-life, bonuses and penalties, buzz cap, personal weight |
 | `social.*` | `enabled` flag, exports dir, buzz window, hashtags (max 25), SERP sites |
 | `exports.*`, `notifications.*` | CSV/JSON/Sheets flags, Telegram/email flags, rating change threshold |
 
@@ -86,7 +87,7 @@ requires_private_room, halal_only, max_price_level, opened_within_months`.
 
 Fifteen categories ship: the twelve from the brief plus `new_cafes`, `new_restaurants` and
 `new_zichar` ("what's new" lists that weight recent recommendations over review volume and keep
-only venues first seen in the last 12 months).
+only venues whose earliest evidence is within the last 30 days).
 
 ### `sources.yaml`
 
@@ -113,10 +114,11 @@ data/
 │   ├── raw/<source>.jsonl    one VenueCandidate sighting per line (see fields below)
 │   ├── pages.jsonl           {source_key, url, title, published_at, content_hash, fetched_at, query, category_key}
 │   ├── events.jsonl          {at, level, component, message, data}
-│   ├── venues.json           stage 2: canonical venues after dedup (id, fields, sources[], aliases[])
-│   ├── merges.jsonl          stage 2: every fuzzy merge for review
-│   ├── scores/<category>.json stage 2: ranked list with score components
+│   ├── venues.json           canonical venues seen in this run (id, fields, evidence[], aliases[])
+│   ├── merges.jsonl          every non-exact merge for review
+│   ├── scores.json           {category: [ {venue_id, score, rank, components, adjustments, excluded_reason} ]}
 │   └── diff.json             stage 5: diff against the previous run
+├── venues.json               the registry: every venue ever seen, stable ids v00001..., next_id
 ├── cache/
 │   ├── http/<2 hex>/<sha256>.meta.json + .body   raw responses with expires_at
 │   └── robots/<host>.json
@@ -146,8 +148,8 @@ Venue note frontmatter (properties, so Obsidian Bases / Dataview can filter):
 ```yaml
 type: venue
 name, name_zh, brand, outlet
-address, postal_code, planning_area, region, lat, lng
-nearest_mrt, mrt_line, mrt_walk_min, drive_km, drive_min, parking
+address, postal_code, district, region, lat, lng
+nearest_mrt, mrt_line, mrt_walk_min
 cuisine: [..], halal, vegetarian_options, kid_friendly, pet_friendly
 price_level: "$$", price_per_pax_sgd, bill_estimate: {cafes_date: 60, family_weekend: 180}
 opening_hours: {mon: ["11:00-22:00"], ...}, open_weekends, late_night, ph_closed
@@ -175,10 +177,13 @@ removes a venue from every output, `status: visited` can be hidden with `--hide-
 ## Pipeline stages
 
 1. **Sources and storage** (done): `sgfh run` → `Collector` → `RunStore` → run note.
-2. **Dedup and scoring**: normalise → match by name+postal, fuzzy fallback (logged) → merge into
-   `venues.json` → score per category → `Categories/*.md` and `Venues/*.md`.
-3. **Enrichment and review analysis**: OneMap geocoding, MRT and driving distance, parking,
-   keyword counts, aspect scores, trend flag, generated summary and best-for line.
+2. **Dedup and scoring** (done): normalise → registry match (place id, name+postal, phone or
+   booking link, fuzzy with log) → `data/venues.json` with stable ids → score per category →
+   `Categories/*.md`, `Venues/*.md`, per category CSV and merged JSON. `sgfh rank` re-runs it offline.
+3. **Enrichment and review analysis**: nearest MRT station, line and walking minutes from a
+   bundled station table (OneMap geocodes postal codes when Google gave no coordinates); no
+   driving distance by request. Keyword counts, aspect scores, trend flag, generated summary and
+   best-for line.
 4. **Social buzz** (flag): export parsers, oEmbed, SERP, hashtag API, buzz score and bonus.
 5. **Dashboard, diff and scheduling**: Streamlit app, diff report, Telegram/email, cron and
    GitHub Actions weekly workflow, optional Google Sheets export.

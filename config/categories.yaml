@@ -216,7 +216,7 @@ categories:
   # --- "what's new" categories: recency matters more than review volume, so the rating weight
   # is lowered and recommendations (recent articles) raised. opened_within_months keeps only
   # venues whose earliest evidence (article date, first Google review, first seen by this tool)
-  # falls inside the window; tune it as you like.
+  # falls inside the window (1 month = the last `scoring.new_within_days` days).
   - key: new_cafes
     display_name: Newly opened cafes
     group: general
@@ -230,7 +230,7 @@ categories:
       - "新加坡 新开 咖啡馆"
     keywords: ["cafe", "coffee", "brunch"]
     weights: {rating: 0.15, recommendations: 0.40, keyword_match: 0.15, ambience: 0.10, food: 0.10}
-    hard_filters: {opened_within_months: 12}
+    hard_filters: {opened_within_months: 1}
 
   - key: new_restaurants
     display_name: Newly opened restaurants
@@ -245,7 +245,7 @@ categories:
       - "新加坡 新开 餐厅"
     keywords: ["restaurant", "tasting menu", "chef"]
     weights: {rating: 0.15, recommendations: 0.40, keyword_match: 0.15, food: 0.15, service: 0.05}
-    hard_filters: {opened_within_months: 12}
+    hard_filters: {opened_within_months: 1}
 
   - key: new_zichar
     display_name: Newly opened zi char places
@@ -259,4 +259,4 @@ categories:
       - "新加坡 新开 煮炒"
     keywords: ["zi char", "zichar", "tze char", "cze char", "煮炒", "hor fun", "cereal prawn"]
     weights: {rating: 0.15, recommendations: 0.40, keyword_match: 0.15, food: 0.20, value: 0.10}
-    hard_filters: {opened_within_months: 12}
+    hard_filters: {opened_within_months: 1}

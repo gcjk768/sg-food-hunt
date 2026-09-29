@@ -52,7 +52,8 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "N", "SIM", "RUF"]
-ignore = ["RUF012", "RUF001", "N818"]  # RUF001: CJK punctuation in regexes is intended
+# E501: ruff format wraps code; long strings and comments are allowed. RUF001/2: CJK punctuation.
+ignore = ["RUF012", "RUF001", "RUF002", "N818", "E501"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["E501"]

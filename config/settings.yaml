@@ -1,7 +1,4 @@
 # Global settings. Secrets never go here; they live in .env (see .env.example).
-home:
-  postal_code: "520123"          # CHANGE ME: used for driving distance / travel time (stage 3)
-
 paths:
   # Everything is plain files so the project can live on a NAS share (no SQLite, no locks).
   vault_dir: vault                # CHANGE ME: path to your Obsidian vault (absolute or relative)
@@ -29,6 +26,10 @@ api_rate_limits:                  # requests per minute per API (official APIs o
   data_gov_sg: 60
 
 scoring:                          # global parameters; per-category weights live in categories.yaml
+  top_n: 15
+  fuzzy_match_threshold: 88       # rapidfuzz token_set_ratio needed to merge two names without a postal code
+  price_per_pax_sgd: {1: 15, 2: 35, 3: 80, 4: 160}   # per price level, used for bill estimates
+  new_within_days: 30             # 'newly opened' window when opened_within_months is 1
   bayesian_prior_reviews: 100     # C in the Bayesian average
   bayesian_prior_rating: 4.2      # m in the Bayesian average
   recommendation_half_life_months: 18

@@ -46,7 +46,6 @@ class CardSearchScraper(BaseScraper):
                 source_ref=card.url,
                 address=card.address,
                 booking_url=card.url if self.booking_source else None,
-                website=None if self.booking_source else card.url,
                 rating=card.rating,
                 review_count=card.review_count,
                 price_text=card.price_text,

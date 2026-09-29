@@ -186,3 +186,83 @@ def test_cli_dry_run_with_empty_cache_touches_no_network(app_config: AppConfig) 
     assert run.stats["warnings"] >= 7  # 6 zi char queries + 1 michelin listing, none cached
     note = Path(app_config.settings.paths.vault_dir) / "SG Food Hunt" / "Runs" / f"{run.run_id}.md"
     assert note.exists() and "dry run: not cached" in note.read_text()
+
+
+async def test_rank_run_end_to_end(
+    app_config: AppConfig,
+    fake_session: FakeSession,
+    http_settings,
+    run_store: RunStore,
+    vault: Vault,
+) -> None:
+    """Collect from the fixture blog, then dedup + score + write venue and category notes."""
+    from sgfoodhunt.ranking import rank_run
+    from sgfoodhunt.storage.frontmatter import parse_note
+
+    _wire_blog(app_config, fake_session)
+    cache = ResponseCache(app_config.settings.paths.cache_dir)
+    http = PoliteClient(http_settings, cache, session=fake_session, sleep=lambda _s: None)
+    collector = Collector(
+        app_config,
+        run_store,
+        cache,
+        http=http,
+        api_factory=MockApiFactory(http_settings, cache, lambda r: httpx.Response(404)),
+    )
+    run = await collector.collect(["cafes_date", "zichar_family"], ["sethlui"])
+    result = rank_run(app_config, run_store, vault, run.run_id)
+    assert {v.name for v in result.venues.values()} == {
+        "Tiong Bahru Bakery",
+        "Keng Eng Kee Seafood",
+    }
+    assert set(result.scores) == {"cafes_date", "zichar_family"}
+    zichar = result.scores["zichar_family"]
+    assert (
+        zichar[0].name == "Keng Eng Kee Seafood" and zichar[0].rank == 1
+    )  # zi char keywords in its snippet
+    venue_dir = vault.root / "Venues"
+    names = sorted(p.stem for p in venue_dir.glob("*.md"))
+    assert names == ["Keng Eng Kee Seafood", "Tiong Bahru Bakery"]
+    note = parse_note((venue_dir / "Keng Eng Kee Seafood.md").read_text())
+    fm = note.frontmatter
+    assert (
+        fm["postal_code"] == "150124"
+        and fm["region"] == "Central"
+        and fm["name_zh"] == "琼荣记海鲜"
+    )
+    assert fm["ranks"]["zichar_family"] == 1 and fm["price_level"] == "$$"
+    assert fm["bill_estimate"]["zichar_family"] == 35.0 * 5
+    assert "## My notes" in note.body and "## Evidence" in note.body
+    assert (vault.root / "Categories" / "Best zi char places for a family weekend meal.md").exists()
+    cat_note = (vault.root / "Categories" / "Best cafes for a date.md").read_text()
+    assert "## Top 15" in cat_note
+    # the pipe is escaped inside a Markdown table cell
+    assert "[[SG Food Hunt/Venues/Tiong Bahru Bakery\\|Tiong Bahru Bakery]]" in cat_note
+    exports = Path(app_config.settings.paths.exports_dir) / run.run_id
+    assert (exports / "zichar_family.csv").exists() and (exports / "venues_ranked.json").exists()
+    assert (run_store.run_dir(run.run_id) / "scores.json").exists()
+    assert run_store.load_run(run.run_id).stats["ranking"]["venues_total"] == 2
+
+    # personal layer: mark KEK visited with a rating and add my notes, then re-rank with --hide-visited
+    path = venue_dir / "Keng Eng Kee Seafood.md"
+    edited = parse_note(path.read_text())
+    edited.frontmatter["status"] = "visited"
+    edited.frontmatter["my_rating"] = 4
+    edited.body = edited.body.replace("## My notes\n", "## My notes\nGreat moonlight hor fun.\n")
+    from sgfoodhunt.storage.frontmatter import render_note
+
+    path.write_text(render_note(edited))
+    result2 = rank_run(app_config, run_store, vault, run.run_id, hide_visited=True)
+    kek = next(s for s in result2.scores["zichar_family"] if s.name == "Keng Eng Kee Seafood")
+    assert kek.hidden and kek.rank == 0 and "personal" in kek.adjustments
+    again = parse_note(path.read_text())
+    assert again.frontmatter["status"] == "visited" and again.frontmatter["my_rating"] == 4
+    assert "Great moonlight hor fun." in again.body
+    cat_note = (
+        vault.root / "Categories" / "Best zi char places for a family weekend meal.md"
+    ).read_text()
+    assert (
+        "## Hidden (visited)" in cat_note
+        and "Keng Eng Kee Seafood|Keng Eng Kee Seafood]] (" in cat_note
+    )
+    assert result2.match_stats.created == 0  # ids stable across re-ranks

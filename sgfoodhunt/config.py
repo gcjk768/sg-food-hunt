@@ -33,10 +33,6 @@ FetchMode = Literal["static", "browser", "api"]
 TosStatus = Literal["verified_ok", "unverified", "disallowed"]
 
 
-class HomeSettings(BaseModel):
-    postal_code: str = Field(pattern=r"^\d{6}$")
-
-
 class PathSettings(BaseModel):
     vault_dir: Path = Path("vault")
     vault_folder: str = "SG Food Hunt"
@@ -66,6 +62,12 @@ class HttpSettings(BaseModel):
 
 
 class ScoringSettings(BaseModel):
+    top_n: int = 15
+    fuzzy_match_threshold: int = 88
+    price_per_pax_sgd: dict[int, float] = Field(
+        default_factory=lambda: {1: 15.0, 2: 35.0, 3: 80.0, 4: 160.0}
+    )
+    new_within_days: int = 30
     bayesian_prior_reviews: int = 100
     bayesian_prior_rating: float = 4.2
     recommendation_half_life_months: float = 18
@@ -105,7 +107,6 @@ class NotificationSettings(BaseModel):
 
 
 class Settings(BaseModel):
-    home: HomeSettings
     paths: PathSettings = Field(default_factory=PathSettings)
     http: HttpSettings
     api_rate_limits: dict[str, int] = Field(default_factory=dict)

@@ -16,6 +16,7 @@ from sgfoodhunt.config import AppConfig, load_config
 from sgfoodhunt.http.cache import ResponseCache
 from sgfoodhunt.logging_setup import setup_logging
 from sgfoodhunt.pipeline import Collector, select_sources
+from sgfoodhunt.ranking import rank_run
 from sgfoodhunt.reporting import (
     export_raw_candidates,
     write_home_note,
@@ -114,8 +115,6 @@ def run(
             "[yellow]--diff-only arrives with stage 5 and --social-only with stage 4.[/yellow]"
         )
         raise typer.Exit(code=2)
-    if hide_visited:
-        log.info("--hide-visited noted; it applies to ranked outputs from stage 2 onwards")
     try:
         for key in category or []:
             config.categories.get(key)
@@ -130,6 +129,10 @@ def run(
     csv_path, json_path = export_raw_candidates(
         store, record.run_id, config.resolve(config.settings.paths.exports_dir)
     )
+    ranked = rank_run(
+        config, store, vault, record.run_id, hide_visited=hide_visited, category_keys=category
+    )
+    record = store.load_run(record.run_id)
     robots = {
         k: ("denied" if "robots" in v else "") for k, v in collector.stats.sources_skipped.items()
     }
@@ -137,10 +140,54 @@ def run(
     link = write_run_note(vault, store, record, config)
     write_home_note(vault, config, link)
     _print_run_summary(config, record)
+    _print_rank_summary(config, ranked)
     console.print(
         f"\nrun note: {vault.note_path('Runs', record.run_id)}\n"
-        f"CSV: {csv_path}\nJSON: {json_path}\nlog: {log_path}"
+        f"raw CSV: {csv_path}\nraw JSON: {json_path}\nlog: {log_path}"
     )
+
+
+def _print_rank_summary(config: AppConfig, ranked) -> None:  # type: ignore[no-untyped-def]
+    table = Table(title=f"Ranking ({len(ranked.venues)} venues, {ranked.match_stats.created} new)")
+    table.add_column("Category")
+    table.add_column("Ranked", justify="right")
+    table.add_column("Top 3")
+    for key, scored in ranked.scores.items():
+        visible = [s for s in scored if not s.excluded_reason and not s.hidden]
+        table.add_row(
+            config.categories.get(key).display_name,
+            str(len(visible)),
+            ", ".join(s.name for s in visible[:3]),
+        )
+    console.print(table)
+
+
+@app.command()
+def rank(
+    config_dir: ConfigOpt = Path("config"),
+    run_id: Annotated[
+        str | None, typer.Option("--run", help="Run to re-score (default: latest)")
+    ] = None,
+    category: Annotated[list[str] | None, typer.Option("--category", "-c")] = None,
+    hide_visited: Annotated[bool, typer.Option("--hide-visited")] = False,
+    verbose: Annotated[bool, typer.Option("--verbose", "-v")] = False,
+) -> None:
+    """Re-run dedup, scoring and note generation for a stored run without any network access."""
+    config = _load(config_dir)
+    store, _, vault = _paths(config)
+    setup_logging(config.resolve(config.settings.paths.logs_dir), "rank", verbose)
+    if run_id is None:
+        latest = store.latest_run(status=None)
+        if latest is None:
+            console.print("[red]no runs found[/red]")
+            raise typer.Exit(code=2)
+        run_id = latest.run_id
+    ranked = rank_run(
+        config, store, vault, run_id, hide_visited=hide_visited, category_keys=category
+    )
+    _print_rank_summary(config, ranked)
+    link = write_run_note(vault, store, store.load_run(run_id), config)
+    write_home_note(vault, config, link)
 
 
 def _print_run_summary(config: AppConfig, record) -> None:  # type: ignore[no-untyped-def]

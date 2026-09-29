@@ -136,7 +136,8 @@ async def test_burpple_cards(make_scraper, fake_session: FakeSession) -> None:
         "Coexist Coffee Co.",
         "KEK Seafood (Keng Eng Kee)",
     ]
-    assert result.candidates[0].website == "https://www.burpple.com/coexist-coffee-co"
+    assert result.candidates[0].source_ref == "https://www.burpple.com/coexist-coffee-co"
+    assert result.candidates[0].website is None
     assert result.candidates[0].booking_url is None
     assert result.candidates[0].postal_code == "669592"
 
@@ -201,7 +202,7 @@ async def test_michelin_listing(make_scraper, fake_session: FakeSession) -> None
         "Odette": "3 Stars",
     }
     assert (
-        result.candidates[0].website
+        result.candidates[0].source_ref
         == "https://guide.michelin.com/sg/en/singapore-region/singapore/restaurant/burnt-ends"
     )
     assert (

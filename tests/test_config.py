@@ -14,7 +14,7 @@ def test_real_config_loads(app_config: AppConfig) -> None:
     assert keys[-3:] == ["new_cafes", "new_restaurants", "new_zichar"]
     assert keys[0] == "cafes_date"
     assert app_config.sources.get("google_places").kind == "api"
-    assert app_config.settings.home.postal_code.isdigit()
+    assert app_config.settings.scoring.top_n == 15
 
 
 def test_category_defaults_are_merged(app_config: AppConfig) -> None:
@@ -93,7 +93,7 @@ def test_new_openings_categories(app_config: AppConfig) -> None:
     for key in ("new_cafes", "new_restaurants", "new_zichar"):
         cat = app_config.categories.get(key)
         assert cat.group == "general"
-        assert cat.hard_filters.opened_within_months == 12
+        assert cat.hard_filters.opened_within_months == 1
         assert "newly opened" in cat.keywords  # group lexicon applied
         assert cat.weights["recommendations"] == 0.40 and cat.weights["rating"] == 0.15
         assert any("新" in q for q in cat.queries)

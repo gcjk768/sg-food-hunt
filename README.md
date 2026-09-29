@@ -4,7 +4,7 @@ Collects, ranks and keeps fresh a list of dining venues in Singapore for dates a
 occasions, and writes the results into an Obsidian vault. Everything is plain files (JSON,
 JSONL, Markdown) so the project can live on a NAS share. There is no database.
 
-**Status: stage 1 of 5 (sources and storage).** See [docs/DESIGN.md](docs/DESIGN.md) for the
+**Status: stage 2 of 5 (sources, storage, dedup, scoring and vault notes).** See [docs/DESIGN.md](docs/DESIGN.md) for the
 full outline, config schema and storage schema, and the stage plan at the bottom of this file.
 
 ## Setup
@@ -19,7 +19,6 @@ cp .env.example .env               # fill in keys; .env is git ignored
 
 Edit `config/settings.yaml`:
 
-- `home.postal_code`: your home postal code (driving distance, stage 3)
 - `paths.vault_dir`: the path of your Obsidian vault (absolute path on the NAS is fine)
 - `paths.vault_folder`: the subfolder inside the vault the tool owns (default `SG Food Hunt`)
 
@@ -29,16 +28,18 @@ Then:
 sgfh init                          # creates data/, logs/, the vault folder, Home.md, Sources.md
 sgfh sources                       # what will run and why
 sgfh categories                    # the 15 categories and their query variants
-sgfh run                           # full collection run (stage 1)
+sgfh run                           # collect, dedup, score, write vault notes and exports
 sgfh run -c zichar_family -s sethlui -s michelin   # one category, two sources
 sgfh run --dry-run                 # cached responses only, no network
+sgfh run --hide-visited            # keep venues marked `status: visited` out of the rankings
+sgfh rank                          # re-score the latest run offline (after changing weights or notes)
+sgfh rank --run 20260929T031500Z -c zichar_family
 sgfh runs                          # list past runs
 sgfh show <run_id>                 # per source counts and sample candidates
 sgfh cache stats | sgfh cache purge
 ```
 
 `--diff-only` and `--social-only` are wired in the CLI and arrive with stages 5 and 4.
-`--hide-visited` is accepted now and applies to ranked outputs from stage 2.
 
 ### Keys
 
@@ -57,16 +58,36 @@ data/runs/<run_id>/run.json          manifest and stats
 data/runs/<run_id>/raw/<source>.jsonl raw sightings, one per (source, query, venue)
 data/runs/<run_id>/pages.jsonl        every page that produced evidence, with publication date
 data/runs/<run_id>/events.jsonl       warnings, skipped sources, errors
+data/runs/<run_id>/venues.json        canonical venues seen in this run (after dedup)
+data/runs/<run_id>/merges.jsonl       every fuzzy / phone / booking-link merge, for review
+data/runs/<run_id>/scores.json        per category scores with every weighted component
+data/venues.json                      the venue registry: stable ids (v00001...) across runs
 data/exports/<run_id>/raw_candidates.{csv,json}
+data/exports/<run_id>/<category>.csv  ranked list per category
+data/exports/<run_id>/venues_ranked.json  one merged JSON with every venue and its scores
 logs/<timestamp>-run.jsonl            structured per run log
 <vault>/SG Food Hunt/Runs/<run_id>.md run note: sources, categories, most surfaced names, warnings
+<vault>/SG Food Hunt/Venues/<Venue>.md   one note per outlet; all data as properties
+<vault>/SG Food Hunt/Categories/<Category>.md  top 15 table + full ranking + hidden + excluded
 <vault>/SG Food Hunt/Home.md, Sources.md
 ```
 
-From stage 2 the vault also gets `Venues/<Venue>.md` (one note per venue, data in frontmatter
-properties) and `Categories/<Category>.md` (top 15 and full ranking). Your edits to a venue note
-survive regeneration: the properties `status` (`visited` | `wishlist` | `excluded`),
-`my_rating`, `my_comment`, `tags`, and any section whose heading starts with `## My`.
+Chains get one note per outlet, named `Brand (Outlet)`, with a shared `brand` property.
+
+### The personal layer lives in the venue notes
+
+Open a venue note in Obsidian and set properties:
+
+| property | effect |
+| --- | --- |
+| `status: excluded` | the venue disappears from every ranking, CSV and JSON |
+| `status: visited` | hidden from rankings when you run with `--hide-visited`; the note stays so Dataview can still list it |
+| `status: wishlist` | no effect on scores; handy for Dataview queries |
+| `my_rating: 4` | blended into the score: `(1 − p)·score + p·my_rating/5`, `p = scoring.personal_rating_weight` |
+| `my_comment` | free text, preserved |
+
+Anything you write under a heading that starts with `## My` (for example `## My notes`) is
+also preserved when the note is regenerated. Everything else in the note is rewritten each run.
 
 ## Adding a category
 
@@ -102,7 +123,7 @@ Add an entry to `config/categories.yaml`. No code changes are needed.
 Set `tos_status` honestly. `disallowed` sources never run. `unverified` sources run only after
 the live robots.txt check passes.
 
-## Ranking (stage 2; the formula is documented now so the config is stable)
+## Ranking
 
 For each category, every venue gets a score in `[0, 1]`:
 
@@ -130,6 +151,22 @@ Components:
 - `food`, `service`, `ambience`, `value`: aspect sentiment scores from review text.
 - `space`, `kid_friendly`, `parking`, `weekend_open`, `quiet`: 0/1 flags (or graded where the
   data allows, e.g. parking own carpark 1.0, public nearby 0.7, street 0.4, none 0).
+
+A component with no data for a venue is dropped and its weight is redistributed over the
+components that do have data, so a blog-only venue is still scored (on fewer signals). Every
+weighted component and adjustment is written to `data/runs/<run_id>/scores.json` and to the venue
+note's `scores` property, so you can see why a venue ranks where it does.
+
+**Newly opened categories** (`new_cafes`, `new_restaurants`, `new_zichar`) keep only venues whose
+earliest evidence (article date, first Google review, or first sighting by this tool) is within
+the last `scoring.new_within_days` days (30). Everything older is listed under "Excluded" in the
+category note with the reason.
+
+**Dedup** matches sightings by Google place id, then normalised name + postal code, then a shared
+phone number or booking link (catches renamed or relocated venues), then fuzzy name
+(`token_set_ratio` ≥ `scoring.fuzzy_match_threshold`) when a postal code is missing. Every
+non-exact merge is logged to `merges.jsonl`. Reddit candidates (low confidence) and SFA rows never
+create a venue; they only attach to one another source already found.
 
 Tune the weights per category in `config/categories.yaml` and the global constants under
 `scoring` in `config/settings.yaml`.
@@ -185,8 +222,10 @@ CI runs the same three on every push (`.github/workflows/ci.yml`).
 
 ## Stage plan
 
-1. Sources and storage (this release)
-2. Normalisation, dedup, scoring, venue and category notes
-3. Enrichment (OneMap, MRT, driving time, parking) and review analysis
+1. Sources and storage (done)
+2. Normalisation, dedup, scoring, venue and category notes (done)
+3. Enrichment and review analysis: nearest MRT station, line and walking minutes (bundled station
+   table + OneMap postal code geocoding; no driving distance by request), keyword counts, aspect
+   scores, rating trend, generated summary and best-for line
 4. Social buzz module (exports, oEmbed, SERP, hashtag API)
 5. Diff report, notifications, Streamlit dashboard, weekly workflow, Sheets export

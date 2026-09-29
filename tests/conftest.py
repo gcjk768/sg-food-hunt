@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import shutil
 from collections.abc import Callable, MutableMapping
 from datetime import timedelta
@@ -72,6 +73,16 @@ class FakeSession:
                     return resp if not isinstance(resp, list) else resp[0]
             return self.default
         return route
+
+
+@pytest.fixture(autouse=True)
+def _reset_logging() -> Any:
+    """setup_logging installs handlers on the root logger; drop them after every test."""
+    yield
+    root = logging.getLogger()
+    for handler in list(root.handlers):
+        root.removeHandler(handler)
+        handler.close()
 
 
 @pytest.fixture()

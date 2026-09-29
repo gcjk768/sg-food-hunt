@@ -75,7 +75,6 @@ class MichelinScraper(BaseScraper):
             cand = self.candidate(
                 name,
                 source_ref=href,
-                website=href,
                 address=(jl.address if jl else None)
                 or (location.get_text(" ", strip=True) if location else None),
                 cuisine=jl.cuisine if jl else [],

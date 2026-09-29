@@ -35,6 +35,7 @@ def setup_logging(logs_dir: Path, run_label: str, verbose: bool = False) -> Path
     root.setLevel(logging.DEBUG if verbose else logging.INFO)
     for handler in list(root.handlers):
         root.removeHandler(handler)
+        handler.close()
 
     file_handler = logging.FileHandler(log_path, encoding="utf-8")
     file_handler.setFormatter(JsonLineFormatter())
