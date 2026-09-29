@@ -168,3 +168,12 @@ def test_stale_blog_evidence_pruned(tmp_path: Path) -> None:
     [ev] = reg.venues["v1"].evidence
     assert ev.queries == ["best hawker centres Singapore"] and ev.category_keys == ["hawker_family"]
     assert strip_news_wording("ION Orchard Food Opera reopens") == "ION Orchard Food Opera"
+
+
+def test_month_headings_are_not_venues() -> None:
+    from sgfoodhunt.models import is_date_only
+
+    for bad in ["July 2026", "February 2026", "12 Feb", "2026", "September"]:
+        assert is_date_only(bad), bad
+    for ok in ["Marina 2026", "1880", "Summer Hill", "May Cafe", "54° Steakhouse"]:
+        assert not is_date_only(ok), ok

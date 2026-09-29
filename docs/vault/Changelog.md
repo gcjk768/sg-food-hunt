@@ -5,6 +5,7 @@ updated: 2026-09-30
 # Changelog
 
 ## 2026-09-30
+- fix: month headings of monthly round-ups ("July 2026") became venues. `is_date_only()` (`sgfoodhunt/models.py`) rejects them in `VenueCandidate`; `prune_blog_evidence()` clears saved ones.
 - fix: hotels ranked #1 for hawker/zi char. Registry evidence persists across runs, so articles older runs opened for every query kept every category. `prune_blog_evidence()` (`sgfoodhunt/dedup/registry.py`) re-checks stored blog evidence each run and re-derives its categories (dropped 2,652 stale entries on the NAS registry). `relevant_article()` is stricter: generic food words don't count, a 2+-word query needs 2 hits, "new/latest" queries need an openings slug.
 - fix: headline names ("New restaurant: X", "X is opening at …", "New dining concept: X") → "X". `strip_news_wording()` in `sgfoodhunt/scrapers/html.py`, applied by the registry (`sgfoodhunt/dedup/registry.py`) on load + create so names saved by older runs are fixed too (the registry keeps the first name it saw).
 - fix: second run crashed in `compute_diff` (`sgfoodhunt/diff.py`) — `business_status` is stored as null and `.get(k, "")` only defaults a *missing* key; now `(… or "")`.

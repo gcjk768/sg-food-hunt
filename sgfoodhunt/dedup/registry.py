@@ -29,6 +29,7 @@ from rapidfuzz import fuzz
 from sgfoodhunt.config import AppConfig
 from sgfoodhunt.dedup.venue import Evidence, Venue
 from sgfoodhunt.http.cache import read_json, write_json
+from sgfoodhunt.models import is_date_only
 from sgfoodhunt.normalise import (
     name_key,
     normalise_cuisines,
@@ -426,6 +427,10 @@ def prune_blog_evidence(registry: VenueRegistry, config: AppConfig) -> int:
             cats_of.setdefault(q, set()).add(cat.key)
     dropped = 0
     for venue in registry.venues.values():
+        if is_date_only(venue.name):  # a month heading saved as a venue by an older scraper
+            dropped += len(venue.evidence)
+            venue.evidence = []
+            continue
         kept = []
         for ev in venue.evidence:
             if ev.source_key in blogs and ev.url and ev.queries:
