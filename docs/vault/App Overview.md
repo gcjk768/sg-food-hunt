@@ -10,7 +10,7 @@ Pipeline: scrape (`sgfoodhunt/scrapers/`) → dedup (`sgfoodhunt/dedup/registry.
 `Dockerfile` + `docker-compose.yml`; `docker/entrypoint.sh` (`serve` = weekly scheduler, default `mon 03:17` SGT). State in bind mounts: `config/ data/ logs/ vault/ social_exports/ claude-config/`. `.gitattributes` forces LF on `*.sh` so Windows builds work.
 
 ## Telegram
-`.env`: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID=<TELEGRAM_CHAT_ID>` (the owner Channel), `TELEGRAM_THREAD_ID=<THREAD_ID>` (food topic) → `message_thread_id` in `sgfoodhunt/notify.py`. Needs `notifications.telegram: true` in `config/settings.yaml`. Test: `docker compose run --rm sgfoodhunt notify-test`.
+`.env`: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID=<TELEGRAM_CHAT_ID>` (the owner Channel), `TELEGRAM_THREAD_ID=<THREAD_ID>` (topic "Food Hunt"; 2765 is the recipe bot's "Recipe" topic) → `message_thread_id` in `sgfoodhunt/notify.py`. Needs `notifications.telegram: true` in `config/settings.yaml`. Test: `docker compose run --rm sgfoodhunt notify-test`.
 
 ## AI layer
 `sgfoodhunt/ai/client.py` shells out to `claude -p`; needs `CLAUDE_CODE_OAUTH_TOKEN` or a CLI login in `claude-config/`. Falls back to rules without it.
