@@ -54,6 +54,18 @@ def claude_logged_in() -> bool:
     return (d / ".credentials.json").exists() or (d / "credentials.json").exists()
 
 
+def _cli_error(stdout: str) -> str | None:
+    """The useful part of a failed ``--output-format json`` reply (it starts with usage noise)."""
+    try:
+        data = json.loads(stdout)
+    except ValueError:
+        return None
+    if not isinstance(data, dict):
+        return None
+    parts = [str(data[k]) for k in ("terminal_reason", "result", "error") if data.get(k)]
+    return " | ".join(parts)[:300] or None
+
+
 def _default_runner(cmd: list[str], timeout: int) -> subprocess.CompletedProcess[str]:
     return subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, check=False)
 
@@ -143,7 +155,9 @@ class AiClient:
             "--tools",
             "",
             "--no-session-persistence",
-            "--bare",
+            # --bare only authenticates with ANTHROPIC_API_KEY; with a subscription/OAuth login
+            # (CLAUDE_CODE_OAUTH_TOKEN or `claude /login`) every call fails with 0 tokens.
+            *(["--bare"] if os.environ.get("ANTHROPIC_API_KEY") else []),
             "--max-budget-usd",
             f"{max(0.05, self.settings.max_budget_usd - self.stats.cost_usd):.2f}",
         ]
@@ -161,7 +175,7 @@ class AiClient:
                 "ai %s: claude exited %s: %s",
                 task,
                 proc.returncode,
-                (proc.stderr or proc.stdout)[:300],
+                _cli_error(proc.stdout) or (proc.stderr or proc.stdout)[:300],
             )
             return None
         try:

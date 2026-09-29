@@ -317,3 +317,18 @@ def test_doctor_detects_cli_login(
     assert claude_logged_in()
     res = runner.invoke(app, ["doctor", "-C", str(app_config.config_dir)])
     assert "Claude CLI login found" in res.output
+
+
+def test_bare_only_with_api_key(cache: ResponseCache, monkeypatch: pytest.MonkeyPatch) -> None:
+    """--bare ignores OAuth logins, so it must only be used with ANTHROPIC_API_KEY."""
+    from sgfoodhunt.ai.client import _cli_error
+
+    fake = FakeClaude()
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    extract_venues(_client(cache, fake), "oauth login")
+    assert "--bare" not in fake.calls[-1]
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-test")
+    extract_venues(_client(cache, fake), "api key")
+    assert "--bare" in fake.calls[-1]
+    assert _cli_error('{"usage": {}, "terminal_reason": "api_error"}') == "api_error"
+    assert _cli_error("not json") is None

@@ -12,6 +12,7 @@ updated: 2026-09-29
 - fix: Burpple and Chope selectors updated to 2026-09 markup; Chope search URL from its SearchAction JSON-LD.
 - chore: disabled Quandoo (closing), TableCheck + Chope (search ignores query), HungryGoWhere (500s), Daniel Food Diary (bot challenge), TimeOut (JS search), Tatler + Michelin (robots.txt). Reasons inline in `config/sources.yaml`.
 - feat: optional `WITH_BROWSER` build arg (Playwright + Chromium), off by default.
+- fix: AI calls always failed with a subscription login — `--bare` only accepts ANTHROPIC_API_KEY; now passed only when that key is set (`sgfoodhunt/ai/client.py`). CLI errors now log `terminal_reason`/`result` instead of the usage preamble.
 
 ## 2026-09-29
 - fix: AI response cache used `ai:<hash>` filenames; `:` is illegal on Windows → `sgfoodhunt/http/cache.py` now maps it to `_`.
