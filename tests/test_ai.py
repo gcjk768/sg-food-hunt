@@ -294,3 +294,26 @@ def test_doctor_reports_ai(app_config: AppConfig, monkeypatch: pytest.MonkeyPatc
     settings.write_text(yaml.safe_dump(data))
     res = runner.invoke(app, ["doctor", "-C", str(app_config.config_dir)])
     assert res.exit_code == 0 and "not on PATH" in res.output  # warning, not a failure
+
+
+def test_doctor_detects_cli_login(
+    app_config: AppConfig, monkeypatch: pytest.MonkeyPatch, tmp_path
+) -> None:  # type: ignore[no-untyped-def]
+    from sgfoodhunt.ai.client import claude_config_dir, claude_logged_in
+
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.delenv("CLAUDE_CODE_OAUTH_TOKEN", raising=False)
+    monkeypatch.setenv("CLAUDE_CONFIG_DIR", str(tmp_path / "cc"))
+    assert claude_config_dir() == tmp_path / "cc" and not claude_logged_in()
+    runner = CliRunner(env={"COLUMNS": "200"})
+    settings = app_config.config_dir / "settings.yaml"
+    data = yaml.safe_load(settings.read_text())
+    data["ai"] = {"enabled": True, "claude_bin": "python3"}  # something on PATH
+    settings.write_text(yaml.safe_dump(data))
+    res = runner.invoke(app, ["doctor", "-C", str(app_config.config_dir)])
+    assert res.exit_code == 0 and "no API key and no CLI login" in res.output
+    (tmp_path / "cc").mkdir()
+    (tmp_path / "cc" / ".credentials.json").write_text("{}")
+    assert claude_logged_in()
+    res = runner.invoke(app, ["doctor", "-C", str(app_config.config_dir)])
+    assert "Claude CLI login found" in res.output

@@ -4,6 +4,7 @@ data
 logs
 vault
 social_exports
+claude-config
 tests
 docs
 .mypy_cache

@@ -6,7 +6,8 @@ FROM python:3.11-slim
 ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    TZ=Asia/Singapore
+    TZ=Asia/Singapore \
+    CLAUDE_CONFIG_DIR=/app/claude-config
 
 # WITH_CLAUDE=true installs Node and the Claude Code CLI so the optional AI layer (`ai.enabled`)
 # can shell out to `claude -p`. Authenticate with ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN in .env.
@@ -28,9 +29,9 @@ RUN pip install .
 # Runtime state lives in mounted volumes (see docker-compose.yml), never in the image.
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh \
-    && mkdir -p /app/config /app/data /app/logs /app/vault /app/social_exports
+    && mkdir -p /app/config /app/data /app/logs /app/vault /app/social_exports /app/claude-config
 
-VOLUME ["/app/config", "/app/data", "/app/logs", "/app/vault", "/app/social_exports"]
+VOLUME ["/app/config", "/app/data", "/app/logs", "/app/vault", "/app/social_exports", "/app/claude-config"]
 HEALTHCHECK --interval=5m --timeout=20s CMD sgfh doctor -C /app/config --quiet || exit 1
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["serve"]

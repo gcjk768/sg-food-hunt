@@ -9,5 +9,7 @@ if [ ! -f /app/config/settings.yaml ]; then
 fi
 case "$1" in
   serve) shift; exec sgfh serve -C /app/config "$@" ;;
+  claude) shift; exec claude "$@" ;;          # e.g. `docker compose run --rm -it sgfoodhunt claude` to log in
+  shell|sh|bash) exec /bin/sh ;;
   *) exec sgfh "$@" ;;
 esac

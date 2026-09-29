@@ -260,18 +260,30 @@ spent, the rule-based path is used for that item. Default model is `claude-sonne
 about double the price. A typical weekly run with all four tasks on costs a dollar or two on
 Sonnet; review analysis is the bulk of it. Set `ai.enabled: false` to turn the layer off.
 
-Setup on the NAS:
+Setup on the NAS, in Docker (the image includes the CLI):
 
 ```bash
-# local machine / venv
-npm install -g @anthropic-ai/claude-code
-claude          # log in once, or export ANTHROPIC_API_KEY
-sgfh doctor     # warns if `claude` is not on PATH
-
-# docker: the image includes the CLI by default (WITH_CLAUDE=true); pass the key through .env
 docker compose build
-echo "ANTHROPIC_API_KEY=sk-ant-..." >> .env      # or CLAUDE_CODE_OAUTH_TOKEN from `claude setup-token`
+docker compose run --rm -it sgfoodhunt claude     # opens the Claude CLI inside the container
 ```
+
+The first start of `claude` asks you to log in. On a headless NAS pick the browser option, open the
+printed URL on your phone or laptop, sign in with your Claude subscription (or console account),
+and paste the code back into the terminal. The login is stored in `./claude-config/` (mounted at
+`/app/claude-config`, git ignored), so it survives container restarts and rebuilds. Type `/exit`
+to leave the CLI, then `docker compose run --rm sgfoodhunt doctor` should say
+"Claude CLI login found".
+
+Alternatives that skip the interactive login:
+
+```bash
+# on any machine where you are already logged in:
+claude setup-token                               # prints a long-lived token
+echo "CLAUDE_CODE_OAUTH_TOKEN=..." >> .env       # or ANTHROPIC_API_KEY=sk-ant-... for API billing
+```
+
+Outside Docker (local venv): `npm install -g @anthropic-ai/claude-code`, run `claude` once to log
+in, then `sgfh doctor`.
 
 What is sent to the model: public article text, anonymised review snippets (no reviewer names),
 public social captions, and venue names. Never your exports beyond those captions, never
@@ -334,7 +346,8 @@ docker compose up -d                               # scheduler: runs weekly, sen
 docker compose logs -f                             # watch it
 ```
 
-`docker compose run --rm sgfoodhunt run --dry-run` reruns from the cache without network.
+`docker compose run --rm sgfoodhunt run --dry-run` reruns from the cache without network, and
+`docker compose run --rm -it sgfoodhunt shell` drops you into a shell inside the container.
 Set `SGFH_RUN_ON_START: "true"` in the compose file to trigger a run when the container starts.
 The container's healthcheck runs `sgfh doctor --quiet` every five minutes.
 

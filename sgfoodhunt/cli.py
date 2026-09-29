@@ -14,6 +14,7 @@ from rich.console import Console
 from rich.table import Table
 
 from sgfoodhunt import __version__
+from sgfoodhunt.ai.client import claude_config_dir, claude_logged_in
 from sgfoodhunt.config import AppConfig, load_config
 from sgfoodhunt.diff import compute_diff, diff_markdown, diff_plain_text
 from sgfoodhunt.http.cache import ResponseCache
@@ -446,9 +447,14 @@ def doctor(
             warnings.append(
                 f"ai.enabled is true but `{config.settings.ai.claude_bin}` is not on PATH; AI tasks fall back to rules (npm install -g @anthropic-ai/claude-code)"
             )
-        if not (os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("CLAUDE_CODE_OAUTH_TOKEN")):
-            notes.append(
-                "ai: neither ANTHROPIC_API_KEY nor CLAUDE_CODE_OAUTH_TOKEN is set; the CLI must already be logged in"
+        if os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("CLAUDE_CODE_OAUTH_TOKEN"):
+            notes.append("ai: credentials come from ANTHROPIC_API_KEY / CLAUDE_CODE_OAUTH_TOKEN")
+        elif claude_logged_in():
+            notes.append(f"ai: Claude CLI login found in {claude_config_dir()}")
+        else:
+            warnings.append(
+                "ai: no API key and no CLI login found; run `claude` once (docker: `docker compose run --rm -it sgfoodhunt claude`) "
+                "or set CLAUDE_CODE_OAUTH_TOKEN from `claude setup-token`"
             )
     runnable, skipped = select_sources(config, None)
     notes.append(

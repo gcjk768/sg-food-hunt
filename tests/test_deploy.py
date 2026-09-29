@@ -127,5 +127,7 @@ def test_docker_files_are_consistent() -> None:
     for mount in ("/app/config", "/app/data", "/app/logs", "/app/vault", "/app/social_exports"):
         assert mount in dockerfile and mount in compose
     assert "SGFH_SCHEDULE" in compose and "env_file: .env" in compose
-    assert "exec sgfh serve -C /app/config" in entry
+    assert "exec sgfh serve -C /app/config" in entry and "exec claude" in entry
+    assert "/app/claude-config" in dockerfile and "./claude-config:/app/claude-config" in compose
+    assert "CLAUDE_CONFIG_DIR=/app/claude-config" in dockerfile
     assert cli_module.serve.__doc__ and "scheduler" in cli_module.serve.__doc__.lower()

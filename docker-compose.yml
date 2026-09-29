@@ -21,6 +21,7 @@ services:
       - ./data:/app/data
       - ./logs:/app/logs
       - ./social_exports:/app/social_exports
+      - ./claude-config:/app/claude-config   # Claude CLI login persists here (git ignored)
       - /volume1/obsidian/MyVault:/app/vault     # CHANGE ME: your Obsidian vault on the NAS
     # The dashboard is optional; uncomment to serve it on port 8501:
     # ports:
@@ -28,6 +29,7 @@ services:
     # command: ["dashboard"]
 
   # One-off commands, e.g.:
+  #   docker compose run --rm -it sgfoodhunt claude          # log the Claude CLI in (once)
   #   docker compose run --rm sgfoodhunt doctor
   #   docker compose run --rm sgfoodhunt notify-test
   #   docker compose run --rm sgfoodhunt run --dry-run

@@ -16,3 +16,4 @@ logs/
 !data/.gitkeep
 vault/
 social_exports/
+claude-config/

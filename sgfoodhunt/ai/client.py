@@ -5,11 +5,13 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
+import os
 import shutil
 import subprocess
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import timedelta
+from pathlib import Path
 from typing import Any
 
 from sgfoodhunt.config import AiSettings
@@ -39,6 +41,17 @@ class AiStats:
             "cost_usd": round(self.cost_usd, 4),
             "by_task": self.by_task,
         }
+
+
+def claude_config_dir() -> Path:
+    """Where the Claude Code CLI keeps its login (``CLAUDE_CONFIG_DIR`` or ``~/.claude``)."""
+    return Path(os.environ.get("CLAUDE_CONFIG_DIR") or Path.home() / ".claude")
+
+
+def claude_logged_in() -> bool:
+    """True when a stored CLI login exists (the credentials file the CLI writes after login)."""
+    d = claude_config_dir()
+    return (d / ".credentials.json").exists() or (d / "credentials.json").exists()
 
 
 def _default_runner(cmd: list[str], timeout: int) -> subprocess.CompletedProcess[str]:
