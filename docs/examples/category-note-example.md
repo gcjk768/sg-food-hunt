@@ -4,7 +4,7 @@ category_key: zichar_family
 display_name: Best zi char places for a family weekend meal
 group: family
 party_size: 5
-run_id: 20260929T032643Z
+run_id: 20260929T033159Z
 ranked: 9
 excluded: 1
 tags:
@@ -12,7 +12,7 @@ tags:
 ---
 # Best zi char places for a family weekend meal
 
-Party of 5. Weights: rating 0.21, recommendations 0.21, food 0.14, value 0.14, keyword_match 0.07, space 0.07, parking 0.07, weekend_open 0.07, service 0.03. Run [[SG Food Hunt/Runs/20260929T032643Z|20260929T032643Z]].
+Party of 5. Weights: rating 0.21, recommendations 0.21, food 0.14, value 0.14, keyword_match 0.07, space 0.07, parking 0.07, weekend_open 0.07, service 0.03. Run [[SG Food Hunt/Runs/20260929T033159Z|20260929T033159Z]].
 
 ## Top 15
 

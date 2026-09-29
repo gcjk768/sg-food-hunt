@@ -70,9 +70,9 @@ categories:
 - zichar_family
 best_rank: 1
 earliest_evidence: '2026-02-02'
-first_seen: 20260929T032643Z
-last_seen: 20260929T032643Z
-updated_run: 20260929T032643Z
+first_seen: 20260929T033159Z
+last_seen: 20260929T033159Z
+updated_run: 20260929T033159Z
 tags:
 - sgfoodhunt/venue
 ---

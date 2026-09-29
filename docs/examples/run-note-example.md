@@ -1,10 +1,10 @@
 ---
 type: run
-run_id: 20260929T032643Z
+run_id: 20260929T033159Z
 mode: collect
 status: ok
-started_at: '2026-09-29T03:26:43+00:00'
-finished_at: '2026-09-29T03:26:44+00:00'
+started_at: '2026-09-29T03:31:59+00:00'
+finished_at: '2026-09-29T03:32:00+00:00'
 candidates: 425
 sources_run:
 - google_places
@@ -33,9 +33,9 @@ categories:
 tags:
 - sgfoodhunt/run
 ---
-# Run 20260929T032643Z
+# Run 20260929T033159Z
 
-Mode **collect**, status **ok**. Started 2026-09-29T03:26:43+00:00, finished 2026-09-29T03:26:44+00:00.
+Mode **collect**, status **ok**. Started 2026-09-29T03:31:59+00:00, finished 2026-09-29T03:32:00+00:00.
 
 - Queries run: 264
 - Raw candidates: 425 across 19 sources
@@ -101,74 +101,96 @@ Mode **collect**, status **ok**. Started 2026-09-29T03:26:43+00:00, finished 202
 
 | Time | Level | Component | Message |
 | --- | --- | --- | --- |
-| 03:26:43 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=best+cafes+for+a+date+Singapore (selectors may be stale) |
-| 03:26:43 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=romantic+cafes+Singapore (selectors may be stale) |
-| 03:26:43 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=cosy+cafes+Singapore+couples (selectors may be stale) |
-| 03:26:43 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=instagrammable+cafe+Singapore (selectors may be stale) |
-| 03:26:43 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=tiktok+viral+cafe+Singapore (selectors may be stale) |
-| 03:26:43 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=%E6%96%B0%E5%8A%A0%E5%9D%A1+%E7%BA%A6%E4%BC%9A+%E5%92%96%E5%95%A1%E9%A |
-| 03:26:43 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=best+zi+char+Singapore (selectors may be stale) |
-| 03:26:43 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=best+zichar+restaurants+Singapore+family (selectors may be stale) |
-| 03:26:43 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=cze+char+Singapore (selectors may be stale) |
-| 03:26:43 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=best+tze+char+Singapore (selectors may be stale) |
-| 03:26:43 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=%E6%96%B0%E5%8A%A0%E5%9D%A1+%E7%85%AE%E7%82%92+%E6%8E%A8%E8%8D%90 (sel |
-| 03:26:43 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=%E6%96%B0%E5%8A%A0%E5%9D%A1+%E6%9C%80%E5%A5%BD+%E7%85%AE%E7%82%92 (sel |
-| 03:26:43 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=new+zi+char+Singapore+2026 (selectors may be stale) |
-| 03:26:43 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=newly+opened+zi+char+Singapore (selectors may be stale) |
-| 03:26:43 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=new+zichar+stall+Singapore (selectors may be stale) |
-| 03:26:43 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=new+tze+char+Singapore (selectors may be stale) |
-| 03:26:43 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=%E6%96%B0%E5%8A%A0%E5%9D%A1+%E6%96%B0%E5%BC%80+%E7%85%AE%E7%82%92 (sel |
-| 03:26:43 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=best+cafes+for+a+date+Singapore |
-| 03:26:43 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=romantic+cafes+Singapore |
-| 03:26:43 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=cosy+cafes+Singapore+couples |
-| 03:26:43 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=instagrammable+cafe+Singapore |
-| 03:26:43 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=tiktok+viral+cafe+Singapore |
-| 03:26:43 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=%E6%96%B0%E5%8A%A0%E5%9D%A1+%E7%BA%A6%E4%BC%9A+%E5%92%96%E5%95%A1%E9 |
-| 03:26:43 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=best+zi+char+Singapore |
-| 03:26:43 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=best+zichar+restaurants+Singapore+family |
-| 03:26:43 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=cze+char+Singapore |
-| 03:26:43 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=best+tze+char+Singapore |
-| 03:26:43 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=%E6%96%B0%E5%8A%A0%E5%9D%A1+%E7%85%AE%E7%82%92+%E6%8E%A8%E8%8D%90 |
-| 03:26:43 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=%E6%96%B0%E5%8A%A0%E5%9D%A1+%E6%9C%80%E5%A5%BD+%E7%85%AE%E7%82%92 |
-| 03:26:43 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=new+zi+char+Singapore+2026 |
-| 03:26:43 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=newly+opened+zi+char+Singapore |
-| 03:26:43 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=new+zichar+stall+Singapore |
-| 03:26:43 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=new+tze+char+Singapore |
-| 03:26:43 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=%E6%96%B0%E5%8A%A0%E5%9D%A1+%E6%96%B0%E5%BC%80+%E7%85%AE%E7%82%92 |
-| 03:26:43 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=best+cafes+for+a+date+Singapore |
-| 03:26:43 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=romantic+cafes+Singapore |
-| 03:26:43 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=cosy+cafes+Singapore+couples |
-| 03:26:43 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=instagrammable+cafe+Singapore |
-| 03:26:43 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=tiktok+viral+cafe+Singapore |
-| 03:26:43 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=%E6%96%B0%E5%8A%A0%E5%9D%A1+%E7%BA%A6%E4%BC%9A+%E5%92%96%E5%95%A1%E9%A6 |
-| 03:26:43 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=best+zi+char+Singapore |
-| 03:26:43 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=best+zichar+restaurants+Singapore+family |
-| 03:26:43 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=cze+char+Singapore |
-| 03:26:43 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=best+tze+char+Singapore |
-| 03:26:43 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=%E6%96%B0%E5%8A%A0%E5%9D%A1+%E7%85%AE%E7%82%92+%E6%8E%A8%E8%8D%90 |
-| 03:26:43 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=%E6%96%B0%E5%8A%A0%E5%9D%A1+%E6%9C%80%E5%A5%BD+%E7%85%AE%E7%82%92 |
-| 03:26:43 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=new+zi+char+Singapore+2026 |
-| 03:26:43 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=newly+opened+zi+char+Singapore |
-| 03:26:44 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=new+zichar+stall+Singapore |
-| 03:26:44 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=new+tze+char+Singapore |
-| 03:26:44 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=%E6%96%B0%E5%8A%A0%E5%9D%A1+%E6%96%B0%E5%BC%80+%E7%85%AE%E7%82%92 |
-| 03:26:44 | warning | thesmartlocal | 1 warning(s): no article links found on https://thesmartlocal.test/?s=best+cafes+for+a+date+Singapore |
-| 03:26:44 | warning | thesmartlocal | 1 warning(s): no article links found on https://thesmartlocal.test/?s=romantic+cafes+Singapore |
-| 03:26:44 | warning | thesmartlocal | 1 warning(s): no article links found on https://thesmartlocal.test/?s=cosy+cafes+Singapore+couples |
-| 03:26:44 | warning | thesmartlocal | 1 warning(s): no article links found on https://thesmartlocal.test/?s=instagrammable+cafe+Singapore |
-| 03:26:44 | warning | tatler | 1 warning(s): no article links found on https://tatler.test/?s=best+cafes+for+a+date+Singapore |
-| 03:26:44 | warning | thesmartlocal | 1 warning(s): no article links found on https://thesmartlocal.test/?s=tiktok+viral+cafe+Singapore |
-| 03:26:44 | warning | thesmartlocal | 1 warning(s): no article links found on https://thesmartlocal.test/?s=%E6%96%B0%E5%8A%A0%E5%9D%A1+%E7%BA%A6%E4%BC%9A+%E5%92%96%E5%95%A1%E9%A |
-| 03:26:44 | warning | tatler | 1 warning(s): no article links found on https://tatler.test/?s=romantic+cafes+Singapore |
-| 03:26:44 | warning | tatler | 1 warning(s): no article links found on https://tatler.test/?s=cosy+cafes+Singapore+couples |
+| 03:31:59 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=best+cafes+for+a+date+Singapore (selectors may be stale) |
+| 03:31:59 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=romantic+cafes+Singapore (selectors may be stale) |
+| 03:31:59 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=cosy+cafes+Singapore+couples (selectors may be stale) |
+| 03:31:59 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=instagrammable+cafe+Singapore (selectors may be stale) |
+| 03:31:59 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=tiktok+viral+cafe+Singapore (selectors may be stale) |
+| 03:31:59 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=%E6%96%B0%E5%8A%A0%E5%9D%A1+%E7%BA%A6%E4%BC%9A+%E5%92%96%E5%95%A1%E9%A |
+| 03:31:59 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=best+zi+char+Singapore (selectors may be stale) |
+| 03:31:59 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=best+zichar+restaurants+Singapore+family (selectors may be stale) |
+| 03:31:59 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=cze+char+Singapore (selectors may be stale) |
+| 03:31:59 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=best+tze+char+Singapore (selectors may be stale) |
+| 03:31:59 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=%E6%96%B0%E5%8A%A0%E5%9D%A1+%E7%85%AE%E7%82%92+%E6%8E%A8%E8%8D%90 (sel |
+| 03:31:59 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=%E6%96%B0%E5%8A%A0%E5%9D%A1+%E6%9C%80%E5%A5%BD+%E7%85%AE%E7%82%92 (sel |
+| 03:31:59 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=new+zi+char+Singapore+2026 (selectors may be stale) |
+| 03:31:59 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=newly+opened+zi+char+Singapore (selectors may be stale) |
+| 03:31:59 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=new+zichar+stall+Singapore (selectors may be stale) |
+| 03:31:59 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=new+tze+char+Singapore (selectors may be stale) |
+| 03:31:59 | warning | tablecheck | 1 warning(s): no results parsed from https://tablecheck.test/search?q=%E6%96%B0%E5%8A%A0%E5%9D%A1+%E6%96%B0%E5%BC%80+%E7%85%AE%E7%82%92 (sel |
+| 03:31:59 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=best+cafes+for+a+date+Singapore |
+| 03:31:59 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=romantic+cafes+Singapore |
+| 03:31:59 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=cosy+cafes+Singapore+couples |
+| 03:31:59 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=instagrammable+cafe+Singapore |
+| 03:31:59 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=tiktok+viral+cafe+Singapore |
+| 03:31:59 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=%E6%96%B0%E5%8A%A0%E5%9D%A1+%E7%BA%A6%E4%BC%9A+%E5%92%96%E5%95%A1%E9 |
+| 03:31:59 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=best+zi+char+Singapore |
+| 03:31:59 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=best+zichar+restaurants+Singapore+family |
+| 03:31:59 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=cze+char+Singapore |
+| 03:31:59 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=best+tze+char+Singapore |
+| 03:31:59 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=%E6%96%B0%E5%8A%A0%E5%9D%A1+%E7%85%AE%E7%82%92+%E6%8E%A8%E8%8D%90 |
+| 03:31:59 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=%E6%96%B0%E5%8A%A0%E5%9D%A1+%E6%9C%80%E5%A5%BD+%E7%85%AE%E7%82%92 |
+| 03:31:59 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=new+zi+char+Singapore+2026 |
+| 03:31:59 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=newly+opened+zi+char+Singapore |
+| 03:31:59 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=new+zichar+stall+Singapore |
+| 03:31:59 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=new+tze+char+Singapore |
+| 03:31:59 | warning | danielfooddiary | 1 warning(s): no article links found on https://danielfooddiary.test/?s=%E6%96%B0%E5%8A%A0%E5%9D%A1+%E6%96%B0%E5%BC%80+%E7%85%AE%E7%82%92 |
+| 03:31:59 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=best+cafes+for+a+date+Singapore |
+| 03:31:59 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=romantic+cafes+Singapore |
+| 03:31:59 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=cosy+cafes+Singapore+couples |
+| 03:31:59 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=instagrammable+cafe+Singapore |
+| 03:31:59 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=tiktok+viral+cafe+Singapore |
+| 03:31:59 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=%E6%96%B0%E5%8A%A0%E5%9D%A1+%E7%BA%A6%E4%BC%9A+%E5%92%96%E5%95%A1%E9%A6 |
+| 03:31:59 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=best+zi+char+Singapore |
+| 03:31:59 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=best+zichar+restaurants+Singapore+family |
+| 03:31:59 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=cze+char+Singapore |
+| 03:31:59 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=best+tze+char+Singapore |
+| 03:31:59 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=%E6%96%B0%E5%8A%A0%E5%9D%A1+%E7%85%AE%E7%82%92+%E6%8E%A8%E8%8D%90 |
+| 03:31:59 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=%E6%96%B0%E5%8A%A0%E5%9D%A1+%E6%9C%80%E5%A5%BD+%E7%85%AE%E7%82%92 |
+| 03:31:59 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=new+zi+char+Singapore+2026 |
+| 03:31:59 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=newly+opened+zi+char+Singapore |
+| 03:31:59 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=new+zichar+stall+Singapore |
+| 03:31:59 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=new+tze+char+Singapore |
+| 03:31:59 | warning | honeycombers | 1 warning(s): no article links found on https://honeycombers.test/?s=%E6%96%B0%E5%8A%A0%E5%9D%A1+%E6%96%B0%E5%BC%80+%E7%85%AE%E7%82%92 |
+| 03:31:59 | warning | thesmartlocal | 1 warning(s): no article links found on https://thesmartlocal.test/?s=best+cafes+for+a+date+Singapore |
+| 03:31:59 | warning | thesmartlocal | 1 warning(s): no article links found on https://thesmartlocal.test/?s=romantic+cafes+Singapore |
+| 03:31:59 | warning | thesmartlocal | 1 warning(s): no article links found on https://thesmartlocal.test/?s=cosy+cafes+Singapore+couples |
+| 03:31:59 | warning | thesmartlocal | 1 warning(s): no article links found on https://thesmartlocal.test/?s=instagrammable+cafe+Singapore |
+| 03:31:59 | warning | thesmartlocal | 1 warning(s): no article links found on https://thesmartlocal.test/?s=tiktok+viral+cafe+Singapore |
+| 03:31:59 | warning | thesmartlocal | 1 warning(s): no article links found on https://thesmartlocal.test/?s=%E6%96%B0%E5%8A%A0%E5%9D%A1+%E7%BA%A6%E4%BC%9A+%E5%92%96%E5%95%A1%E9%A |
+| 03:31:59 | warning | tatler | 1 warning(s): no article links found on https://tatler.test/?s=best+cafes+for+a+date+Singapore |
+| 03:31:59 | warning | thesmartlocal | 1 warning(s): no article links found on https://thesmartlocal.test/?s=best+zi+char+Singapore |
+| 03:31:59 | warning | tatler | 1 warning(s): no article links found on https://tatler.test/?s=romantic+cafes+Singapore |
 
 ## Social buzz
 
-_social module disabled (`social.enabled: false`)_
+- Instagram export posts: 5, TikTok export videos: 3 (oEmbed filled 0)
+- SERP results: 0, hashtag posts: 0
+- Matched to venues: 4, unmatched (see data/social/unmatched.jsonl): 4
+- New mentions stored: 7; secondhand mentions in reviews/articles: 1
+- Trending venues: none
+
 
 ## Diff
 
-_Available from stage 5 (diff report against the previous run)._
+_First scored run: nothing to compare against yet._
+
+**New venues (12)**
+- Ah Hua Zi Char · Central
+- Burnt Ends
+- Coexist Coffee Co. · West
+- Imperial Treasure Super Peking Duck · Central
+- Keng Eng Kee Seafood · Central
+- Luna Rooftop · Central
+- Mum's Kitchen 妈妈厨房 · East
+- Odette
+- Old Cafe
+- Sky Garden Grill · Central
+- Tiong Bahru Bakery · Central
+- Two Chefs Eating Place
+
+**New social mentions:** 7
+
 
 ## My notes
 

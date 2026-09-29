@@ -1,0 +1,51 @@
+name: Weekly collection
+
+# Runs the whole pipeline once a week and uploads the exports as an artifact.
+# The Obsidian vault lives on your NAS, so this workflow writes to a throwaway vault folder;
+# use the cron on the NAS (scripts/cron.example) when you want the vault updated in place.
+on:
+  schedule:
+    - cron: "17 19 * * 0"   # Sunday 19:17 UTC = Monday 03:17 SGT
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install
+        run: pip install -e .
+      - name: Restore cache and registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            data/cache
+            data/venues.json
+            data/social
+          key: sgfoodhunt-data-${{ github.run_id }}
+          restore-keys: sgfoodhunt-data-
+      - name: Run
+        env:
+          GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+          REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+          REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
+          REDDIT_USER_AGENT: ${{ secrets.REDDIT_USER_AGENT }}
+          SERP_API_KEY: ${{ secrets.SERP_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: sgfh run
+      - name: Upload outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: sgfoodhunt-${{ github.run_id }}
+          path: |
+            data/exports
+            data/runs
+            vault
+            logs
+          retention-days: 30

@@ -163,7 +163,7 @@ def test_cli_commands(app_config: AppConfig, tmp_path: Path) -> None:
         and (Path(app_config.settings.paths.vault_dir) / "SG Food Hunt" / "Home.md").exists()
     )
     res = runner.invoke(app, ["run", "-C", cfg, "--diff-only"])
-    assert res.exit_code == 2 and "stage 5" in res.output
+    assert res.exit_code == 2 and "no runs found" in res.output
     res = runner.invoke(app, ["run", "-C", cfg, "-c", "nope"])
     assert res.exit_code == 2 and "unknown category" in res.output
     res = runner.invoke(app, ["runs", "-C", cfg])

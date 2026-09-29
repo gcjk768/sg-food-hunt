@@ -6,6 +6,8 @@ from collections import Counter, defaultdict
 from typing import Any
 
 from sgfoodhunt.config import AppConfig
+from sgfoodhunt.diff import RunDiff, diff_markdown
+from sgfoodhunt.http.cache import read_json
 from sgfoodhunt.storage.frontmatter import Note
 from sgfoodhunt.storage.runs import RunRecord, RunStore
 from sgfoodhunt.storage.vault import CATEGORIES, RUNS, VENUES, Vault
@@ -83,6 +85,24 @@ def write_run_note(vault: Vault, store: RunStore, run: RunRecord, config: AppCon
             f"- Trending venues: {', '.join(social.get('trending') or []) or 'none'}\n"
             + ("".join(f"- skipped: {s}\n" for s in social.get("skipped") or []))
         )
+    diff_path = store.run_dir(run.run_id) / "diff.json"
+    diff_section = "_not computed yet (run `sgfh rank`)_"
+    if diff_path.exists():
+        d = read_json(diff_path)
+        diff_obj = RunDiff(run_id=d["run_id"], prev_run_id=d.get("prev_run_id"))
+        from sgfoodhunt.diff import CategoryDiff
+
+        diff_obj.categories = [
+            CategoryDiff(c["key"], c["display_name"], c["entered"], c["left"])
+            for c in d.get("categories", [])
+        ]
+        diff_obj.rating_changes = d.get("rating_changes", [])
+        diff_obj.newly_closed = d.get("newly_closed", [])
+        diff_obj.reopened = d.get("reopened", [])
+        diff_obj.new_venues = d.get("new_venues", [])
+        diff_obj.new_sources = d.get("new_sources", [])
+        diff_obj.new_social_mentions = d.get("new_social_mentions", [])
+        diff_section = diff_markdown(diff_obj)
     body = f"""# Run {run.run_id}
 
 Mode **{run.mode}**, status **{run.status}**. Started {run.started_at}, finished {run.finished_at}.
@@ -115,7 +135,7 @@ Mode **{run.mode}**, status **{run.status}**. Started {run.started_at}, finished
 
 ## Diff
 
-_Available from stage 5 (diff report against the previous run)._
+{diff_section}
 
 ## My notes
 

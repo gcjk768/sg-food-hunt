@@ -13,8 +13,10 @@ from rich.table import Table
 
 from sgfoodhunt import __version__
 from sgfoodhunt.config import AppConfig, load_config
+from sgfoodhunt.diff import compute_diff, diff_markdown, diff_plain_text
 from sgfoodhunt.http.cache import ResponseCache
 from sgfoodhunt.logging_setup import setup_logging
+from sgfoodhunt.notify import notify
 from sgfoodhunt.pipeline import Collector, select_sources
 from sgfoodhunt.ranking import default_geocoder, rank_run
 from sgfoodhunt.reporting import (
@@ -111,8 +113,15 @@ def run(
     store, cache, vault = _paths(config)
     log_path = setup_logging(config.resolve(config.settings.paths.logs_dir), "run", verbose)
     if diff_only:
-        console.print("[yellow]--diff-only arrives with stage 5.[/yellow]")
-        raise typer.Exit(code=2)
+        latest = store.latest_run(status=None)
+        if latest is None:
+            console.print("[red]no runs found[/red]")
+            raise typer.Exit(code=2)
+        diff = compute_diff(config, store, latest.run_id)
+        console.print(diff_markdown(diff))
+        write_home_note(vault, config, write_run_note(vault, store, latest, config))
+        _notify(config, diff)
+        return
     if social_only:
         latest = store.latest_run(status=None)
         if latest is None:
@@ -178,10 +187,24 @@ def run(
     write_home_note(vault, config, link)
     _print_run_summary(config, record)
     _print_rank_summary(config, ranked)
+    if ranked.diff is not None:
+        console.print(diff_markdown(ranked.diff))
+        _notify(config, ranked.diff)
     console.print(
         f"\nrun note: {vault.note_path('Runs', record.run_id)}\n"
         f"raw CSV: {csv_path}\nraw JSON: {json_path}\nlog: {log_path}"
     )
+
+
+def _notify(config: AppConfig, diff) -> None:  # type: ignore[no-untyped-def]
+    n = config.settings.notifications
+    if not (n.telegram or n.email):
+        return
+    if diff.is_empty and diff.prev_run_id is not None:
+        log.info("diff is empty; notifications skipped")
+        return
+    result = notify(config, diff_plain_text(diff), subject=f"SG Food Hunt diff {diff.run_id}")
+    console.print(f"notifications: telegram {result.telegram}, email {result.email}")
 
 
 def _print_rank_summary(config: AppConfig, ranked) -> None:  # type: ignore[no-untyped-def]

@@ -4,7 +4,10 @@ Collects, ranks and keeps fresh a list of dining venues in Singapore for dates a
 occasions, and writes the results into an Obsidian vault. Everything is plain files (JSON,
 JSONL, Markdown) so the project can live on a NAS share. There is no database.
 
-**Status: stage 4 of 5 (sources, storage, dedup, scoring, vault notes, MRT enrichment, review analysis and the social buzz module).** See [docs/DESIGN.md](docs/DESIGN.md) for the
+**Status: all five stages built.** Sources and storage, dedup and scoring, MRT enrichment and
+review analysis, the social buzz module, and the diff report, notifications, dashboard and
+scheduling. The first live run against the real sites will still need selector tuning (see the
+legal notes below). See [docs/DESIGN.md](docs/DESIGN.md) for the
 full outline, config schema and storage schema, and the stage plan at the bottom of this file.
 
 ## Setup
@@ -41,7 +44,8 @@ sgfh cache stats | sgfh cache purge
 ```
 
 `sgfh run --social-only` re-parses your Instagram / TikTok exports and secondhand mentions against
-the latest run's venues without touching the network. `--diff-only` arrives with stage 5.
+the latest run's venues without touching the network. `sgfh run --diff-only` recomputes the diff
+of the latest run against the previous one, rewrites the run note and sends notifications.
 
 ### Keys
 
@@ -228,15 +232,52 @@ venue id. No commenter or viewer data is ever stored.
 at most `scoring.buzz_bonus_max` (5% by default). A venue with at least
 `social.trending_threshold` mentions in the window gets `trending_social: true`.
 
+## Diff report and notifications
+
+Every `sgfh run` (and `sgfh rank`) compares the run with the previous scored run and writes
+`data/runs/<run_id>/diff.json` plus a "Diff" section in the run note:
+
+- venues that entered or left each category's top 15
+- Google rating changes of at least `notifications.rating_change_threshold` (0.2)
+- newly closed (and reopened) venues
+- new venues, new sources found per venue, and new social mentions
+
+Set `notifications.telegram: true` and/or `notifications.email: true` in settings.yaml and the
+matching variables in `.env` (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`; `SMTP_HOST`, `SMTP_PORT`,
+`SMTP_USER`, `SMTP_PASSWORD`, `REPORT_EMAIL_TO`) to receive the diff as plain text. An empty diff
+sends nothing.
+
+## Dashboard
+
+```bash
+pip install -e ".[dashboard]"
+streamlit run sgfoodhunt/dashboard/app.py -- --config config
+```
+
+Filters: category, region, budget, halal, kid friendly, nearest MRT (replaces "distance from
+home" since there is no home location), trending on social, hide closed. Shows the ranked table
+with booking links, a map of the filtered venues, and recent social mention counts. It reads
+`data/venues.json` and the latest `scores.json`, so it works on the NAS without the vault.
+
+## Google Sheets export (optional)
+
+Set `exports.google_sheets: true`, install `pip install -e ".[sheets]"`, share a spreadsheet
+with a service account and set `GOOGLE_SHEETS_CREDENTIALS_JSON` (path to its key file) and
+`GOOGLE_SHEETS_SPREADSHEET_ID`. Each run rewrites one worksheet per category.
+
 ## Scheduling
 
-Weekly cron on the NAS (see `scripts/cron.example`):
+Weekly cron on the NAS (see `scripts/cron.example`), which keeps the vault updated in place:
 
 ```
 17 3 * * 1  cd /volume1/SG-Cafe-Food-Hunt && .venv/bin/sgfh run >> logs/cron.log 2>&1
 ```
 
-A GitHub Actions weekly workflow and Telegram/email notification of the diff arrive with stage 5.
+`.github/workflows/weekly.yml` runs the same pipeline on GitHub Actions every Monday 03:17 SGT
+(or on demand), restores the cache and registry between runs, and uploads the exports, run
+folders and a throwaway vault as an artifact. Add the API keys as repository secrets. Because the
+vault is on your NAS, the Actions run cannot update it; use it for the notifications and CSVs, or
+as a backup when the NAS is off.
 
 ## Politeness, legal and ethical notes
 
@@ -283,4 +324,4 @@ CI runs the same three on every push (`.github/workflows/ci.yml`).
 2. Normalisation, dedup, scoring, venue and category notes (done)
 3. Enrichment (OneMap geocoding, nearest MRT station) and review analysis (done)
 4. Social buzz module (exports, oEmbed, SERP, hashtag API) (done)
-5. Diff report, notifications, Streamlit dashboard, weekly workflow, Sheets export
+5. Diff report, notifications, Streamlit dashboard, weekly workflow, Sheets export (done)

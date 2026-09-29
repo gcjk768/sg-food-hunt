@@ -57,7 +57,10 @@ SG-Cafe-Food-Hunt/
 │   ├── data/mrt_stations.json bundled MRT station table (refresh: scripts/update_mrt_stations.py)
 │   ├── social/                exports.py (IG/TikTok parsers), oembed.py, serp.py, hashtags.py,
 │   │                          secondhand.py, matcher.py, store.py, buzz.py, pipeline.py
-│   └── dashboard/             stage 5: Streamlit app reading the vault + data/
+│   ├── diff.py                run-to-run diff (top list churn, ratings, closures, new venues/sources/mentions)
+│   ├── notify.py              Telegram bot and SMTP email delivery of the diff
+│   ├── sheets.py              optional Google Sheets export (gspread)
+│   └── dashboard/             Streamlit app (app.py) over data/venues.json + latest scores.json
 ├── tests/                     fixtures/ (saved HTML and JSON) + one test module per area
 ├── scripts/cron.example       weekly cron line
 └── .github/workflows/ci.yml   ruff, mypy, pytest on every push
@@ -119,7 +122,7 @@ data/
 │   ├── venues.json           canonical venues seen in this run (id, fields, evidence[], aliases[])
 │   ├── merges.jsonl          every non-exact merge for review
 │   ├── scores.json           {category: [ {venue_id, score, rank, components, adjustments, excluded_reason} ]}
-│   └── diff.json             stage 5: diff against the previous run
+│   └── diff.json             diff against the previous scored run
 ├── venues.json               the registry: every venue ever seen, stable ids v00001..., next_id
 ├── cache/
 │   ├── http/<2 hex>/<sha256>.meta.json + .body   raw responses with expires_at
@@ -188,5 +191,6 @@ removes a venue from every output, `status: visited` can be hidden with `--hide-
    run-to-run history, generated summary and best-for line, all persisted in the registry.
 4. **Social buzz** (done, behind `social.enabled`): export parsers, TikTok oEmbed, SERP, hashtag
    API, handle/caption matcher, mention store, buzz score capped at 5% of the ranking.
-5. **Dashboard, diff and scheduling**: Streamlit app, diff report, Telegram/email, cron and
-   GitHub Actions weekly workflow, optional Google Sheets export.
+5. **Dashboard, diff and scheduling** (done): Streamlit app, diff report in the run note and
+   diff.json, Telegram/email, cron example and GitHub Actions weekly workflow, optional Google
+   Sheets export.

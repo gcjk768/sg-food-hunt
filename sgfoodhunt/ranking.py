@@ -13,6 +13,7 @@ from typing import Any
 from sgfoodhunt.config import AppConfig
 from sgfoodhunt.dedup import Venue, build_venues
 from sgfoodhunt.dedup.registry import MatchStats
+from sgfoodhunt.diff import RunDiff, compute_diff
 from sgfoodhunt.enrich import EnrichStats, OneMapGeocoder, enrich_venues
 from sgfoodhunt.http.cache import ResponseCache, write_json
 from sgfoodhunt.http.client import AsyncApiClient
@@ -40,6 +41,8 @@ class RankResult:
     match_stats: MatchStats
     enrich_stats: EnrichStats = field(default_factory=EnrichStats)
     social_stats: SocialStats = field(default_factory=SocialStats)
+    diff: RunDiff | None = None
+    sheets: list[str] = field(default_factory=list)
     personal_count: int = 0
     notes_written: int = 0
     exports: dict[str, str] = field(default_factory=dict)
@@ -156,6 +159,15 @@ async def rank_run(
     exports_dir = config.resolve(config.settings.paths.exports_dir) / run_id
     csvs = export_category_csvs(config, scores, venues, exports_dir)
     merged = export_merged_json(config, scores, venues, exports_dir, run_id)
+    diff = compute_diff(config, store, run_id)
+    sheets: list[str] = []
+    if config.settings.exports.google_sheets:
+        from sgfoodhunt.sheets import export_csvs_to_sheets
+
+        try:
+            sheets = export_csvs_to_sheets(csvs)
+        except Exception as exc:
+            log.warning("google sheets export skipped: %s", exc)
     result = RankResult(
         run_id=run_id,
         venues=venues,
@@ -163,12 +175,19 @@ async def rank_run(
         match_stats=match_stats,
         enrich_stats=enrich_stats,
         social_stats=social_stats,
+        diff=diff,
+        sheets=sheets,
         personal_count=len(personal),
         notes_written=notes_written,
         exports={**{k: str(p) for k, p in csvs.items()}, "merged_json": str(merged)},
     )
     record = store.load_run(run_id)
     record.stats["ranking"] = result.summary()
+    record.stats["diff"] = {
+        "prev_run_id": diff.prev_run_id,
+        "empty": diff.is_empty,
+        "new_venues": len(diff.new_venues),
+    }
     store.save_run(record)
     log.info(
         "ranked %d categories over %d venues (%d new); %d venue notes written",

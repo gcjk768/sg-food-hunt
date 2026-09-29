@@ -66,7 +66,7 @@ pretty = true
 files = ["sgfoodhunt", "tests"]
 
 [[tool.mypy.overrides]]
-module = ["bs4.*", "rapidfuzz.*", "respx.*", "playwright.*", "pandas.*"]
+module = ["bs4.*", "rapidfuzz.*", "respx.*", "playwright.*", "pandas.*", "streamlit.*", "gspread.*"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
