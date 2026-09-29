@@ -26,6 +26,12 @@ COPY pyproject.toml README.md ./
 COPY sgfoodhunt ./sgfoodhunt
 RUN pip install .
 
+# WITH_BROWSER=true adds Playwright + Chromium for `fetch: browser` sources (Chope). ~450 MB.
+# Off by default: no enabled source needs it (2026-09-29). Also set shm_size: 512m in compose.
+ARG WITH_BROWSER=false
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+RUN if [ "$WITH_BROWSER" = "true" ]; then          pip install ".[browser]"          && playwright install --with-deps chromium          && rm -rf /var/lib/apt/lists/*;        fi
+
 # Runtime state lives in mounted volumes (see docker-compose.yml), never in the image.
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh \

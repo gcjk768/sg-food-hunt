@@ -61,14 +61,16 @@ class CardSearchScraper(BaseScraper):
 class ChopeScraper(CardSearchScraper):
     key: ClassVar[str] = "chope"
     default_selectors = CardSelectors(
-        card="div.restaurant-card, li.restaurant-item, article[data-restaurant-id]",
-        name="h3, .restaurant-name, .restaurant-card__name",
-        link="a[href*='/singapore-restaurants/']",
-        address=".restaurant-address, .restaurant-card__address, .location",
-        rating=".rating, .restaurant-card__rating",
+        # 2026-09 rendered search (li.card_container); older class names kept as fallbacks.
+        # content_thi = [price, cuisine..., area]; the area goes into address for geocoding hints.
+        card="li.card_container, div.restaurant-card, li.restaurant-item, article[data-restaurant-id]",
+        name="a.res_name, h3, .restaurant-name, .restaurant-card__name",
+        link="a[href*='/singapore-restaurants/restaurant/'], a[href*='/singapore-restaurants/']",
+        address="ul.content_thi > li:last-child, .restaurant-address, .restaurant-card__address",
+        rating=".content_sec, .rating, .restaurant-card__rating",
         review_count=".reviews, .review-count",
-        price=".price, .restaurant-card__price",
-        cuisine=".cuisine, .restaurant-card__cuisine",
+        price="b.select-price, .price:not(:has(b.select-price)), .restaurant-card__price",
+        cuisine="ul.content_thi > li:nth-of-type(2), .cuisine, .restaurant-card__cuisine",
     )
 
 

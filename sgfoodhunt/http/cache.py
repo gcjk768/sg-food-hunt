@@ -55,6 +55,10 @@ def cache_key(method: str, url: str, body: bytes | str | None = None) -> str:
     return h.hexdigest()
 
 
+_UMASK = os.umask(0)
+os.umask(_UMASK)
+
+
 def atomic_write_bytes(path: Path, data: bytes) -> None:
     """Write via a temp file and rename so a crash never leaves a half written file."""
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -62,6 +66,9 @@ def atomic_write_bytes(path: Path, data: bytes) -> None:
     try:
         with os.fdopen(fd, "wb") as fh:
             fh.write(data)
+        # mkstemp always creates 0600; give the file normal umask-based permissions so vault notes
+        # written by the container (root) stay readable/editable from Obsidian on the host.
+        os.chmod(tmp, 0o666 & ~_UMASK)
         os.replace(tmp, path)
     except BaseException:
         if os.path.exists(tmp):

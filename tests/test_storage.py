@@ -135,3 +135,15 @@ def test_run_ids_do_not_collide(tmp_path: Path) -> None:
     a = store.create_run("collect", [], [])
     b = store.create_run("collect", [], [])
     assert a.run_id != b.run_id
+
+
+def test_atomic_write_uses_umask_not_mkstemp_0600(tmp_path) -> None:  # type: ignore[no-untyped-def]
+    import os
+    import stat
+
+    from sgfoodhunt.http.cache import _UMASK, atomic_write_text
+
+    p = tmp_path / "note.md"
+    atomic_write_text(p, "x")
+    if os.name == "posix":
+        assert stat.S_IMODE(p.stat().st_mode) == 0o666 & ~_UMASK

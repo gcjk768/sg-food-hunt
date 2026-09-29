@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import re
 from typing import ClassVar
+from urllib.parse import urlsplit
 
 from sgfoodhunt.ai.tasks import extract_listicle
 from sgfoodhunt.models import ScrapeResult, SearchQuery
@@ -23,6 +24,7 @@ DEFAULT_CONTENT_SELECTORS = (
     "div.post-content",
     "div.article-content",
     "div.td-post-content",
+    ".elementor-widget-theme-post-content",  # Elementor sites (e.g. Seth Lui) have no <article>
     "article",
     "main",
 )
@@ -33,6 +35,9 @@ class ListicleBlogScraper(BaseScraper):
     #: regex on the URL path identifying an article on this site
     article_pattern: ClassVar[str] = r"^/[a-z0-9-]{12,}/?$"
     content_selectors: ClassVar[tuple[str, ...]] = DEFAULT_CONTENT_SELECTORS
+    #: CSS selector for the search results area; limits link discovery so nav/footer links that
+    #: happen to match ``article_pattern`` are not opened. None = whole page.
+    results_selector: ClassVar[str | None] = None
     heading_tags: ClassVar[tuple[str, ...]] = ("h2", "h3")
     max_articles: ClassVar[int] = 5
     #: articles whose title matches none of these words are still opened; this only orders them
@@ -56,8 +61,21 @@ class ListicleBlogScraper(BaseScraper):
         return int(self.source.options.get("max_articles", self.max_articles))
 
     def article_links(self, soup, search_url: str) -> list[str]:  # type: ignore[no-untyped-def]
-        links = absolute_links(soup, search_url, self._article_re())
-        links = [u for u in links if u.rstrip("/") != search_url.rstrip("/")]
+        scope = self.source.options.get("results_selector", self.results_selector)
+        roots = (soup.select(str(scope)) if scope else []) or [soup]
+        links = list(
+            dict.fromkeys(
+                u for r in roots for u in absolute_links(r, search_url, self._article_re())
+            )
+        )
+        # Same site only: an off-site profile link (facebook.com/<blog>) can match article_pattern,
+        # and a robots.txt refusal there used to skip the whole source for the rest of the run.
+        host = urlsplit(search_url).netloc
+        links = [
+            u
+            for u in links
+            if urlsplit(u).netloc == host and u.rstrip("/") != search_url.rstrip("/")
+        ]
 
         # Prefer listicle looking URLs; keep document order otherwise.
         def score(url: str) -> int:
@@ -153,6 +171,7 @@ class ListicleBlogScraper(BaseScraper):
 class SethLuiScraper(ListicleBlogScraper):
     key = "sethlui"
     article_pattern = r"^/[a-z0-9-]+-singapore/?$|^/[a-z0-9-]{15,}/?$"
+    results_selector = ".e-loop-item"
 
 
 class DanielFoodDiaryScraper(ListicleBlogScraper):

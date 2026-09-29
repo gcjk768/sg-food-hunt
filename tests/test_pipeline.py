@@ -178,13 +178,13 @@ def test_cli_dry_run_with_empty_cache_touches_no_network(app_config: AppConfig) 
     cfg = str(app_config.config_dir)
     res = runner.invoke(
         app,
-        ["run", "-C", cfg, "--dry-run", "-c", "zichar_family", "-s", "sethlui", "-s", "michelin"],
+        ["run", "-C", cfg, "--dry-run", "-c", "zichar_family", "-s", "sethlui", "-s", "eatbook"],
     )
     assert res.exit_code == 0, res.output
     store = RunStore(app_config.settings.paths.data_dir)
     run = store.latest_run()
     assert run is not None and run.mode == "dry_run" and run.stats["requests"] == 0
-    assert run.stats["warnings"] >= 7  # 6 zi char queries + 1 michelin listing, none cached
+    assert run.stats["warnings"] >= 7  # 6 zi char queries x 2 blogs, none cached
     note = Path(app_config.settings.paths.vault_dir) / "SG Food Hunt" / "Runs" / f"{run.run_id}.md"
     assert note.exists() and "dry run: not cached" in note.read_text()
 

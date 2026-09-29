@@ -3,6 +3,8 @@
 # any other arguments are passed straight to sgfh (e.g. "run --dry-run", "doctor", "notify-test").
 set -e
 cd /app
+# Files land on a NAS share edited from Obsidian as a non-root user: let the share's ACLs decide.
+umask 000
 if [ ! -f /app/config/settings.yaml ]; then
   echo "config/settings.yaml is missing: mount your config folder at /app/config" >&2
   exit 1

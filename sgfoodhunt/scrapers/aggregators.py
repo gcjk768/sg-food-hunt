@@ -13,13 +13,15 @@ class BurppleScraper(CardSearchScraper):
     booking_source = False
     default_selectors = CardSelectors(
         card="div.searchVenue, div.venue-card, a.venue-list-item",
-        name=".searchVenue-name, .venue-card__name, h3",
-        link="a[href^='/']",
-        address=".searchVenue-location, .venue-card__location, .location",
+        # 2026-09 markup first (searchVenue-header-*), older class names kept as fallbacks
+        name=".searchVenue-header-name-name, .searchVenue-name, .venue-card__name, h3",
+        link=".searchVenue-header a[href^='/'], a[href^='/']",
+        address=".searchVenue-header-locationDistancePrice-location, .searchVenue-location, "
+        ".venue-card__location, .location",
         rating=".searchVenue-rating, .rating",
-        review_count=".searchVenue-reviews, .reviews",
-        price=".searchVenue-price, .price",
-        cuisine=".searchVenue-tags, .tags",
+        review_count=".searchVenue-header-reviews, .searchVenue-reviews, .reviews",
+        price=".searchVenue-header-locationDistancePrice-price, .searchVenue-price, .price",
+        cuisine=".searchVenue-header-categories, .searchVenue-tags, .tags",
     )
 
 

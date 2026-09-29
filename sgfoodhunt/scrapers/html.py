@@ -196,6 +196,10 @@ def extract_listicle_entries(
     headings = [h for h in article.find_all(list(heading_tags)) if _block_text(h)]
     for heading in headings:
         raw = _block_text(heading)
+        info = ""
+        if ":" in raw and extract_postal_code(raw):
+            # single-venue review info line: "Name: address, Singapore 650643 | Tel | Hours"
+            raw, info = (part.strip() for part in raw.split(":", 1))
         if raw.lower().strip(" :") in SKIP_HEADINGS or len(raw) > 140:
             continue
         chunks: list[str] = []
@@ -209,7 +213,7 @@ def extract_listicle_entries(
                     break
                 chunks.append(_block_text(sib))
                 links.extend(str(a["href"]) for a in sib.find_all("a", href=True))
-        text = re.sub(r"\s+", " ", " ".join(c for c in chunks if c)).strip()
+        text = re.sub(r"\s+", " ", " ".join(c for c in [info, *chunks] if c)).strip()
         if len(text) < min_text_chars:
             continue
         name, name_zh = split_chinese_name(clean_venue_heading(raw))

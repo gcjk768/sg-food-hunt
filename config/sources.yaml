@@ -42,10 +42,10 @@ sources:
     name: Chope
     kind: booking
     scraper: ChopeScraper
-    enabled: true
+    enabled: false             # 2026-09-29: search ignores the words (same 15 featured venues for any query; parser fixed, needs WITH_BROWSER)
     priority: 20
     base_url: https://www.chope.co
-    search_url: https://www.chope.co/singapore-restaurants/search?q={query}
+    search_url: https://www.chope.co/singapore-restaurants/category/restaurant/2?restaurant={query}  # from the site's SearchAction JSON-LD; old /search 404s
     fetch: browser
     independent: false
     tos_status: unverified
@@ -56,7 +56,7 @@ sources:
     name: Quandoo
     kind: booking
     scraper: QuandooScraper
-    enabled: true
+    enabled: false             # 2026-09-29: Quandoo is closing down (platform off after 2026-09-30)
     priority: 21
     base_url: https://www.quandoo.sg
     search_url: https://www.quandoo.sg/en/result?destination=singapore&query={query}
@@ -69,7 +69,7 @@ sources:
     name: TableCheck
     kind: booking
     scraper: TableCheckScraper
-    enabled: true
+    enabled: false             # 2026-09-29: search is a JS map that ignores the query and returns the same ~50 venues
     priority: 22
     base_url: https://www.tablecheck.com
     search_url: https://www.tablecheck.com/en/singapore/search?q={query}
@@ -110,7 +110,7 @@ sources:
     name: HungryGoWhere
     kind: aggregator
     scraper: HungryGoWhereScraper
-    enabled: true
+    enabled: false             # 2026-09-29: every search returns HTTP 500
     priority: 31
     base_url: https://www.hungrygowhere.com
     search_url: https://www.hungrygowhere.com/search?q={query}
@@ -149,7 +149,7 @@ sources:
     name: Daniel Food Diary
     kind: blog
     scraper: DanielFoodDiaryScraper
-    enabled: true
+    enabled: false             # 2026-09-29: site answers crawlers with a bot challenge (202); not bypassed
     priority: 41
     base_url: https://danielfooddiary.com
     search_url: https://danielfooddiary.com/?s={query}
@@ -175,7 +175,7 @@ sources:
     name: Time Out Singapore
     kind: blog
     scraper: TimeOutScraper
-    enabled: true
+    enabled: false             # 2026-09-29: search results are JS rendered and show trending links, not matches
     priority: 43
     base_url: https://www.timeout.com
     search_url: https://www.timeout.com/singapore/search?q={query}
@@ -229,7 +229,7 @@ sources:
     name: Tatler Dining Singapore
     kind: blog
     scraper: TatlerDiningScraper
-    enabled: true
+    enabled: false             # 2026-09-29: robots.txt disallows /search
     priority: 47
     base_url: https://www.tatlerasia.com
     search_url: https://www.tatlerasia.com/search?q={query}&section=dining
@@ -242,7 +242,7 @@ sources:
     name: Michelin Guide Singapore
     kind: guide
     scraper: MichelinScraper
-    enabled: true
+    enabled: false             # 2026-09-29: robots.txt disallows the selection listing
     priority: 50
     base_url: https://guide.michelin.com
     fetch: static

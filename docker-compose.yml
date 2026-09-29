@@ -7,6 +7,7 @@ services:
       context: .
       args:
         WITH_CLAUDE: "true"           # bakes in the Claude Code CLI for the AI layer ("false" to skip)
+        WITH_BROWSER: "false"         # "true" = Chromium for JS-rendered sources (add shm_size: 512m)
     image: sgfoodhunt:latest
     container_name: sgfoodhunt
     restart: unless-stopped
