@@ -8,9 +8,6 @@ from dataclasses import dataclass
 from functools import lru_cache
 from importlib import resources
 
-WALK_DETOUR_FACTOR = 1.25  # straight line -> street distance
-WALK_METRES_PER_MIN = 80.0
-
 
 @dataclass(slots=True, frozen=True)
 class Station:
@@ -48,7 +45,3 @@ def nearest_station(lat: float, lng: float) -> tuple[Station, float]:
             best, best_d = st, d
     assert best is not None
     return best, best_d
-
-
-def walk_minutes(distance_m: float) -> int:
-    return max(1, math.ceil(distance_m * WALK_DETOUR_FACTOR / WALK_METRES_PER_MIN))

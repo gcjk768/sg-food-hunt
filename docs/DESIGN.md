@@ -52,10 +52,11 @@ SG-Cafe-Food-Hunt/
 │   ├── normalise/             names, price levels, cuisine labels, opening hours, region from postal code
 │   ├── dedup/                 venue model + registry (place id, name+postal, phone/booking link, fuzzy)
 │   ├── scoring/               Bayesian rating, recency-decayed recommendations, weights, filters, penalties
-│   ├── enrich/                OneMap postal geocoding, nearest MRT station / lines / walk minutes
+│   ├── enrich/                OneMap postal geocoding, nearest MRT station and lines
 │   ├── reviews/               keyword counts, aspect scores, noise, rating trend, summary, best-for
 │   ├── data/mrt_stations.json bundled MRT station table (refresh: scripts/update_mrt_stations.py)
-│   ├── social/                stage 4: IG/TikTok export parsers, oEmbed, SERP, hashtag API, buzz score
+│   ├── social/                exports.py (IG/TikTok parsers), oembed.py, serp.py, hashtags.py,
+│   │                          secondhand.py, matcher.py, store.py, buzz.py, pipeline.py
 │   └── dashboard/             stage 5: Streamlit app reading the vault + data/
 ├── tests/                     fixtures/ (saved HTML and JSON) + one test module per area
 ├── scripts/cron.example       weekly cron line
@@ -123,7 +124,7 @@ data/
 ├── cache/
 │   ├── http/<2 hex>/<sha256>.meta.json + .body   raw responses with expires_at
 │   └── robots/<host>.json
-├── social/                   stage 4: parsed export mentions (mentions.jsonl, unmatched.jsonl)
+├── social/                   mentions.jsonl (deduplicated), unmatched.jsonl (review + manual resolve), hashtag_log.json
 └── exports/<run_id>/         CSV per category, merged JSON
 ```
 
@@ -150,7 +151,7 @@ Venue note frontmatter (properties, so Obsidian Bases / Dataview can filter):
 type: venue
 name, name_zh, brand, outlet
 address, postal_code, district, region, lat, lng
-nearest_mrt, mrt_lines, mrt_walk_min
+nearest_mrt, mrt_lines
 cuisine: [..], halal, vegetarian_options, kid_friendly, pet_friendly
 price_level: "$$", price_per_pax_sgd, bill_estimate: {cafes_date: 60, family_weekend: 180}
 opening_hours: {mon: ["11:00-22:00"], ...}, open_weekends, late_night, ph_closed
@@ -181,10 +182,11 @@ removes a venue from every output, `status: visited` can be hidden with `--hide-
 2. **Dedup and scoring** (done): normalise → registry match (place id, name+postal, phone or
    booking link, fuzzy with log) → `data/venues.json` with stable ids → score per category →
    `Categories/*.md`, `Venues/*.md`, per category CSV and merged JSON. `sgfh rank` re-runs it offline.
-3. **Enrichment and review analysis** (done): nearest MRT station, lines and walking minutes
-   from a bundled station table (OneMap geocodes postal codes when Google gave no coordinates);
+3. **Enrichment and review analysis** (done): nearest MRT station and lines from a bundled
+   station table (OneMap geocodes postal codes when Google gave no coordinates);
    no driving distance by request. Keyword counts, aspect scores, noise level, rating trend from
    run-to-run history, generated summary and best-for line, all persisted in the registry.
-4. **Social buzz** (flag): export parsers, oEmbed, SERP, hashtag API, buzz score and bonus.
+4. **Social buzz** (done, behind `social.enabled`): export parsers, TikTok oEmbed, SERP, hashtag
+   API, handle/caption matcher, mention store, buzz score capped at 5% of the ranking.
 5. **Dashboard, diff and scheduling**: Streamlit app, diff report, Telegram/email, cron and
    GitHub Actions weekly workflow, optional Google Sheets export.

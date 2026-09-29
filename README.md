@@ -4,7 +4,7 @@ Collects, ranks and keeps fresh a list of dining venues in Singapore for dates a
 occasions, and writes the results into an Obsidian vault. Everything is plain files (JSON,
 JSONL, Markdown) so the project can live on a NAS share. There is no database.
 
-**Status: stage 3 of 5 (sources, storage, dedup, scoring, vault notes, MRT enrichment and review analysis).** See [docs/DESIGN.md](docs/DESIGN.md) for the
+**Status: stage 4 of 5 (sources, storage, dedup, scoring, vault notes, MRT enrichment, review analysis and the social buzz module).** See [docs/DESIGN.md](docs/DESIGN.md) for the
 full outline, config schema and storage schema, and the stage plan at the bottom of this file.
 
 ## Setup
@@ -40,7 +40,8 @@ sgfh show <run_id>                 # per source counts and sample candidates
 sgfh cache stats | sgfh cache purge
 ```
 
-`--diff-only` and `--social-only` are wired in the CLI and arrive with stages 5 and 4.
+`sgfh run --social-only` re-parses your Instagram / TikTok exports and secondhand mentions against
+the latest run's venues without touching the network. `--diff-only` arrives with stage 5.
 
 ### Keys
 
@@ -79,7 +80,7 @@ Chains get one note per outlet, named `Brand (Outlet)`, with a shared `brand` pr
 
 - Coordinates come from Google Places; venues without them are geocoded by postal code through
   OneMap's public search endpoint (cached for a year). No driving distance is computed.
-- Nearest MRT station, its lines and walking minutes (straight line × 1.25 at 80 m/min) come from
+- The nearest MRT station and its lines (no walking time, by request) come from
   a bundled station table in `sgfoodhunt/data/mrt_stations.json` (MRT only, approximate
   coordinates). Refresh it from the data.gov.sg "LTA MRT Station Exit" GeoJSON with
   `python scripts/update_mrt_stations.py <file.geojson>`.
@@ -190,6 +191,43 @@ create a venue; they only attach to one another source already found.
 Tune the weights per category in `config/categories.yaml` and the global constants under
 `scoring` in `config/settings.yaml`.
 
+## Social buzz module (optional)
+
+Off by default. Turn it on with `social.enabled: true` in `config/settings.yaml`. Instagram and
+TikTok are never scraped; signals come only from these routes, each with its own parser:
+
+1. **Your own exports.** Drop the unzipped folders under `social_exports/` (the folder name must
+   start with `instagram` or `tiktok`):
+   - Instagram: Settings → Accounts Center → Your information and permissions → Download your
+     information → select **Saved** and **Likes**, format **JSON**. Unzip into
+     `social_exports/instagram/`. The tool reads `saved_posts.json` and `liked_posts.json`
+     (post URL, creator handle, date; Instagram does not export captions of others' posts, so
+     matching is by creator handle).
+   - TikTok: Settings → Account → Download your data → format **JSON**. Unzip into
+     `social_exports/tiktok/`. The tool reads favourite and liked videos, then calls TikTok's
+     public oEmbed endpoint for each video's caption and creator (cached 180 days).
+2. **Secondhand mentions.** Counts "tiktok", "instagram", "viral", "insta worthy" in stored
+   review snippets and article snippets per venue (`social_secondhand` property).
+3. **Search engine index.** With `SERP_API_KEY` set (SerpAPI shaped endpoint,
+   `social.serp_endpoint` to change), every category query runs restricted to
+   `social.serp_sites`; only the result URL, title and snippet are stored. Post pages are never
+   fetched.
+4. **Instagram Hashtag Search API.** With `INSTAGRAM_GRAPH_TOKEN` and
+   `INSTAGRAM_BUSINESS_ACCOUNT_ID` set and `social.hashtags` listed (max 25), recent media
+   captions and timestamps are stored. A local log (`data/social/hashtag_log.json`) keeps you
+   under the 30 unique tags per week platform limit. Not configured → skipped silently.
+
+Mentions are matched to venues by creator handle, then by venue names or hashtags inside the
+caption (fuzzy). Unmatched captions go to `data/social/unmatched.jsonl` with the best guesses;
+set `resolved_venue_id` on a row and the next run treats it as a manual match. Mentions live in
+`data/social/mentions.jsonl` with source, URL, caption, creator handle, post date and matched
+venue id. No commenter or viewer data is ever stored.
+
+**Buzz score:** distinct mentions in the last `social.buzz_window_months` with recency decay
+(`0.5^(age_days / buzz_half_life_days)`), normalised across venues, and added to the ranking as
+at most `scoring.buzz_bonus_max` (5% by default). A venue with at least
+`social.trending_threshold` mentions in the window gets `trending_social: true`.
+
 ## Scheduling
 
 Weekly cron on the NAS (see `scripts/cron.example`):
@@ -243,6 +281,6 @@ CI runs the same three on every push (`.github/workflows/ci.yml`).
 
 1. Sources and storage (done)
 2. Normalisation, dedup, scoring, venue and category notes (done)
-3. Enrichment (OneMap geocoding, nearest MRT) and review analysis (done)
-4. Social buzz module (exports, oEmbed, SERP, hashtag API)
+3. Enrichment (OneMap geocoding, nearest MRT station) and review analysis (done)
+4. Social buzz module (exports, oEmbed, SERP, hashtag API) (done)
 5. Diff report, notifications, Streamlit dashboard, weekly workflow, Sheets export

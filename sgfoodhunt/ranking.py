@@ -25,6 +25,7 @@ from sgfoodhunt.reporting.venue_notes import (
 from sgfoodhunt.reviews import analyse_venue
 from sgfoodhunt.reviews.analysis import record_rating_history
 from sgfoodhunt.scoring import ScoredVenue, score_category
+from sgfoodhunt.social import SocialStats, run_social
 from sgfoodhunt.storage.runs import RunStore
 from sgfoodhunt.storage.vault import Vault
 
@@ -38,6 +39,7 @@ class RankResult:
     scores: dict[str, list[ScoredVenue]]
     match_stats: MatchStats
     enrich_stats: EnrichStats = field(default_factory=EnrichStats)
+    social_stats: SocialStats = field(default_factory=SocialStats)
     personal_count: int = 0
     notes_written: int = 0
     exports: dict[str, str] = field(default_factory=dict)
@@ -50,6 +52,7 @@ class RankResult:
             "fuzzy_merges": len(self.match_stats.merges),
             "geocoded": self.enrich_stats.geocoded,
             "mrt_assigned": self.enrich_stats.mrt_assigned,
+            "social": self.social_stats.as_dict(),
             "personal_notes": self.personal_count,
             "venue_notes_written": self.notes_written,
             "ranked_per_category": {
@@ -79,6 +82,9 @@ async def rank_run(
     hide_visited: bool = False,
     category_keys: list[str] | None = None,
     geocoder: OneMapGeocoder | None = None,
+    cache: ResponseCache | None = None,
+    social_offline: bool = False,
+    social_exports_only: bool = False,
 ) -> RankResult:
     """Dedup -> enrich -> analyse reviews -> score -> notes and exports for a stored run.
 
@@ -95,6 +101,21 @@ async def rank_run(
     enrich_stats = await enrich_venues(seen, geocoder)
     for v in venues.values():
         analyse_venue(v, config)
+    social_stats = SocialStats(enabled=False)
+    if config.settings.social.enabled:
+        social_cache = cache or ResponseCache(config.resolve(config.settings.paths.cache_dir))
+        social_stats = await run_social(
+            config,
+            social_cache,
+            venues,
+            run_id,
+            offline=social_offline,
+            exports_only=social_exports_only,
+        )
+    buzz = {
+        vid: b.score * config.settings.scoring.buzz_bonus_max
+        for vid, b in social_stats.buzz.items()
+    }
     vault.ensure()
     personal = read_personal_notes(vault, list(venues.values()))
 
@@ -114,6 +135,7 @@ async def rank_run(
             personal=personal,
             aspects=aspects,
             trends=trends,
+            buzz=buzz,
             hide_visited=hide_visited,
         )
     ranks: dict[str, dict[str, int]] = {}
@@ -140,6 +162,7 @@ async def rank_run(
         scores=scores,
         match_stats=match_stats,
         enrich_stats=enrich_stats,
+        social_stats=social_stats,
         personal_count=len(personal),
         notes_written=notes_written,
         exports={**{k: str(p) for k, p in csvs.items()}, "merged_json": str(merged)},

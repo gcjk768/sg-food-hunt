@@ -110,11 +110,38 @@ def run(
     config = _load(config_dir)
     store, cache, vault = _paths(config)
     log_path = setup_logging(config.resolve(config.settings.paths.logs_dir), "run", verbose)
-    if diff_only or social_only:
-        console.print(
-            "[yellow]--diff-only arrives with stage 5 and --social-only with stage 4.[/yellow]"
-        )
+    if diff_only:
+        console.print("[yellow]--diff-only arrives with stage 5.[/yellow]")
         raise typer.Exit(code=2)
+    if social_only:
+        latest = store.latest_run(status=None)
+        if latest is None:
+            console.print(
+                "[red]no runs yet: run a collection first so there are venues to match[/red]"
+            )
+            raise typer.Exit(code=2)
+        if not config.settings.social.enabled:
+            console.print("[yellow]social.enabled is false in settings.yaml[/yellow]")
+            raise typer.Exit(code=2)
+        ranked = asyncio.run(
+            rank_run(
+                config,
+                store,
+                vault,
+                latest.run_id,
+                hide_visited=hide_visited,
+                category_keys=category,
+                geocoder=None,
+                cache=cache,
+                social_exports_only=True,
+            )
+        )
+        _print_rank_summary(config, ranked)
+        console.print(ranked.social_stats.as_dict())
+        write_home_note(
+            vault, config, write_run_note(vault, store, store.load_run(latest.run_id), config)
+        )
+        return
     try:
         for key in category or []:
             config.categories.get(key)
@@ -138,6 +165,8 @@ def run(
             hide_visited=hide_visited,
             category_keys=category,
             geocoder=default_geocoder(config, cache, dry_run=dry_run),
+            cache=cache,
+            social_offline=dry_run,
         )
     )
     record = store.load_run(record.run_id)
@@ -202,6 +231,8 @@ def rank(
             hide_visited=hide_visited,
             category_keys=category,
             geocoder=default_geocoder(config, cache, dry_run=offline),
+            cache=cache,
+            social_offline=offline,
         )
     )
     _print_rank_summary(config, ranked)

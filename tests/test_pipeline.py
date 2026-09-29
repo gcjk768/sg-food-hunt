@@ -244,7 +244,9 @@ async def test_rank_run_end_to_end(
         and fm["name_zh"] == "琼荣记海鲜"
     )
     assert fm["ranks"]["zichar_family"] == 1 and fm["price_level"] == "$$"
-    assert fm["nearest_mrt"] == "Redhill" and fm["mrt_walk_min"] >= 1 and fm["lat"] == 1.2865
+    assert (
+        fm["nearest_mrt"] == "Redhill" and fm["mrt_lines"] == ["East West"] and fm["lat"] == 1.2865
+    )
     assert fm["best_for"] == "a no-fuss zi char dinner with the family"
     assert "## Getting there" in note.body and "Nearest MRT: **Redhill**" in note.body
     assert "Keng Eng Kee Seafood is a" in note.body

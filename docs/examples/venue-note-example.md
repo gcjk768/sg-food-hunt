@@ -16,7 +16,6 @@ location: 1.2865,103.8127
 nearest_mrt: Redhill
 mrt_lines:
 - East West
-mrt_walk_min: 9
 cuisine:
 - Chinese
 - Seafood
@@ -64,16 +63,16 @@ scores:
   cafes_date: 0.884
   zichar_family: 0.937
 ranks:
-  cafes_date: 1
+  cafes_date: 2
   zichar_family: 1
 categories:
 - cafes_date
 - zichar_family
 best_rank: 1
 earliest_evidence: '2026-02-02'
-first_seen: 20260929T031852Z
-last_seen: 20260929T031852Z
-updated_run: 20260929T031852Z
+first_seen: 20260929T032643Z
+last_seen: 20260929T032643Z
+updated_run: 20260929T032643Z
 tags:
 - sgfoodhunt/venue
 ---
@@ -85,7 +84,7 @@ tags:
 
 ## Summary
 
-Keng Eng Kee Seafood is a budget friendly Zi Char place in Queenstown / Tiong Bahru, about 9 min on foot from Redhill MRT. It is recommended by 7 independent sources, holds a Michelin Bib Gourmand and rated 4.3 on Google over 2,100 reviews.
+Keng Eng Kee Seafood is a budget friendly Zi Char place in Queenstown / Tiong Bahru, near Redhill MRT. It is recommended by 7 independent sources, holds a Michelin Bib Gourmand and rated 4.3 on Google over 2,100 reviews.
 
 ## Best for
 
@@ -93,12 +92,12 @@ a no-fuss zi char dinner with the family
 
 ## Getting there
 
-Nearest MRT: **Redhill** (East West), about 9 min walk.
+Nearest MRT: **Redhill** (East West).
 
 ## Rankings
 
-- [[SG Food Hunt/Categories/Best cafes for a date|Best cafes for a date]]: rank 1, score 0.88
 - [[SG Food Hunt/Categories/Best zi char places for a family weekend meal|Best zi char places for a family weekend meal]]: rank 1, score 0.94
+- [[SG Food Hunt/Categories/Best cafes for a date|Best cafes for a date]]: rank 2, score 0.88
 
 **Excluded from:**
 - Newly opened zi char places: earliest evidence 2026-02-02 is older than 30 days
@@ -121,6 +120,10 @@ _unknown_
 | Google Reserve | [https://maps.google.com/?cid=3](https://maps.google.com/?cid=3) |  | cafes_date, zichar_family, new_zichar |
 | Google Maps (Places API) | [https://maps.google.com/?cid=3](https://maps.google.com/?cid=3) |  | cafes_date, zichar_family, new_zichar |
 | Burpple | [https://www.burpple.com/kek-seafood](https://www.burpple.com/kek-seafood) |  | cafes_date, zichar_family, new_zichar |
+
+## Recent social mentions
+
+- 2025-07-01 · instagram · @kengengkeeseafood · [post](https://www.instagram.com/reel/C8xyzREEL/)
 
 ## Review snippets
 

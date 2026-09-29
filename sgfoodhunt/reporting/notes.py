@@ -70,6 +70,19 @@ def write_run_note(vault: Vault, store: RunStore, run: RunRecord, config: AppCon
             top_names[row["name"]] += 1
     frequent = [[name, n] for name, n in top_names.most_common(40)]
 
+    social = (stats.get("ranking") or {}).get("social") or {}
+    if not social or not social.get("enabled", False):
+        social_section = "_social module disabled (`social.enabled: false`)_"
+    else:
+        social_section = (
+            f"- Instagram export posts: {social.get('ig_export', 0)}, TikTok export videos: {social.get('tiktok_export', 0)} "
+            f"(oEmbed filled {social.get('oembed_filled', 0)})\n"
+            f"- SERP results: {social.get('serp', 0)}, hashtag posts: {social.get('hashtag', 0)}\n"
+            f"- Matched to venues: {social.get('matched', 0)}, unmatched (see data/social/unmatched.jsonl): {social.get('unmatched', 0)}\n"
+            f"- New mentions stored: {social.get('stored_new', 0)}; secondhand mentions in reviews/articles: {social.get('secondhand_total', 0)}\n"
+            f"- Trending venues: {', '.join(social.get('trending') or []) or 'none'}\n"
+            + ("".join(f"- skipped: {s}\n" for s in social.get("skipped") or []))
+        )
     body = f"""# Run {run.run_id}
 
 Mode **{run.mode}**, status **{run.status}**. Started {run.started_at}, finished {run.finished_at}.
@@ -95,6 +108,10 @@ Mode **{run.mode}**, status **{run.status}**. Started {run.started_at}, finished
 ## Warnings
 
 {_md_table(["Time", "Level", "Component", "Message"], warn_rows) if warn_rows else "_none_"}
+
+## Social buzz
+
+{social_section}
 
 ## Diff
 

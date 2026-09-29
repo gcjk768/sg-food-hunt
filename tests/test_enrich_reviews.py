@@ -11,7 +11,6 @@ from sgfoodhunt.enrich import (
     enrich_venues,
     load_stations,
     nearest_station,
-    walk_minutes,
 )
 from sgfoodhunt.http.cache import ResponseCache
 from sgfoodhunt.http.client import AsyncApiClient
@@ -42,10 +41,8 @@ def test_nearest_station_and_walk() -> None:
     assert station.name == "Havelock" and "Thomson-East Coast" in station.lines and dist < 500
     station, dist = nearest_station(1.2861, 103.8280)  # just east of Tiong Bahru station
     assert station.name == "Tiong Bahru" and "East West" in station.lines
-    assert walk_minutes(dist) <= 11
     station, _ = nearest_station(1.2864, 103.8536)  # Fullerton
     assert station.name == "Raffles Place"
-    assert walk_minutes(0) == 1 and walk_minutes(800) == 13
 
 
 async def test_geocoder_and_enrich(http_settings, cache: ResponseCache) -> None:
@@ -74,7 +71,7 @@ async def test_geocoder_and_enrich(http_settings, cache: ResponseCache) -> None:
     no_postal = Venue(id="v4", name="Mystery")
     stats = await enrich_venues([kek, nowhere, has_coords, no_postal], geocoder)
     assert stats.geocoded == 1 and stats.geocode_failed == 1 and stats.mrt_assigned == 2
-    assert kek.lat == 1.2865 and kek.nearest_mrt == "Redhill" and kek.mrt_walk_min
+    assert kek.lat == 1.2865 and kek.nearest_mrt == "Redhill" and kek.mrt_lines == ["East West"]
     assert has_coords.nearest_mrt == "Raffles Place" and stats.onemap_requests == 2
     assert no_postal.nearest_mrt is None
     # second pass is served from cache and does not re-assign
@@ -139,7 +136,6 @@ def test_summary_and_best_for(app_config: AppConfig) -> None:
         region="Central",
         price_level=1,
         nearest_mrt="Redhill",
-        mrt_walk_min=8,
         michelin="Bib Gourmand",
         ratings={"google_places": {"rating": 4.3, "review_count": 2100}},
         evidence=[
@@ -152,7 +148,7 @@ def test_summary_and_best_for(app_config: AppConfig) -> None:
     analyse_venue(v, app_config, {"zichar_family": 1, "family_weekend": 4})
     assert v.summary is not None
     assert v.summary.startswith(
-        "Keng Eng Kee Seafood is a budget friendly Zi Char place in Queenstown / Tiong Bahru, about 8 min on foot from Redhill MRT."
+        "Keng Eng Kee Seafood is a budget friendly Zi Char place in Queenstown / Tiong Bahru, near Redhill MRT."
     )
     assert (
         "recommended by 3 independent sources" in v.summary and "Michelin Bib Gourmand" in v.summary

@@ -344,8 +344,8 @@ def summarise(venue: Venue, config: AppConfig) -> str:
         venue.price_level or 0
     )
     first = f"{venue.name} is a {price + ' ' if price else ''}{kind_phrase}{where}"
-    if venue.nearest_mrt and venue.mrt_walk_min:
-        first += f", about {venue.mrt_walk_min} min on foot from {venue.nearest_mrt} MRT"
+    if venue.nearest_mrt:
+        first += f", near {venue.nearest_mrt} MRT"
     first += "."
     strengths = [a for a, s in venue.aspects.items() if s >= 0.7]
     weaknesses = [a for a, s in venue.aspects.items() if s <= 0.35]

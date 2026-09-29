@@ -61,8 +61,6 @@ class Venue:
     # stage 3: enrichment and review analysis
     nearest_mrt: str | None = None
     mrt_lines: list[str] = field(default_factory=list)
-    mrt_distance_m: int | None = None
-    mrt_walk_min: int | None = None
     rating_history: list[dict[str, Any]] = field(default_factory=list)
     rating_trend: str | None = None
     aspects: dict[str, float] = field(default_factory=dict)
@@ -70,6 +68,12 @@ class Venue:
     noise_level: str | None = None
     summary: str | None = None
     best_for: str | None = None
+    # stage 4: social buzz
+    social_secondhand: int = 0
+    buzz_score: float = 0.0
+    social_mentions_window: int = 0
+    trending_social: bool = False
+    recent_social: list[dict[str, Any]] = field(default_factory=list)
     first_seen_run: str | None = None
     last_seen_run: str | None = None
 

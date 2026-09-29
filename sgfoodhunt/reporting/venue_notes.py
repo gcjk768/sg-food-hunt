@@ -100,7 +100,6 @@ def build_venue_note(
         "location": f"{venue.lat},{venue.lng}" if venue.lat and venue.lng else None,
         "nearest_mrt": venue.nearest_mrt,
         "mrt_lines": venue.mrt_lines or None,
-        "mrt_walk_min": venue.mrt_walk_min,
         "cuisine": venue.cuisine or None,
         "price_level": "$" * venue.price_level if venue.price_level else None,
         "price_per_pax_sgd": per_pax,
@@ -139,6 +138,10 @@ def build_venue_note(
         "noise_level": venue.noise_level,
         "keyword_counts": venue.keyword_counts or None,
         "best_for": venue.best_for,
+        "buzz_score": venue.buzz_score or None,
+        "trending_social": venue.trending_social or None,
+        "social_mentions_6m": venue.social_mentions_window or None,
+        "social_secondhand": venue.social_secondhand or None,
         "business_status": venue.business_status,
         "source_count": len(venue.source_keys),
         "independent_sources": len(venue.independent_sources),
@@ -187,10 +190,18 @@ def build_venue_note(
             ]
         )
     mrt_line = (
-        f"Nearest MRT: **{venue.nearest_mrt}** ({', '.join(venue.mrt_lines)}), about {venue.mrt_walk_min} min walk."
+        f"Nearest MRT: **{venue.nearest_mrt}** ({', '.join(venue.mrt_lines)})."
         if venue.nearest_mrt
         else "_no coordinates yet_"
     )
+    social_lines = [
+        f"- {m.get('date') or 'undated'} · {m.get('platform')} · {('@' + m['creator']) if m.get('creator') else m.get('source')} · [post]({m['url']})"
+        for m in venue.recent_social
+        if m.get("url")
+    ]
+    social_block = "\n".join(social_lines) if social_lines else "_none_"
+    if venue.social_secondhand:
+        social_block += f"\n\nReviews and articles mention TikTok / Instagram / viral {venue.social_secondhand} time(s)."
     excluded_block = (
         ("\n**Excluded from:**\n" + "\n".join(excluded_lines)) if excluded_lines else ""
     )
@@ -232,6 +243,10 @@ def build_venue_note(
 ## Evidence
 
 {_md_table(["Source", "Page", "Date", "Categories"], evidence_rows) if evidence_rows else "_none_"}
+
+## Recent social mentions
+
+{social_block}
 
 ## Review snippets
 
@@ -283,7 +298,7 @@ def build_category_note(
             s.rank,
             link,
             v.region or "",
-            f"{v.nearest_mrt} ({v.mrt_walk_min} min)" if v.nearest_mrt else "",
+            v.nearest_mrt or "",
             "$" * v.price_level if v.price_level else "",
             f"{v.google_rating:.1f} ({v.google_reviews or 0})" if v.google_rating else "",
             len(v.independent_sources),

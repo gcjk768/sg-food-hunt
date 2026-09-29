@@ -90,6 +90,8 @@ class SocialSettings(BaseModel):
     trending_threshold: int = 5
     hashtags: list[str] = Field(default_factory=list, max_length=25)
     serp_sites: list[str] = Field(default_factory=lambda: ["instagram.com", "tiktok.com"])
+    serp_endpoint: str = "https://serpapi.com/search.json"
+    serp_max_results: int = 10
 
 
 class ExportSettings(BaseModel):

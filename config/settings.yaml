@@ -50,8 +50,10 @@ social:
   buzz_window_months: 6
   buzz_half_life_days: 60
   trending_threshold: 5
-  hashtags: []                    # max 25, only used with an Instagram Business token
+  hashtags: []                    # max 25, only used with an Instagram Business token, e.g. [sgcafe, sgfoodie, sgfood]
   serp_sites: ["instagram.com", "tiktok.com"]
+  serp_endpoint: https://serpapi.com/search.json
+  serp_max_results: 10
 
 exports:
   google_sheets: false

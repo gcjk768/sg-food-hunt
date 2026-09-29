@@ -8,7 +8,7 @@ from dataclasses import dataclass
 
 from sgfoodhunt.dedup.venue import Venue
 from sgfoodhunt.enrich.geocode import OneMapGeocoder
-from sgfoodhunt.enrich.mrt import nearest_station, walk_minutes
+from sgfoodhunt.enrich.mrt import nearest_station
 
 log = logging.getLogger(__name__)
 
@@ -33,11 +33,9 @@ async def enrich_venues(venues: Iterable[Venue], geocoder: OneMapGeocoder | None
             else:
                 stats.geocode_failed += 1
         if v.lat is not None and v.lng is not None and v.nearest_mrt is None:
-            station, dist = nearest_station(v.lat, v.lng)
+            station, _dist = nearest_station(v.lat, v.lng)
             v.nearest_mrt = station.name
             v.mrt_lines = list(station.lines)
-            v.mrt_distance_m = round(dist)
-            v.mrt_walk_min = walk_minutes(dist)
             stats.mrt_assigned += 1
     if geocoder is not None:
         stats.onemap_requests = geocoder.lookups
