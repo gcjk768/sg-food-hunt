@@ -174,7 +174,7 @@ def compute_diff(
                             "delta": round(delta, 2),
                         }
                     )
-            if v.get("business_status", "").startswith("CLOSED") and not str(
+            if (v.get("business_status") or "").startswith("CLOSED") and not str(
                 pv.get("business_status") or ""
             ).startswith("CLOSED"):
                 diff.newly_closed.append(

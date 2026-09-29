@@ -68,3 +68,35 @@ def test_blog_links_must_match_query_and_be_food() -> None:
 def test_heading_news_prefix_stripped() -> None:
     assert clean_venue_heading("New menu: Maggie’s") == "Maggie’s"
     assert clean_venue_heading("New restaurant: Yanhuo Restaurant") == "Yanhuo Restaurant"
+
+
+def test_diff_handles_null_business_status(tmp_path: Path) -> None:
+    """business_status is stored as null; the second run's diff crashed on None.startswith."""
+    from sgfoodhunt.diff import compute_diff
+
+    config = load_config(CONFIG)
+    config.settings.paths.data_dir = tmp_path
+    venue = {
+        "id": "v1",
+        "name": "A",
+        "business_status": None,
+        "evidence": [],
+        "first_seen_run": "r1",
+    }
+    for r in ("r1", "r2"):
+        _write_run(tmp_path, r, {}, [venue])
+        (tmp_path / "runs" / r / "run.json").write_text(
+            json.dumps(
+                {
+                    "run_id": r,
+                    "status": "ok",
+                    "mode": "collect",
+                    "started_at": "x",
+                    "categories": [],
+                    "sources": [],
+                }
+            ),
+            encoding="utf-8",
+        )
+    diff = compute_diff(config, RunStore(tmp_path), "r2", prev_run_id="r1")
+    assert diff.newly_closed == [] and diff.reopened == []
