@@ -100,3 +100,24 @@ def test_diff_handles_null_business_status(tmp_path: Path) -> None:
         )
     diff = compute_diff(config, RunStore(tmp_path), "r2", prev_run_id="r1")
     assert diff.newly_closed == [] and diff.reopened == []
+
+
+def test_headline_names_cleaned() -> None:
+    assert clean_venue_heading("New outlet: Martina’s Kitchen") == "Martina’s Kitchen"
+    assert clean_venue_heading("Molly Tea is opening at Hillion Mall on 9 October") == "Molly Tea"
+    assert (
+        clean_venue_heading("Marymount Bakehouse opens at Upper Thomson with sourdough")
+        == "Marymount Bakehouse"
+    )
+    assert clean_venue_heading("Opening Hours Cafe") == "Opening Hours Cafe"
+
+
+def test_stored_names_keep_leading_numbers() -> None:
+    from sgfoodhunt.scrapers.html import strip_news_wording
+
+    assert strip_news_wording("99 Old Trees") == "99 Old Trees"
+    assert strip_news_wording("54° Steakhouse") == "54° Steakhouse"
+    assert strip_news_wording("New dining concept: LingZhi Greens") == "LingZhi Greens"
+    assert strip_news_wording("Noci Bakehouse opens second outlet at Orchard Gateway") == (
+        "Noci Bakehouse"
+    )

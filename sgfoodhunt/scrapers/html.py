@@ -27,7 +27,13 @@ LEADING_NUMBER_RE = re.compile(r"^\s*(?:#?\d{1,3}[.):\-–—]?\s*)")
 TRAILING_SEP_RE = re.compile(r"\s*[|–—-]\s*(?:best|top|the|a|an|for|our|where)\b.*$", re.IGNORECASE)
 # "New menu: Maggie's", "New restaurant: Yanhuo" -> the venue name only
 NEWS_PREFIX_RE = re.compile(
-    r"^(?:new|just opened|now open|opening)\s*(?:menu|restaurant|cafe|bar|opening|outlet)?\s*:\s*",
+    r"^(?:new|just opened|now open|opening)(?:\s+[a-z]+){0,2}\s*:\s*",
+    re.IGNORECASE,
+)
+# "Molly Tea is opening at Hillion Mall on 9 October", "Noci opens second outlet at ..." -> name
+NEWS_SUFFIX_RE = re.compile(
+    r"\s+(?:is\s+)?(?:opening|opens|opened|now open|reopens|launches)(?:\s+[a-z]+){0,2}?\s+"
+    r"(?:at|in|on|this|its|a|an|the|with|soon|today)(?:\s.*)?$",
     re.IGNORECASE,
 )
 CJK_RE = re.compile(r"[一-鿿]{2,}")
@@ -147,10 +153,17 @@ def page_title(soup: BeautifulSoup) -> str | None:
     return None
 
 
+def strip_news_wording(name: str) -> str:
+    """ "New restaurant: X" / "X is opening at ..." -> "X". Safe on stored venue names (unlike
+    clean_venue_heading, which also drops a leading list number and would eat "99 Old Trees")."""
+    cleaned = NEWS_SUFFIX_RE.sub("", NEWS_PREFIX_RE.sub("", name.strip())).strip()
+    return cleaned or name
+
+
 def clean_venue_heading(text: str) -> str:
     text = re.sub(r"\s+", " ", text).strip()
     text = LEADING_NUMBER_RE.sub("", text)
-    text = NEWS_PREFIX_RE.sub("", text)
+    text = strip_news_wording(text)
     text = TRAILING_SEP_RE.sub("", text)
     text = re.sub(r"\s*[\[(]\s*(?:closed|permanently closed|new)\s*[\])]\s*$", "", text, flags=re.I)
     return text.strip(" -–—:|")

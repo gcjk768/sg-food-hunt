@@ -5,6 +5,7 @@ updated: 2026-09-30
 # Changelog
 
 ## 2026-09-30
+- fix: headline names ("New restaurant: X", "X is opening at …", "New dining concept: X") → "X". `strip_news_wording()` in `sgfoodhunt/scrapers/html.py`, applied by the registry (`sgfoodhunt/dedup/registry.py`) on load + create so names saved by older runs are fixed too (the registry keeps the first name it saw).
 - fix: second run crashed in `compute_diff` (`sgfoodhunt/diff.py`) — `business_status` is stored as null and `.get(k, "")` only defaults a *missing* key; now `(… or "")`.
 - docs: README rewritten (highlights, flow, stack, limitations; fixed stale clone URL); architecture diagram added as `docs/architecture.drawio` + `.drawio.svg` + `.png`.
 - fix: blog search pages also link sidebar/"latest" posts that ignore the query; they came back for every query (~85x), so baby classes, cruises, JB guides etc. landed as venues in all 15 categories. `relevant_article()` in `sgfoodhunt/scrapers/blogs.py` now opens a link only if its slug names food, isn't an overseas guide, and shares a word with the query (Chinese queries on these English blogs are dropped).

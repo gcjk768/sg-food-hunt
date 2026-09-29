@@ -37,6 +37,7 @@ from sgfoodhunt.normalise import (
     region_for_postal,
     split_brand_outlet,
 )
+from sgfoodhunt.scrapers.html import strip_news_wording
 
 log = logging.getLogger(__name__)
 
@@ -130,6 +131,11 @@ class VenueRegistry:
         data = read_json(self.path)
         for raw in data.get("venues", []):
             venue = Venue.from_dict(raw)
+            clean = strip_news_wording(venue.name)  # names saved before the cleaner learned a rule
+            if clean and clean != venue.name:
+                venue.name = clean
+                brand, outlet = split_brand_outlet(clean)
+                venue.brand, venue.outlet = (brand if outlet else None), outlet
             self.venues[venue.id] = venue
             self._index(venue)
         self._next = int(data.get("next_id", len(self.venues) + 1))
@@ -211,10 +217,11 @@ class VenueRegistry:
         return vid
 
     def create(self, row: dict[str, Any], run_id: str) -> Venue:
-        brand, outlet = split_brand_outlet(row["name"])
+        name = strip_news_wording(row["name"])
+        brand, outlet = split_brand_outlet(name)
         venue = Venue(
             id=self._new_id(),
-            name=row["name"],
+            name=name,
             brand=brand if outlet else None,
             outlet=outlet,
             first_seen_run=run_id,
