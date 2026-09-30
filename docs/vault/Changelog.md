@@ -5,6 +5,7 @@ updated: 2026-09-30
 # Changelog
 
 ## 2026-09-30
+- chore(nas): NAS stack now runs daily — `SGFH_SCHEDULE: daily 03:17` in `/volume1/docker/sg-food-hunt/docker-compose.yml` (was `mon 03:17`). Posts only venues new to a top 3, so quiet days send nothing.
 - fix: month headings of monthly round-ups ("July 2026") became venues. `is_date_only()` (`sgfoodhunt/models.py`) rejects them in `VenueCandidate`; `prune_blog_evidence()` clears saved ones.
 - fix: hotels ranked #1 for hawker/zi char. Registry evidence persists across runs, so articles older runs opened for every query kept every category. `prune_blog_evidence()` (`sgfoodhunt/dedup/registry.py`) re-checks stored blog evidence each run and re-derives its categories (dropped 2,652 stale entries on the NAS registry). `relevant_article()` is stricter: generic food words don't count, a 2+-word query needs 2 hits, "new/latest" queries need an openings slug.
 - fix: headline names ("New restaurant: X", "X is opening at …", "New dining concept: X") → "X". `strip_news_wording()` in `sgfoodhunt/scrapers/html.py`, applied by the registry (`sgfoodhunt/dedup/registry.py`) on load + create so names saved by older runs are fixed too (the registry keeps the first name it saw).
