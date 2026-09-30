@@ -209,12 +209,12 @@ def _notify(config: AppConfig, diff) -> None:  # type: ignore[no-untyped-def]
         return
     store, _, _ = _paths(config)
     cards = venue_messages(config, store, diff)
-    # any change is news: the summary goes first, then one card per new top pick
-    summary = diff_plain_text(diff, title="SG Food Hunt update")
-    text = "\n\n".join([summary, *cards])
-    result = notify(
-        config, text, subject=f"SG Food Hunt diff {diff.run_id}", messages=[summary, *cards]
-    )
+    # Telegram gets only venue cards (the owner's fixed format); the text summary is for email
+    if not cards and n.telegram and not n.email:
+        log.info("no new venue cards; notifications skipped")
+        return
+    text = "\n\n".join([diff_plain_text(diff, title="SG Food Hunt update"), *cards])
+    result = notify(config, text, subject=f"SG Food Hunt diff {diff.run_id}", messages=cards)
     console.print(f"notifications: telegram {result.telegram}, email {result.email}")
 
 

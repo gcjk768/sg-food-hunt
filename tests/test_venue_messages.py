@@ -40,6 +40,14 @@ def test_one_message_per_new_top_pick(tmp_path: Path) -> None:
     # next week: only v3 is new to cat_a's top 3, v0 is new to cat_b's
     second = venue_messages(config, store, RunDiff(run_id="r2", prev_run_id="r1"))
     assert sorted(m.splitlines()[0] for m in second) == ["🍽 Venue 0", "🍽 Venue 3"]
+    # a venue entering a long top list (not the top 3) gets a card with its rank too
+    from sgfoodhunt.diff import CategoryDiff
+
+    label = config.categories.get(cat_a).display_name
+    v4 = {"venue_id": "v4", "name": "Venue 4", "rank": 15}
+    entered = CategoryDiff(cat_a, label, entered=[v4])
+    third = venue_messages(config, store, RunDiff("r2", "r1", categories=[entered]))
+    assert f"🍽 Venue 4\n#15 · {label}" in third
 
 
 def test_telegram_sends_each_message_separately() -> None:

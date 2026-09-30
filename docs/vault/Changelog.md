@@ -5,6 +5,7 @@ updated: 2026-09-30
 # Changelog
 
 ## 2026-09-30
+- feat: Telegram sends **only venue cards** (🍽 name / #rank · list / 📍 / summary / 🔗 / Sources), the owner's fixed format. `venue_messages()` (`sgfoodhunt/diff.py`) now also cards any venue that entered a top list (e.g. #15), not just new top-3 picks. `_notify()` (`sgfoodhunt/cli.py`) no longer sends the text summary to Telegram (email still gets it). Replaces the summary-first message from earlier today.
 - feat: Telegram now posts on **any** change, not only new top-3 venues. `_notify()` (`sgfoodhunt/cli.py`) sends the diff summary (new venues, rating changes, closures, reopenings, social mentions, top-3 moves) first, then one card per new top pick. It stays silent only when nothing changed. The repo `docker-compose.yml` now defaults to `daily 03:17` to match the NAS.
 - chore(nas): NAS stack now runs daily — `SGFH_SCHEDULE: daily 03:17` in `/volume1/docker/sg-food-hunt/docker-compose.yml` (was `mon 03:17`). Posts only venues new to a top 3, so quiet days send nothing.
 - fix: month headings of monthly round-ups ("July 2026") became venues. `is_date_only()` (`sgfoodhunt/models.py`) rejects them in `VenueCandidate`; `prune_blog_evidence()` clears saved ones.

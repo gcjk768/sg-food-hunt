@@ -320,5 +320,11 @@ def venue_messages(
         for vid, s in _top(scored, per_category).items():
             if vid not in prev_top and not s.get("hidden"):
                 tops.setdefault(vid, []).append((s["rank"], label))
+    # any venue that entered a top list (e.g. #15) also gets a card, so every update is a card
+    for cd in diff.categories:
+        for e in cd.entered:
+            pairs = tops.setdefault(e["venue_id"], [])
+            if (e["rank"], cd.display_name) not in pairs:
+                pairs.append((e["rank"], cd.display_name))
     order = sorted(tops, key=lambda vid: (min(tops[vid])[0], -len(tops[vid])))
     return [_card(venues[vid], tops[vid]) for vid in order if vid in venues]

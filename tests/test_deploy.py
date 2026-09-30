@@ -133,20 +133,22 @@ def test_docker_files_are_consistent() -> None:
     assert cli_module.serve.__doc__ and "scheduler" in cli_module.serve.__doc__.lower()
 
 
-def test_notify_sends_any_change_even_without_new_top_picks(
+def test_telegram_gets_only_venue_cards(
     app_config: AppConfig, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     from sgfoodhunt.diff import RunDiff
 
     app_config.settings.notifications.telegram = True
     sent: list[list[str]] = []
-    monkeypatch.setattr(cli_module, "venue_messages", lambda *a, **k: [])
+    cards = ["🍽 HighHouse\n#15 · Rooftop bars"]
+    monkeypatch.setattr(cli_module, "venue_messages", lambda *a, **k: cards)
     monkeypatch.setattr(
         cli_module, "notify", lambda config, text, subject, messages=None: sent.append(messages)
         or type("R", (), {"telegram": "sent", "email": None})()
     )
-    change = RunDiff(run_id="r2", prev_run_id="r1", new_venues=[{"venue_id": "v", "name": "Ah Hock"}])
+    change = RunDiff(run_id="r2", prev_run_id="r1", new_venues=[{"venue_id": "v", "name": "A"}])
     cli_module._notify(app_config, change)
-    assert len(sent) == 1 and "SG Food Hunt update" in sent[0][0]
-    cli_module._notify(app_config, RunDiff(run_id="r3", prev_run_id="r2"))  # nothing new
+    assert sent == [cards]  # cards only, no summary message
+    monkeypatch.setattr(cli_module, "venue_messages", lambda *a, **k: [])
+    cli_module._notify(app_config, change)  # a change with no venue card sends nothing
     assert len(sent) == 1
