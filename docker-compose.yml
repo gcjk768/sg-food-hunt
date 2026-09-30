@@ -14,7 +14,7 @@ services:
     env_file: .env                    # API keys, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, TELEGRAM_THREAD_ID
     environment:
       TZ: Asia/Singapore
-      SGFH_SCHEDULE: "mon 03:17"      # weekly run time (local TZ); "daily 03:17" also works
+      SGFH_SCHEDULE: "daily 03:17"    # run time (local TZ); "mon 03:17" = weekly
       SGFH_RUN_ON_START: "false"      # set "true" to run immediately when the container starts
       # AI layer (on by default): put ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN in .env
     volumes:

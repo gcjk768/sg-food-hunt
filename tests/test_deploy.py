@@ -131,3 +131,22 @@ def test_docker_files_are_consistent() -> None:
     assert "/app/claude-config" in dockerfile and "./claude-config:/app/claude-config" in compose
     assert "CLAUDE_CONFIG_DIR=/app/claude-config" in dockerfile
     assert cli_module.serve.__doc__ and "scheduler" in cli_module.serve.__doc__.lower()
+
+
+def test_notify_sends_any_change_even_without_new_top_picks(
+    app_config: AppConfig, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from sgfoodhunt.diff import RunDiff
+
+    app_config.settings.notifications.telegram = True
+    sent: list[list[str]] = []
+    monkeypatch.setattr(cli_module, "venue_messages", lambda *a, **k: [])
+    monkeypatch.setattr(
+        cli_module, "notify", lambda config, text, subject, messages=None: sent.append(messages)
+        or type("R", (), {"telegram": "sent", "email": None})()
+    )
+    change = RunDiff(run_id="r2", prev_run_id="r1", new_venues=[{"venue_id": "v", "name": "Ah Hock"}])
+    cli_module._notify(app_config, change)
+    assert len(sent) == 1 and "SG Food Hunt update" in sent[0][0]
+    cli_module._notify(app_config, RunDiff(run_id="r3", prev_run_id="r2"))  # nothing new
+    assert len(sent) == 1

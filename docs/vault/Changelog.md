@@ -5,6 +5,7 @@ updated: 2026-09-30
 # Changelog
 
 ## 2026-09-30
+- feat: Telegram now posts on **any** change, not only new top-3 venues. `_notify()` (`sgfoodhunt/cli.py`) sends the diff summary (new venues, rating changes, closures, reopenings, social mentions, top-3 moves) first, then one card per new top pick. It stays silent only when nothing changed. The repo `docker-compose.yml` now defaults to `daily 03:17` to match the NAS.
 - chore(nas): NAS stack now runs daily — `SGFH_SCHEDULE: daily 03:17` in `/volume1/docker/sg-food-hunt/docker-compose.yml` (was `mon 03:17`). Posts only venues new to a top 3, so quiet days send nothing.
 - fix: month headings of monthly round-ups ("July 2026") became venues. `is_date_only()` (`sgfoodhunt/models.py`) rejects them in `VenueCandidate`; `prune_blog_evidence()` clears saved ones.
 - fix: hotels ranked #1 for hawker/zi char. Registry evidence persists across runs, so articles older runs opened for every query kept every category. `prune_blog_evidence()` (`sgfoodhunt/dedup/registry.py`) re-checks stored blog evidence each run and re-derives its categories (dropped 2,652 stale entries on the NAS registry). `relevant_article()` is stricter: generic food words don't count, a 2+-word query needs 2 hits, "new/latest" queries need an openings slug.
