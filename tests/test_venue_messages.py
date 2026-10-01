@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+from typing import Any
 
 import httpx
 
@@ -15,7 +16,7 @@ from sgfoodhunt.storage.runs import RunStore
 CONFIG = Path(__file__).resolve().parents[1] / "config"
 
 
-def _write_run(root: Path, run_id: str, scores: dict, venues: list) -> None:
+def _write_run(root: Path, run_id: str, scores: dict[str, Any], venues: list[Any]) -> None:
     d = root / "runs" / run_id
     d.mkdir(parents=True)
     (d / "scores.json").write_text(json.dumps(scores), encoding="utf-8")
@@ -27,7 +28,7 @@ def test_one_message_per_new_top_pick(tmp_path: Path) -> None:
     cat_a, cat_b = [c.key for c in config.categories.categories[:2]]
     venues = [{"id": f"v{i}", "name": f"Venue {i}", "evidence": []} for i in range(5)]
 
-    def s(vid: str, rank: int) -> dict:
+    def s(vid: str, rank: int) -> dict[str, Any]:
         return {"venue_id": vid, "rank": rank, "name": vid}
 
     _write_run(tmp_path, "r1", {cat_a: [s("v0", 1), s("v1", 2), s("v2", 3), s("v3", 4)]}, venues)
@@ -110,7 +111,7 @@ def test_split_message_never_cuts_a_tag() -> None:
 
 
 def test_html_rejected_resends_as_plain_text() -> None:
-    posts: list[dict] = []
+    posts: list[dict[str, Any]] = []
 
     def handler(req: httpx.Request) -> httpx.Response:
         body = json.loads(req.content)
@@ -162,7 +163,7 @@ def test_diff_handles_null_business_status(tmp_path: Path) -> None:
 
     config = load_config(CONFIG)
     config.settings.paths.data_dir = tmp_path
-    venue = {
+    venue: dict[str, Any] = {
         "id": "v1",
         "name": "A",
         "business_status": None,

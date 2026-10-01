@@ -139,19 +139,21 @@ def test_telegram_gets_only_venue_cards(
     from sgfoodhunt.diff import RunDiff
 
     app_config.settings.notifications.telegram = True
-    sent: list[list[str]] = []
-    cards = ["🍽 HighHouse\n#15 · Rooftop bars"]
+    sent: list[list[str] | None] = []
+    emails: list[str] = []
+    cards = ["🍽 <b>High &amp; House</b> · #15 · Rooftop bars"]
     monkeypatch.setattr(cli_module, "venue_messages", lambda *a, **k: cards)
-    monkeypatch.setattr(
-        cli_module,
-        "notify",
-        lambda config, text, subject, messages=None: (
-            sent.append(messages) or type("R", (), {"telegram": "sent", "email": None})()
-        ),
-    )
+
+    def fake_notify(config, text, subject, messages=None):  # type: ignore[no-untyped-def]
+        sent.append(messages)
+        emails.append(text)
+        return type("R", (), {"telegram": "sent", "email": None})()
+
+    monkeypatch.setattr(cli_module, "notify", fake_notify)
     change = RunDiff(run_id="r2", prev_run_id="r1", new_venues=[{"venue_id": "v", "name": "A"}])
     cli_module._notify(app_config, change)
     assert sent == [cards]  # cards only, no summary message
+    assert "🍽 High & House · #15" in emails[0] and "<b>" not in emails[0]  # email is plain
     monkeypatch.setattr(cli_module, "venue_messages", lambda *a, **k: [])
     cli_module._notify(app_config, change)  # a change with no venue card sends nothing
     assert len(sent) == 1
