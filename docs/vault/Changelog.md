@@ -1,8 +1,15 @@
 ---
 tags: [active]
-updated: 2026-10-01
+updated: 2026-10-02
 ---
 # Changelog
+
+## 2026-10-02
+- feat: NAS vault movement log + memory. `sgfoodhunt/reporting/memory.py` appends one line per event to `SG Food Hunt/Activity/YYYY-MM-DD.md` (`- HH:MM emoji **what** · detail · [[venue]]`, SGT): run started/finished/failed (`sgfoodhunt/cli.py`), new venues found (`sgfoodhunt/ranking.py`), entered/left top 15 and moved up/down (`write_venue_notes()` in `sgfoodhunt/reporting/venue_notes.py`), card sent/skipped and send failures (`_notify()` in `sgfoodhunt/cli.py`). Venue notes get an append-only `## History` (first seen, rank/list moves, cards sent), kept above `## My notes`.
+- feat: read side. Before the AI summary (`analyse_reviews()` in `sgfoodhunt/ai/tasks.py`), venues now in a top list get a capped (4,000 chars, newest first) excerpt of their History + their last-30-day Activity lines plus current and last-run ranks (`_memory()` in `sgfoodhunt/ranking.py`), so the summary can say "New on the list" / "Moved up". Venues outside a top list get no memory, so their prompt and 90-day AI cache are unchanged; if the memory call gets no answer it falls back to the cached memory-free prompt.
+- feat: `_notify()` skips a card when the venue's History shows a `card sent` at the same ranks (`last_card()` / `card_ranks()`); the run-to-run diff and dedupe registry are unchanged. Card format unchanged.
+- chore: all vault I/O is best-effort (logged, never raised); a broken venue note no longer stops the run. Notify errors are logged to Activity without the error text (it can contain the bot URL).
+- ops: NAS compose can narrow the vault mount to `/volume1/<USER>/Obsidian/SG Food Hunt:/app/vault/SG Food Hunt` (no code change needed; links still resolve as `SG Food Hunt/...`).
 
 ## 2026-10-01
 - feat: Telegram venue cards restyled to the HTML card standard — same fields, same order; bold name with the best rank, emoji-led lines, address in `<code>`, booking link as a "Book a table"/"Website" label, sources as domain links in an expandable quote (`_card()` in `sgfoodhunt/diff.py`). `send_telegram()` (`sgfoodhunt/notify.py`) now sends `parse_mode=HTML`, splits between blocks (`split_message()`), and resends as plain text if Telegram can't parse the HTML. All dynamic text (incl. LLM summaries) is escaped with `esc()`. `notify-test` (`sgfoodhunt/cli.py`) sends a card too; email gets plain-text cards.

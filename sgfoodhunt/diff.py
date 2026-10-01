@@ -316,11 +316,23 @@ def _card(v: dict[str, Any], tops: list[tuple[int, str]]) -> str:
     return "\n".join(lines)
 
 
+def card_ranks(tops: list[tuple[int, str]]) -> str:
+    """The ranks a card is sent at, e.g. ``#2 · Zi char; #9 · Hawker`` (vault dedupe key)."""
+    return "; ".join(f"#{r} · {label}" for r, label in sorted(tops))
+
+
 def venue_messages(
     config: AppConfig, store: RunStore, diff: RunDiff, per_category: int = 3
 ) -> list[str]:
     """One message per venue that is newly in a category's top ``per_category`` (every top pick on
     the first run), best rank first. Venues in several top lists get one message listing them."""
+    return [html for _v, _tops, html in venue_cards(config, store, diff, per_category)]
+
+
+def venue_cards(
+    config: AppConfig, store: RunStore, diff: RunDiff, per_category: int = 3
+) -> list[tuple[dict[str, Any], list[tuple[int, str]], str]]:
+    """``venue_messages`` with the venue dict and its (rank, list) pairs kept alongside."""
     cur_dir = store.run_dir(diff.run_id)
     cur_scores, venues = _load_scores(cur_dir), _load_venues(cur_dir)
     prev_scores = _load_scores(store.run_dir(diff.prev_run_id)) if diff.prev_run_id else {}
@@ -338,4 +350,6 @@ def venue_messages(
             if (e["rank"], cd.display_name) not in pairs:
                 pairs.append((e["rank"], cd.display_name))
     order = sorted(tops, key=lambda vid: (min(tops[vid])[0], -len(tops[vid])))
-    return [_card(venues[vid], tops[vid]) for vid in order if vid in venues]
+    return [
+        (venues[vid], tops[vid], _card(venues[vid], tops[vid])) for vid in order if vid in venues
+    ]

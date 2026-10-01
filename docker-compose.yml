@@ -24,6 +24,8 @@ services:
       - ./social_exports:/app/social_exports
       - ./claude-config:/app/claude-config   # Claude CLI login persists here (git ignored)
       - ./vault:/app/vault                   # CHANGE ME: point at your Obsidian vault on the NAS
+      # NAS: mount only this app's folder so it can't touch other apps' notes, e.g.
+      #   - "/volume1/<USER>/Obsidian/SG Food Hunt:/app/vault/SG Food Hunt"
     mem_limit: 1536m                  # NAS has 8 GB shared with other stacks
     # The dashboard is optional; uncomment to serve it on port 8501:
     # ports:

@@ -142,7 +142,10 @@ def test_telegram_gets_only_venue_cards(
     sent: list[list[str] | None] = []
     emails: list[str] = []
     cards = ["🍽 <b>High &amp; House</b> · #15 · Rooftop bars"]
-    monkeypatch.setattr(cli_module, "venue_messages", lambda *a, **k: cards)
+    venue = {"id": "v", "name": "High & House"}
+    monkeypatch.setattr(
+        cli_module, "venue_cards", lambda *a, **k: [(venue, [(15, "Rooftop bars")], cards[0])]
+    )
 
     def fake_notify(config, text, subject, messages=None):  # type: ignore[no-untyped-def]
         sent.append(messages)
@@ -154,6 +157,6 @@ def test_telegram_gets_only_venue_cards(
     cli_module._notify(app_config, change)
     assert sent == [cards]  # cards only, no summary message
     assert "🍽 High & House · #15" in emails[0] and "<b>" not in emails[0]  # email is plain
-    monkeypatch.setattr(cli_module, "venue_messages", lambda *a, **k: [])
+    monkeypatch.setattr(cli_module, "venue_cards", lambda *a, **k: [])
     cli_module._notify(app_config, change)  # a change with no venue card sends nothing
     assert len(sent) == 1

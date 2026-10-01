@@ -7,7 +7,7 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 
 import typer
 from rich.console import Console
@@ -16,7 +16,13 @@ from rich.table import Table
 from sgfoodhunt import __version__
 from sgfoodhunt.ai.client import claude_config_dir, claude_logged_in
 from sgfoodhunt.config import AppConfig, load_config
-from sgfoodhunt.diff import compute_diff, diff_markdown, diff_plain_text, venue_messages
+from sgfoodhunt.diff import (
+    card_ranks,
+    compute_diff,
+    diff_markdown,
+    diff_plain_text,
+    venue_cards,
+)
 from sgfoodhunt.http.cache import ResponseCache
 from sgfoodhunt.logging_setup import setup_logging
 from sgfoodhunt.notify import esc, html_to_plain, notify
@@ -28,9 +34,17 @@ from sgfoodhunt.reporting import (
     write_run_note,
     write_sources_note,
 )
+from sgfoodhunt.reporting.memory import (
+    CARD_SENT,
+    append_history,
+    history_entry,
+    last_card,
+    log_activity,
+    note_name_of,
+)
 from sgfoodhunt.schedule import parse_schedule
 from sgfoodhunt.storage.runs import RunStore
-from sgfoodhunt.storage.vault import Vault
+from sgfoodhunt.storage.vault import VENUES, Vault
 
 app = typer.Typer(
     help="Collect, rank and keep fresh a list of dining venues in Singapore.", no_args_is_help=True
@@ -164,24 +178,29 @@ def run(
         console.print(f"[red]{exc}[/red]")
         raise typer.Exit(code=2) from exc
     vault.ensure()
-    collector = Collector(config, store, cache, dry_run=dry_run, concurrency=concurrency)
-    record = asyncio.run(collector.collect(category, source))
-    csv_path, json_path = export_raw_candidates(
-        store, record.run_id, config.resolve(config.settings.paths.exports_dir)
-    )
-    ranked = asyncio.run(
-        rank_run(
-            config,
-            store,
-            vault,
-            record.run_id,
-            hide_visited=hide_visited,
-            category_keys=category,
-            geocoder=default_geocoder(config, cache, dry_run=dry_run),
-            cache=cache,
-            social_offline=dry_run,
+    log_activity(vault, "▶️", "run started", "dry run" if dry_run else "")
+    try:
+        collector = Collector(config, store, cache, dry_run=dry_run, concurrency=concurrency)
+        record = asyncio.run(collector.collect(category, source))
+        csv_path, json_path = export_raw_candidates(
+            store, record.run_id, config.resolve(config.settings.paths.exports_dir)
         )
-    )
+        ranked = asyncio.run(
+            rank_run(
+                config,
+                store,
+                vault,
+                record.run_id,
+                hide_visited=hide_visited,
+                category_keys=category,
+                geocoder=default_geocoder(config, cache, dry_run=dry_run),
+                cache=cache,
+                social_offline=dry_run,
+            )
+        )
+    except Exception as exc:
+        log_activity(vault, "❌", "run failed", type(exc).__name__)
+        raise
     record = store.load_run(record.run_id)
     robots = {
         k: ("denied" if "robots" in v else "") for k, v in collector.stats.sources_skipped.items()
@@ -190,6 +209,15 @@ def run(
     link = write_run_note(vault, store, record, config)
     write_home_note(vault, config, link)
     _print_run_summary(config, record)
+    st = record.stats or {}
+    log_activity(
+        vault,
+        "✅" if record.status == "ok" else "⚠️",
+        f"run finished ({record.status})",
+        f"{st.get('candidates', 0)} candidates · {len(ranked.venues)} venues "
+        f"({ranked.match_stats.created} new) · {st.get('errors', 0)} errors",
+        f"{link}|{record.run_id}",
+    )
     _print_rank_summary(config, ranked)
     if ranked.diff is not None:
         console.print(diff_markdown(ranked.diff))
@@ -207,8 +235,16 @@ def _notify(config: AppConfig, diff) -> None:  # type: ignore[no-untyped-def]
     if diff.is_empty and diff.prev_run_id is not None:
         log.info("diff is empty; notifications skipped")
         return
-    store, _, _ = _paths(config)
-    cards = venue_messages(config, store, diff)
+    store, _, vault = _paths(config)
+    # long-term memory: never re-send a card the vault shows went out at the same ranks
+    fresh = []
+    for v, tops, html in venue_cards(config, store, diff):
+        name, ranks = note_name_of(v), card_ranks(tops)
+        if last_card(vault, name) == ranks:
+            log_activity(vault, "⏭️", "card skipped", f"already sent at {ranks}", _vlink(vault, v))
+        else:
+            fresh.append((name, ranks, v, html))
+    cards = [html for *_, html in fresh]
     # Telegram gets only venue cards (the owner's fixed format); the text summary is for email
     if not cards and n.telegram and not n.email:
         log.info("no new venue cards; notifications skipped")
@@ -217,6 +253,17 @@ def _notify(config: AppConfig, diff) -> None:  # type: ignore[no-untyped-def]
     text = "\n\n".join([diff_plain_text(diff, title="SG Food Hunt update"), *plain_cards])
     result = notify(config, text, subject=f"SG Food Hunt diff {diff.run_id}", messages=cards)
     console.print(f"notifications: telegram {result.telegram}, email {result.email}")
+    if result.telegram == "sent":
+        for name, ranks, v, _html in fresh:
+            log_activity(vault, "📨", CARD_SENT, ranks, _vlink(vault, v))
+            append_history(vault, name, [history_entry("📨", CARD_SENT, ranks)])
+    for channel in ("telegram", "email"):
+        if getattr(result, channel, None) == "failed":  # no error text: it can carry the bot URL
+            log_activity(vault, "❌", f"{channel} send failed", f"{len(cards)} cards · see logs/")
+
+
+def _vlink(vault: Vault, v: dict[str, Any]) -> str:
+    return f"{vault.link_target(VENUES, note_name_of(v))}|{v.get('name')}"
 
 
 def _print_rank_summary(config: AppConfig, ranked) -> None:  # type: ignore[no-untyped-def]
