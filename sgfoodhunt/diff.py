@@ -7,9 +7,11 @@ import json
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 from sgfoodhunt.config import AppConfig
 from sgfoodhunt.http.cache import read_json, write_json
+from sgfoodhunt.notify import esc
 from sgfoodhunt.storage.runs import RunRecord, RunStore
 
 
@@ -275,17 +277,24 @@ def diff_plain_text(diff: RunDiff, title: str = "SG Food Hunt weekly diff") -> s
     return f"{title} ({diff.run_id})\n\n{text}"
 
 
+def _link(url: str, label: str) -> str:
+    return f'<a href="{esc(url)}">{esc(label)}</a>'
+
+
 def _card(v: dict[str, Any], tops: list[tuple[int, str]]) -> str:
+    """Telegram HTML card, the owner's fixed field order: name / ranks / address · MRT / facts /
+    summary / link / sources (sources tucked into an expandable quote). Every value is escaped."""
     name = v["name"] + (f" ({v['name_zh']})" if v.get("name_zh") else "")
-    lines = [f"🍽 {name}"]
     ranked = sorted(tops)
-    lines += [f"#{rank} · {label}" for rank, label in ranked[:3]]
+    rank_lines = [f"#{rank} · {esc(label)}" for rank, label in ranked[:3]]
+    lines = [f"🍽 <b>{esc(name)}</b> · {rank_lines[0]}" if rank_lines else f"🍽 <b>{esc(name)}</b>"]
+    lines += [f"🏆 {r}" for r in rank_lines[1:]]
     if len(ranked) > 3:
-        lines.append(f"…and top 3 in {len(ranked) - 3} more lists")
+        lines.append(f"<i>…and top 3 in {len(ranked) - 3} more lists</i>")
     where = v.get("address") or v.get("district") or v.get("region")
     if where:
-        mrt = f" · near {v['nearest_mrt']} MRT" if v.get("nearest_mrt") else ""
-        lines.append(f"📍 {where}{mrt}")
+        mrt = f" · 🚇 near {esc(v['nearest_mrt'])} MRT" if v.get("nearest_mrt") else ""
+        lines.append(f"📍 <code>{esc(where)}</code>{mrt}")
     g = (v.get("ratings") or {}).get("google_places") or {}
     facts = [
         ", ".join(v.get("cuisine") or []),
@@ -293,15 +302,17 @@ def _card(v: dict[str, Any], tops: list[tuple[int, str]]) -> str:
         f"★ {g['rating']} ({g.get('review_count', '?')})" if g.get("rating") else "",
     ]
     if any(facts):
-        lines.append(" · ".join(f for f in facts if f))
+        lines.append("🍴 " + esc(" · ".join(f for f in facts if f)))
     if v.get("summary"):
-        lines.append(v["summary"])
-    link = v.get("booking_url") or v.get("website")
-    if link:
-        lines.append(f"🔗 {link}")
+        lines.append(f"💬 {esc(v['summary'])}")
+    if v.get("booking_url"):
+        lines.append("🔗 " + _link(v["booking_url"], "Book a table"))
+    elif v.get("website"):
+        lines.append("🔗 " + _link(v["website"], "Website"))
     urls = list(dict.fromkeys(e["url"] for e in v.get("evidence", []) if e.get("url")))[:3]
     if urls:
-        lines.append("Sources: " + " | ".join(urls))
+        links = "  ·  ".join(_link(u, urlsplit(u).netloc.removeprefix("www.") or u) for u in urls)
+        lines.append(f"<blockquote expandable>📚 Sources: {links}</blockquote>")
     return "\n".join(lines)
 
 

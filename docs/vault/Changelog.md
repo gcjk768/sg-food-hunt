@@ -1,8 +1,12 @@
 ---
 tags: [active]
-updated: 2026-09-30
+updated: 2026-10-01
 ---
 # Changelog
+
+## 2026-10-01
+- feat: Telegram venue cards restyled to the HTML card standard — same fields, same order; bold name with the best rank, emoji-led lines, address in `<code>`, booking link as a "Book a table"/"Website" label, sources as domain links in an expandable quote (`_card()` in `sgfoodhunt/diff.py`). `send_telegram()` (`sgfoodhunt/notify.py`) now sends `parse_mode=HTML`, splits between blocks (`split_message()`), and resends as plain text if Telegram can't parse the HTML. All dynamic text (incl. LLM summaries) is escaped with `esc()`. `notify-test` (`sgfoodhunt/cli.py`) sends a card too; email gets plain-text cards.
+- fix: sync NAS hotfix — `Dockerfile` healthcheck timeout 20s → 180s + 3m start period (doctor takes 40-90s to import on the NAS); was a NAS-only compose override.
 
 ## 2026-09-30
 - feat: Telegram sends **only venue cards** (🍽 name / #rank · list / 📍 / summary / 🔗 / Sources), the owner's fixed format. `venue_messages()` (`sgfoodhunt/diff.py`) now also cards any venue that entered a top list (e.g. #15), not just new top-3 picks. `_notify()` (`sgfoodhunt/cli.py`) no longer sends the text summary to Telegram (email still gets it). Replaces the summary-first message from earlier today.

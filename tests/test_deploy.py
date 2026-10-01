@@ -78,7 +78,7 @@ def test_notify_test_command(app_config: AppConfig, monkeypatch: pytest.MonkeyPa
     monkeypatch.setattr(notify_module, "send_telegram", fake_send)
     res = runner.invoke(app, ["notify-test", "-C", cfg])
     assert res.exit_code == 0, res.output
-    assert sent and sent[0]["chat"] == "42" and "SG Food Hunt is connected" in sent[0]["text"]
+    assert sent and sent[0]["chat"] == "42" and "<b>SG FOOD HUNT</b>" in sent[0]["text"][0]
 
     def failing(token: str, chat_id: str, text: str, client=None, thread_id=None) -> None:  # type: ignore[no-untyped-def]
         raise httpx.HTTPError("boom")
@@ -143,8 +143,11 @@ def test_telegram_gets_only_venue_cards(
     cards = ["🍽 HighHouse\n#15 · Rooftop bars"]
     monkeypatch.setattr(cli_module, "venue_messages", lambda *a, **k: cards)
     monkeypatch.setattr(
-        cli_module, "notify", lambda config, text, subject, messages=None: sent.append(messages)
-        or type("R", (), {"telegram": "sent", "email": None})()
+        cli_module,
+        "notify",
+        lambda config, text, subject, messages=None: (
+            sent.append(messages) or type("R", (), {"telegram": "sent", "email": None})()
+        ),
     )
     change = RunDiff(run_id="r2", prev_run_id="r1", new_venues=[{"venue_id": "v", "name": "A"}])
     cli_module._notify(app_config, change)

@@ -7,7 +7,7 @@ import httpx
 
 from sgfoodhunt.config import load_config
 from sgfoodhunt.diff import RunDiff, venue_messages
-from sgfoodhunt.notify import send_telegram
+from sgfoodhunt.notify import esc, html_to_plain, send_telegram, split_message
 from sgfoodhunt.scrapers.blogs import relevant_article
 from sgfoodhunt.scrapers.html import clean_venue_heading, strip_news_wording
 from sgfoodhunt.storage.runs import RunStore
@@ -36,10 +36,10 @@ def test_one_message_per_new_top_pick(tmp_path: Path) -> None:
     )
     store = RunStore(tmp_path)
     first = venue_messages(config, store, RunDiff(run_id="r1", prev_run_id=None))
-    assert [m.splitlines()[0] for m in first] == ["🍽 Venue 0", "🍽 Venue 1", "🍽 Venue 2"]
+    assert [m.split("</b>")[0] for m in first] == [f"🍽 <b>Venue {i}" for i in range(3)]
     # next week: only v3 is new to cat_a's top 3, v0 is new to cat_b's
     second = venue_messages(config, store, RunDiff(run_id="r2", prev_run_id="r1"))
-    assert sorted(m.splitlines()[0] for m in second) == ["🍽 Venue 0", "🍽 Venue 3"]
+    assert sorted(m.split("</b>")[0] for m in second) == ["🍽 <b>Venue 0", "🍽 <b>Venue 3"]
     # a venue entering a long top list (not the top 3) gets a card with its rank too
     from sgfoodhunt.diff import CategoryDiff
 
@@ -47,7 +47,85 @@ def test_one_message_per_new_top_pick(tmp_path: Path) -> None:
     v4 = {"venue_id": "v4", "name": "Venue 4", "rank": 15}
     entered = CategoryDiff(cat_a, label, entered=[v4])
     third = venue_messages(config, store, RunDiff("r2", "r1", categories=[entered]))
-    assert f"🍽 Venue 4\n#15 · {label}" in third
+    assert f"🍽 <b>Venue 4</b> · #15 · {esc(label)}" in third
+
+
+def test_card_keeps_fields_in_order_and_escapes() -> None:
+    """the owner's fixed card: name / ranks / address · MRT / facts / summary / link / sources."""
+    from sgfoodhunt.diff import _card
+
+    v = {
+        "name": "Tom & Jerry's <Bar>",
+        "name_zh": "汤姆",
+        "address": "1 Raffles Pl #01-01",
+        "nearest_mrt": "Raffles Place",
+        "cuisine": ["Japanese"],
+        "price_text": "$$",
+        "ratings": {"google_places": {"rating": 4.5, "review_count": 120}},
+        "summary": "LLM says <script>alert(1)</script> & more",
+        "booking_url": "https://chope.co/x?a=1&b=2",
+        "evidence": [{"url": "https://www.sethlui.com/a"}, {"url": "https://eatbook.sg/b"}],
+    }
+    card = _card(v, [(4, "Cafes"), (1, "Date night"), (2, "Brunch"), (9, "A"), (7, "B")])
+    assert card.splitlines()[0] == (
+        "🍽 <b>Tom &amp; Jerry&#x27;s &lt;Bar&gt; (汤姆)</b> · #1 · Date night"
+    )
+    assert "<script>" not in card and "&lt;script&gt;" in card
+    assert 'href="https://chope.co/x?a=1&amp;b=2"' in card
+    assert card.endswith("</blockquote>") and "<blockquote expandable>" in card
+    plain = html_to_plain(card)
+    fields = [
+        "Tom & Jerry's <Bar> (汤姆)",
+        "#1 · Date night",
+        "#2 · Brunch",
+        "#4 · Cafes",
+        "…and top 3 in 2 more lists",
+        "📍 1 Raffles Pl #01-01 · 🚇 near Raffles Place MRT",
+        "Japanese · $$ · ★ 4.5 (120)",
+        "LLM says <script>alert(1)</script> & more",
+        "Book a table (https://chope.co/x?a=1&b=2)",
+        "Sources: sethlui.com (https://www.sethlui.com/a)  ·  eatbook.sg (https://eatbook.sg/b)",
+    ]
+    pos = [plain.index(f) for f in fields]
+    assert pos == sorted(pos)
+
+
+def test_split_message_never_cuts_a_tag() -> None:
+    block = "🍽 <b>Name</b> · #1\n📍 <code>addr</code>\n<blockquote expandable>src</blockquote>"
+    text = "\n\n".join([block] * 200)
+    chunks = split_message(text, limit=500)
+    assert len(chunks) > 1 and all(len(c) <= 500 for c in chunks)
+    for c in chunks:  # every chunk is whole blocks: tags balanced
+        for start, end in (
+            ("<b>", "</b>"),
+            ("<code>", "</code>"),
+            ("<blockquote", "</blockquote>"),
+        ):
+            assert c.count(start) == c.count(end)
+    assert "\n\n".join(chunks) == text
+    # one giant line can't be split between tags: it goes as escaped plain text
+    huge = split_message("<b>" + "x&" * 600 + "</b>", limit=500)
+    assert all(len(c) <= 500 and "<b>" not in c for c in huge)
+    assert html_to_plain("".join(huge)).replace("\n", "") == "x&" * 600
+
+
+def test_html_rejected_resends_as_plain_text() -> None:
+    posts: list[dict] = []
+
+    def handler(req: httpx.Request) -> httpx.Response:
+        body = json.loads(req.content)
+        posts.append(body)
+        if body.get("parse_mode") == "HTML":
+            return httpx.Response(
+                400, json={"ok": False, "description": "Bad Request: can't parse entities"}
+            )
+        return httpx.Response(200, json={"ok": True})
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    send_telegram("t", "c", '🍽 <b>A &amp; B</b>\n<a href="https://x.sg">Book</a>', client=client)
+    assert posts[0]["parse_mode"] == "HTML" and posts[0]["disable_web_page_preview"]
+    assert "parse_mode" not in posts[1]
+    assert posts[1]["text"] == "🍽 A & B\nBook (https://x.sg)"
 
 
 def test_telegram_sends_each_message_separately() -> None:

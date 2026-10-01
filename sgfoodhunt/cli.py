@@ -19,7 +19,7 @@ from sgfoodhunt.config import AppConfig, load_config
 from sgfoodhunt.diff import compute_diff, diff_markdown, diff_plain_text, venue_messages
 from sgfoodhunt.http.cache import ResponseCache
 from sgfoodhunt.logging_setup import setup_logging
-from sgfoodhunt.notify import notify
+from sgfoodhunt.notify import esc, html_to_plain, notify
 from sgfoodhunt.pipeline import Collector, select_sources
 from sgfoodhunt.ranking import default_geocoder, rank_run
 from sgfoodhunt.reporting import (
@@ -213,7 +213,8 @@ def _notify(config: AppConfig, diff) -> None:  # type: ignore[no-untyped-def]
     if not cards and n.telegram and not n.email:
         log.info("no new venue cards; notifications skipped")
         return
-    text = "\n\n".join([diff_plain_text(diff, title="SG Food Hunt update"), *cards])
+    plain_cards = [html_to_plain(c) for c in cards]  # cards are Telegram HTML; email is plain
+    text = "\n\n".join([diff_plain_text(diff, title="SG Food Hunt update"), *plain_cards])
     result = notify(config, text, subject=f"SG Food Hunt diff {diff.run_id}", messages=cards)
     console.print(f"notifications: telegram {result.telegram}, email {result.email}")
 
@@ -507,7 +508,13 @@ def notify_test(config_dir: ConfigOpt = Path("config")) -> None:
         f"Vault: {config.resolve(config.settings.paths.vault_dir)}\n"
         "You will receive the diff report here after each run."
     )
-    result = notify(config, text, subject="SG Food Hunt test message")
+    card = (
+        "🍽 <b>SG FOOD HUNT</b> · connected\n\n"
+        f"⚙️ Config <code>{esc(config.config_dir)}</code>\n"
+        f"🗂 Vault <code>{esc(config.resolve(config.settings.paths.vault_dir))}</code>\n"
+        "<i>Venue cards land here after each run.</i>"
+    )
+    result = notify(config, text, subject="SG Food Hunt test message", messages=[card])
     console.print(f"telegram: {result.telegram}, email: {result.email}")
     for err in result.errors:
         console.print(f"[red]{err}[/red]")
