@@ -24,7 +24,7 @@ href="/singapore-restaurants/restaurant/madame">Madame</a></div>
 
 SETHLUI = """<div class="elementor-widget-theme-post-content"><div class="elementor-widget-container">
 <p>Long review text about the dim sum and the bao.</p>
-<h3>Lian Bang Fu Zhou: #01-42, Blk 643 Bukit Batok Central, Singapore 650643 | Tel: +65 8866 9140 |
+<h3>Lian Bang Fu Zhou: #01-42, Blk 643 Bukit Batok Central, Singapore 650643 | Tel: <PHONE> |
 Opening hours: 6am – 8pm (Daily)</h3></div></div>"""
 
 

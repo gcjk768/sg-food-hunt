@@ -1,40 +1,45 @@
-# docker compose up -d
-# Edit the paths on the left of each volume line to match your NAS. The vault folder must be
-# the Obsidian vault (the tool writes into the "SG Food Hunt" subfolder inside it).
+# SG Food Hunt on the NAS (Dockge stack). Weekly run; the diff goes to the owner Channel topic 159 (Food Hunt).
+# Claude: log in once from the container terminal (`claude`, then /login), same as trading-desk.
 services:
   sgfoodhunt:
     build:
-      context: .
+      context: ./data/_src # a476a67; fetched from GitHub (NAS docker has no git)
       args:
-        WITH_CLAUDE: "true"           # bakes in the Claude Code CLI for the AI layer ("false" to skip)
-        WITH_BROWSER: "false"         # "true" = Chromium for JS-rendered sources (add shm_size: 512m)
-    image: sgfoodhunt:latest
+        WITH_CLAUDE: "true"
+    image: sgfoodhunt:a476a67
     container_name: sgfoodhunt
     restart: unless-stopped
-    env_file: .env                    # API keys, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, TELEGRAM_THREAD_ID
+    env_file: .env # TELEGRAM_BOT_TOKEN (+ optional GOOGLE_PLACES_API_KEY etc.)
     environment:
       TZ: Asia/Singapore
-      SGFH_SCHEDULE: "daily 03:17"    # run time (local TZ); "mon 03:17" = weekly
-      SGFH_RUN_ON_START: "false"      # set "true" to run immediately when the container starts
-      # AI layer (on by default): put ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN in .env
+      SGFH_SCHEDULE: daily 08:00
+      SGFH_RUN_ON_START: "false"
+      TELEGRAM_CHAT_ID: "<TELEGRAM_CHAT_ID>"
+      TELEGRAM_THREAD_ID: "<THREAD_ID>"
+      # Text-only AI calls go to Ollama (slow is fine, saves Claude limit); web-search calls still use Claude.
+      SHIM_REAL: /usr/lib/node_modules/@anthropic-ai/claude-code/bin/claude.exe
+      OLLAMA_URL: http://<LAN_IP>:11434
+      OLLAMA_MODEL: gpt-oss:20b
+      SHIM_TIMEOUT: "3000"
+      SHIM_FALLBACK: unreachable
+      SHIM_LOG: /app/logs/ollama-shim.log
     volumes:
       - ./config:/app/config
+      - /volume1/docker/ollama/shim:/shim:ro # claude -p stand-in that answers from Ollama (settings.yaml claude_bin)
       - ./data:/app/data
       - ./logs:/app/logs
       - ./social_exports:/app/social_exports
-      - ./claude-config:/app/claude-config   # Claude CLI login persists here (git ignored)
-      - ./vault:/app/vault                   # CHANGE ME: point at your Obsidian vault on the NAS
-      # NAS: mount only this app's folder so it can't touch other apps' notes, e.g.
-      #   - "/volume1/<USER>/Obsidian/SG Food Hunt:/app/vault/SG Food Hunt"
-    mem_limit: 1536m                  # NAS has 8 GB shared with other stacks
-    # The dashboard is optional; uncomment to serve it on port 8501:
-    # ports:
-    #   - "8501:8501"
-    # command: ["dashboard"]
-
-  # One-off commands, e.g.:
-  #   docker compose run --rm -it sgfoodhunt claude          # log the Claude CLI in (once)
-  #   docker compose run --rm sgfoodhunt doctor
-  #   docker compose run --rm sgfoodhunt notify-test
-  #   docker compose run --rm sgfoodhunt run --dry-run
-  #   docker compose run --rm sgfoodhunt run -c zichar_family -s michelin
+      - /volume1/docker/trading-desk/.home/.claude:/app/claude-config # Claude CLI login lives here
+      - "/volume1/<USER>/Obsidian/SG Food Hunt:/app/vault/SG Food Hunt" # this app folder only
+    stdin_open: true # so the Dockge terminal can run `claude` interactively
+    tty: true
+    mem_limit: 1536m
+    healthcheck:
+      # host is IO-loaded; doctor needs 40-90s just to import, image default is 20s
+      test:
+        - CMD-SHELL
+        - sgfh doctor -C /app/config --quiet || exit 1
+      interval: 5m
+      timeout: 180s
+      start_period: 3m
+networks: {}

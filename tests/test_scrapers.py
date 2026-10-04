@@ -48,7 +48,7 @@ async def test_blog_scraper_extracts_venues(make_scraper, fake_session: FakeSess
     assert tbb.postal_code == "160056" and tbb.website == "https://www.tiongbahrubakery.com"
     assert tbb.page is not None and tbb.page.published_at == "2026-03-14"
     assert tbb.opening_hours == {
-        "text": "7.30am to 8pm daily Tel: +65 6220 3430"[:120]
+        "text": "7.30am to 8pm daily Tel: <PHONE>"[:120]
     } or "7.30am" in str(tbb.opening_hours)
     assert result.candidates[1].name_zh == "琼荣记海鲜"
     assert len(result.pages) == 2 and result.requests_made == 2  # off-query hawker guide skipped

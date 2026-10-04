@@ -59,7 +59,7 @@ def test_registry_matching_paths(tmp_path: Path) -> None:
             "Keng Eng Kee Seafood",
             source_ref="ChIJ_kek",
             postal_code="150124",
-            phone="+65 6272 1038",
+            phone="<PHONE>",
             address="124 Bukit Merah Lane 1, Singapore 150124",
             rating=4.3,
             review_count=2100,
@@ -94,7 +94,7 @@ def test_registry_matching_paths(tmp_path: Path) -> None:
             snippet="romantic? no, but family favourite",
             extra={"article_title": "Best zi char", "published_at": "2026-03-14"},
         ),
-        row("burpple", "KEK Seafood", phone="+65 6272 1038"),  # phone relink
+        row("burpple", "KEK Seafood", phone="<PHONE>"),  # phone relink
         row(
             "michelin",
             "Keng Eng Kee Seafood",
@@ -198,8 +198,8 @@ def test_build_venues_writes_files(app_config: AppConfig, tmp_path: Path) -> Non
     run_dir.mkdir()
     rows = [
         row("sethlui", "Cafe A", postal_code="160056"),
-        row("burpple", "Cafe A", phone="+65 6220 3430", postal_code="160056"),
-        row("eatbook", "Kafe A", phone="+65 6220 3430"),
+        row("burpple", "Cafe A", phone="<PHONE>", postal_code="160056"),
+        row("eatbook", "Kafe A", phone="<PHONE>"),
     ]
     registry, stats = build_venues(app_config, rows, RUN, run_dir)
     assert len(registry.venues) == 1 and stats.created == 1

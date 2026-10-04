@@ -29,8 +29,8 @@ def test_extract_postal_code(text: str | None, expected: str | None) -> None:
 @pytest.mark.parametrize(
     ("text", "expected"),
     [
-        ("Tel: +65 6220 3430", "+65 6220 3430"),
-        ("call 9123-4567 now", "+65 9123 4567"),
+        ("Tel: <PHONE>", "<PHONE>"),
+        ("call 9123-4567 now", "<PHONE>"),
         ("Singapore 160056", None),  # postal code must not be read as a phone
         ("", None),
     ],
@@ -53,7 +53,7 @@ def test_candidate_derives_postal_and_phone_from_address() -> None:
     )
     assert c.name == "Cafe X"
     assert c.postal_code == "123456"
-    assert c.phone == "+65 6123 4567"
+    assert c.phone == "<PHONE>"
     assert c.confidence == 1.0
 
 

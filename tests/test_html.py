@@ -31,7 +31,7 @@ def test_listicle_extraction() -> None:
         "Some Cafe Without Details",
     ]
     tbb, kek = entries[0], entries[1]
-    assert tbb.postal_code == "160056" and tbb.phone == "+65 6220 3430"
+    assert tbb.postal_code == "160056" and tbb.phone == "<PHONE>"
     assert tbb.hours == "7.30am to 8pm daily"
     assert "https://www.tiongbahrubakery.com" in tbb.links
     assert kek.name_zh == "琼荣记海鲜" and kek.postal_code == "150124" and kek.price_text == "$$"

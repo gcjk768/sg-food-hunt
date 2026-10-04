@@ -27,7 +27,7 @@ api_rate_limits:                  # requests per minute per API (official APIs o
   onemap: 60
 
 scoring:                          # global parameters; per-category weights live in categories.yaml
-  top_n: 15
+  top_n: 25
   fuzzy_match_threshold: 88       # rapidfuzz token_set_ratio needed to merge two names without a postal code
   price_per_pax_sgd: {1: 15, 2: 35, 3: 80, 4: 160}   # per price level, used for bill estimates
   new_within_days: 30             # 'newly opened' window when opened_within_months is 1
@@ -58,10 +58,10 @@ social:
 ai:                               # Claude via the Claude Code CLI (`claude -p`); falls back to rules if the CLI is missing
   enabled: true
   provider: claude_cli            # the only provider; needs the `claude` binary and ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN
-  model: claude-sonnet-5-5        # claude-opus-5-5 for the strongest answers at about double the cost
+  model: claude-haiku-4-5-20251001  # was claude-sonnet-5-5 (web-search tasks only; text tasks go to Ollama)
   effort: low                     # low | medium | high: extraction and matching are simple tasks
-  claude_bin: claude
-  timeout_seconds: 180
+  claude_bin: /shim/claude
+  timeout_seconds: 3300
   max_calls_per_run: 200          # hard cap on CLI calls per run (cached answers do not count)
   max_budget_usd: 5.0             # stop calling once this much has been spent in one run
   cache_ttl_days: 90              # identical prompts are served from data/cache
@@ -77,6 +77,6 @@ exports:
   json: true
 
 notifications:
-  telegram: false
+  telegram: true
   email: false
   rating_change_threshold: 0.2
