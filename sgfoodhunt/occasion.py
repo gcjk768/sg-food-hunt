@@ -8,10 +8,12 @@ import logging
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
+from sgfoodhunt.ai.client import AiClient
 from sgfoodhunt.config import AppConfig
 from sgfoodhunt.diff import _link, _load_scores, _load_venues, michelin_award, verdict
 from sgfoodhunt.http.cache import read_json, write_json
 from sgfoodhunt.notify import TELEGRAM_MAX, esc, html_to_plain, notify
+from sgfoodhunt.promos import find_promos, promo_line
 from sgfoodhunt.storage.runs import RunStore
 
 log = logging.getLogger(__name__)
@@ -42,7 +44,9 @@ def star_count(michelin: str | None) -> int:
     return 1 if m == "Star" else 0
 
 
-def _entry(config: AppConfig, v: dict[str, Any], rank: int) -> str:
+def _entry(
+    config: AppConfig, v: dict[str, Any], rank: int, promo: dict[str, Any] | None = None
+) -> str:
     award = michelin_award(v)
     stars = star_count(v.get("michelin"))
     name = esc(v["name"] + (f" ({v['name_zh']})" if v.get("name_zh") else ""))
@@ -66,18 +70,20 @@ def _entry(config: AppConfig, v: dict[str, Any], rank: int) -> str:
         f"💰 about S${per_pax * 4:,.0f} for 4" if per_pax else "",
         _link(v["booking_url"], "Book") if v.get("booking_url") else "",
     ]
-    return head + "\n" + "  ·  ".join(b for b in bits if b) if any(bits) else head
+    body = head + "\n" + "  ·  ".join(b for b in bits if b) if any(bits) else head
+    return body + ("\n" + promo_line(promo) if promo else "")
 
 
-def occasion_message(config: AppConfig, store: RunStore, run_id: str | None = None) -> str | None:
-    """One message for the latest scored run, or None when the category has no venues yet."""
+def occasion_picks(
+    config: AppConfig, store: RunStore, run_id: str | None = None
+) -> list[tuple[int, dict[str, Any]]]:
+    """(rank, venue) for the special occasion list, Michelin stars first (3 to 1), then rank."""
     if not config.categories.has(CATEGORY):
-        return None
-    run_id = run_id or (
-        store.latest_run(status=None).run_id if store.latest_run(status=None) else None
-    )
+        return []
+    latest = store.latest_run(status=None)
+    run_id = run_id or (latest.run_id if latest else None)
     if not run_id:
-        return None
+        return []
     run_dir = store.run_dir(run_id)
     scored = [
         s
@@ -86,8 +92,18 @@ def occasion_message(config: AppConfig, store: RunStore, run_id: str | None = No
     ]
     venues = _load_venues(run_dir)
     picks = [(s["rank"], venues[s["venue_id"]]) for s in scored if s["venue_id"] in venues]
-    # Michelin stars first (3 to 1), then the ranker's order
     picks.sort(key=lambda p: (-star_count(p[1].get("michelin")), p[0]))
+    return picks[:MAX_VENUES]
+
+
+def occasion_message(
+    config: AppConfig,
+    store: RunStore,
+    run_id: str | None = None,
+    promos: dict[str, dict[str, Any]] | None = None,
+) -> str | None:
+    """One message for the latest scored run, or None when the category has no venues yet."""
+    picks = occasion_picks(config, store, run_id)
     day = datetime.now(UTC).strftime("%a %d %b %Y")
     note = (
         "<blockquote expandable>Estimated bill for 4 is over S$200 (price level 3 or 4, or a "
@@ -96,7 +112,9 @@ def occasion_message(config: AppConfig, store: RunStore, run_id: str | None = No
         f"Updated every {OCCASION_EVERY_DAYS // 7} weeks.</blockquote>"
     )
     for n in range(min(MAX_VENUES, len(picks)), 0, -1):  # one message: drop the tail until it fits
-        body = "\n\n".join(_entry(config, v, r) for r, v in picks[:n])
+        body = "\n\n".join(
+            _entry(config, v, r, (promos or {}).get(v["name"])) for r, v in picks[:n]
+        )
         head = f"🎉 <b>SPECIAL OCCASIONS</b> · S$200+ for 4 · {day}"
         text = f"{head}\n\n{body}\n\n{note}" if body else ""
         if len(text) <= TELEGRAM_MAX:
@@ -113,11 +131,15 @@ def due(config: AppConfig, now: datetime | None = None) -> bool:
     return (now or datetime.now(UTC)) - last >= timedelta(days=OCCASION_EVERY_DAYS)
 
 
-def send_occasion(config: AppConfig, store: RunStore, force: bool = False) -> str:
+def send_occasion(
+    config: AppConfig, store: RunStore, force: bool = False, ai: AiClient | None = None
+) -> str:
     """Send the list when due (or forced). Returns what happened, for the console."""
     if not force and not due(config):
         return "not due yet"
-    text = occasion_message(config, store)
+    # one web search pass adds a 🎁 or 🎄 line to venues that have a current promotion
+    promos = find_promos(ai, [v["name"] for _, v in occasion_picks(config, store)])
+    text = occasion_message(config, store, promos=promos)
     if not text:
         return "no special occasion venues yet"
     result = notify(

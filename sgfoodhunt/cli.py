@@ -14,7 +14,7 @@ from rich.console import Console
 from rich.table import Table
 
 from sgfoodhunt import __version__
-from sgfoodhunt.ai.client import claude_config_dir, claude_logged_in
+from sgfoodhunt.ai.client import build_ai_client, claude_config_dir, claude_logged_in
 from sgfoodhunt.config import AppConfig, load_config
 from sgfoodhunt.diff import (
     card_ranks,
@@ -223,6 +223,7 @@ def run(
         console.print(diff_markdown(ranked.diff))
         _notify(config, ranked.diff)
     _occasion(config, store)
+    _promos(config, store)
     console.print(
         f"\nrun note: {vault.note_path('Runs', record.run_id)}\n"
         f"raw CSV: {csv_path}\nraw JSON: {json_path}\nlog: {log_path}"
@@ -271,12 +272,33 @@ def _occasion(config: AppConfig, store: RunStore, force: bool = False) -> str:
     if not (n.telegram or n.email):
         return "notifications off"
     try:
-        out = send_occasion(config, store, force=force)
+        _, cache, _ = _paths(config)
+        out = send_occasion(
+            config, store, force=force, ai=build_ai_client(config.settings.ai, cache)
+        )
     except Exception as exc:  # a broken list must not stop the weekly run
         log.warning("special occasion list failed: %s", exc)
         return "failed"
     if out != "not due yet":
         log.info("special occasion list: %s", out)
+    return out
+
+
+def _promos(config: AppConfig, store: RunStore, force: bool = False) -> str:
+    """The weekly promo message for the places on your lists. Never fails a run."""
+    from sgfoodhunt.promos import send_promos
+
+    n = config.settings.notifications
+    if not (n.telegram or n.email):
+        return "notifications off"
+    try:
+        _, cache, _ = _paths(config)
+        out = send_promos(config, store, build_ai_client(config.settings.ai, cache), force=force)
+    except Exception as exc:
+        log.warning("promo message failed: %s", exc)
+        return "failed"
+    if out != "not due yet":
+        log.info("promo message: %s", out)
     return out
 
 
@@ -568,6 +590,19 @@ def occasion(
     config = _load(config_dir)
     store, _, _ = _paths(config)
     console.print(f"special occasion list: {_occasion(config, store, force=force)}")
+
+
+@app.command()
+def promos(
+    config_dir: ConfigOpt = Path("config"),
+    force: Annotated[
+        bool, typer.Option("--force", help="Send now, ignoring the 7 day gap")
+    ] = False,
+) -> None:
+    """Search for current promotions at the places on your lists and send them as one message."""
+    config = _load(config_dir)
+    store, _, _ = _paths(config)
+    console.print(f"promos: {_promos(config, store, force=force)}")
 
 
 @app.command("notify-test")

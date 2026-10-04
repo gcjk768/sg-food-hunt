@@ -99,6 +99,7 @@ class AiTasks(BaseModel):
     article_extraction: bool = True
     review_analysis: bool = True
     social_matching: bool = True
+    promo_search: bool = True  # web search for current promotions (weekly message, occasion list)
 
 
 class AiSettings(BaseModel):

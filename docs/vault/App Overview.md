@@ -18,6 +18,9 @@ Working: Eatbook, Honeycombers, The Smart Local, Sassy Mama (family only), Seth 
 ## Special occasion list
 `sgfoodhunt/occasion.py`: one message every 14 days (after a run) of restaurants over S$200 for 4, Michelin first (⭐ per star), `Worth` and `Buffet` tags. `sgfh occasion --force` sends it now. State: `data/occasion_state.json`.
 
+## Promotions
+`sgfoodhunt/promos.py`: weekly 🎁 PROMOS message (one Telegram message, `sgfh promos --force` sends now) of current deals at the top venues of every enabled list, found with Claude web search (`AiClient.ask(web=True)`, the only AI task with tools). Each deal needs a source link; expired deals are dropped. The special occasion list gets the same 🎁/🎄 line per venue. State: `data/promos_state.json`. Switch off with `ai.tasks.promo_search: false`.
+
 ## Vault memory (movement log)
 `sgfoodhunt/reporting/memory.py`, per the NAS vault standard. **Write:** `log_activity()` → `SG Food Hunt/Activity/YYYY-MM-DD.md`, one line per event in SGT (run started/finished/failed, new venues, top-15 entered/left/moved, card sent/skipped, send failed). Venue notes keep an append-only `## History` (`history_entry()`, carried over by `write_venue_notes()` in `sgfoodhunt/reporting/venue_notes.py`; `append_history()` for cards). **Read:** `_memory()` in `sgfoodhunt/ranking.py` builds a ≤4,000-char excerpt (current + last-run ranks, History, 30-day Activity lines for the venue, newest first) for top-list venues only and passes it to `analyse_reviews()` (`sgfoodhunt/ai/tasks.py`). `_notify()` (`sgfoodhunt/cli.py`) skips a card when `last_card()` shows it went out at the same ranks (`card_ranks()` in `sgfoodhunt/diff.py`). Everything is best-effort: errors are logged, never raised. Files are 0666 via the image's `umask 000`.
 
