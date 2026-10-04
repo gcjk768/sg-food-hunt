@@ -222,6 +222,7 @@ def run(
     if ranked.diff is not None:
         console.print(diff_markdown(ranked.diff))
         _notify(config, ranked.diff)
+    _occasion(config, store)
     console.print(
         f"\nrun note: {vault.note_path('Runs', record.run_id)}\n"
         f"raw CSV: {csv_path}\nraw JSON: {json_path}\nlog: {log_path}"
@@ -260,6 +261,23 @@ def _notify(config: AppConfig, diff) -> None:  # type: ignore[no-untyped-def]
     for channel in ("telegram", "email"):
         if getattr(result, channel, None) == "failed":  # no error text: it can carry the bot URL
             log_activity(vault, "❌", f"{channel} send failed", f"{len(cards)} cards · see logs/")
+
+
+def _occasion(config: AppConfig, store: RunStore, force: bool = False) -> str:
+    """The special occasion list (one message), at most once every two weeks. Never fails a run."""
+    from sgfoodhunt.occasion import send_occasion
+
+    n = config.settings.notifications
+    if not (n.telegram or n.email):
+        return "notifications off"
+    try:
+        out = send_occasion(config, store, force=force)
+    except Exception as exc:  # a broken list must not stop the weekly run
+        log.warning("special occasion list failed: %s", exc)
+        return "failed"
+    if out != "not due yet":
+        log.info("special occasion list: %s", out)
+    return out
 
 
 def _vlink(vault: Vault, v: dict[str, Any]) -> str:
@@ -537,6 +555,19 @@ def doctor(
             else f"[red]doctor: {len(problems)} problem(s)[/red]"
         )
     raise typer.Exit(code=1 if problems else 0)
+
+
+@app.command()
+def occasion(
+    config_dir: ConfigOpt = Path("config"),
+    force: Annotated[
+        bool, typer.Option("--force", help="Send now, ignoring the 2 week gap")
+    ] = False,
+) -> None:
+    """Send the special occasion list (restaurants over S$200 for 4) from the latest run."""
+    config = _load(config_dir)
+    store, _, _ = _paths(config)
+    console.print(f"special occasion list: {_occasion(config, store, force=force)}")
 
 
 @app.command("notify-test")

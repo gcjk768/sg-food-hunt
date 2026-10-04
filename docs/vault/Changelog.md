@@ -1,8 +1,15 @@
 ---
 tags: [active]
-updated: 2026-10-02
+updated: 2026-10-04
 ---
 # Changelog
+
+## 2026-10-04
+- feat: special occasion list (`sgfoodhunt/occasion.py`, category `occasion_4pax`, `digest_only`). ONE Telegram message of restaurants whose estimated bill for 4 is over S$200 (price level 3 or 4; Michelin and buffet places kept even with no price): Michelin venues first with ⭐ per star and bold Michelin, `Worth` and `Buffet` tags, est. bill and Book link. Sent every 14 days after a run (`occasion_state.json` in the data dir), or `sgfh occasion --force`. New `HardFilters.price_required` and `Category.digest_only` (no per-venue cards for it). `is_buffet()` reads name, cuisine and summary.
+- feat: Michelin in the verdict. A Michelin star or Bib Gourmand is ✅ Worth going (reason `Bib Gourmand` / `Michelin 1 Star`) and shows 🏅 / ⭐ on the card; closed or hygiene C and D still win (`michelin_award()`, `verdict()` in `sgfoodhunt/diff.py`). The official guide scraper stays off (robots.txt disallows the listing), so the award is read from a venue's own article snippet (`michelin_from_text()` in `sgfoodhunt/dedup/registry.py`, strict: Bib Gourmand, N Michelin star(s), Michelin-starred). 'Selected' and 'Green Star' are not awards.
+- feat: hawker focus. `hawker_family` is on and rewritten for stalls: 8 queries incl. Michelin Bib Gourmand and Michelin star hawkers, food 0.30 and value 0.20 weights, party of 2.
+- feat: `restaurants_4pax` ("Restaurants for 4 under S$200") enabled: party of 4, new hard filter `bill_range_sgd: [100, 200]` (`HardFilters` in `sgfoodhunt/config.py`, `hard_filter_reason()` in `sgfoodhunt/scoring/score.py`) using `price_per_pax_sgd` x party size, so only price level 2 (about S$140) passes; unknown price is kept.
+- feat: cafes and zi char only. 10 other categories set `enabled: false` in `config/categories.yaml` (`Category.enabled`, filtered in `load_config`; tests set `SGFH_ALL_CATEGORIES=1`). Cards simplified (`_card` in `sgfoodhunt/diff.py`): name + 🆕 NEW, ✅ Worth going / ❌ Not worth going with the reason (`verdict()`), address · MRT, facts, summary, link; no ranks, list names or sources. New venues get a card even without a top place.
 
 ## 2026-10-02
 - feat: NAS vault movement log + memory. `sgfoodhunt/reporting/memory.py` appends one line per event to `SG Food Hunt/Activity/YYYY-MM-DD.md` (`- HH:MM emoji **what** · detail · [[venue]]`, SGT): run started/finished/failed (`sgfoodhunt/cli.py`), new venues found (`sgfoodhunt/ranking.py`), entered/left top 15 and moved up/down (`write_venue_notes()` in `sgfoodhunt/reporting/venue_notes.py`), card sent/skipped and send failures (`_notify()` in `sgfoodhunt/cli.py`). Venue notes get an append-only `## History` (first seen, rank/list moves, cards sent), kept above `## My notes`.

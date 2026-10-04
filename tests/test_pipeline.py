@@ -20,7 +20,7 @@ from tests.conftest import FakeSession, MockApiFactory, fixture_text
 
 def test_select_helpers(app_config: AppConfig) -> None:
     assert [c.key for c in select_categories(app_config, ["zichar_family"])] == ["zichar_family"]
-    assert len(select_categories(app_config, None)) == 15
+    assert len(select_categories(app_config, None)) == 17
     runnable, skipped = select_sources(app_config, None)
     assert "tripadvisor" not in [s.key for s in runnable] and "disallowed" in skipped["tripadvisor"]
     runnable, skipped = select_sources(app_config, ["sethlui", "tripadvisor"])

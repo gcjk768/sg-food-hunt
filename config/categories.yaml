@@ -53,6 +53,7 @@ categories:
     hard_filters: {open_weekends: true}
 
   - key: restaurants_date
+    enabled: false   # only cafes and zi char are on (the owner, 2026-10-04); set true to bring it back
     display_name: Best restaurants for a date
     group: dating
     party_size: 2
@@ -67,7 +68,40 @@ categories:
     weights: {ambience: 0.20, service: 0.15, quiet: 0.10, food: 0.15}
     hard_filters: {}
 
+  - key: restaurants_4pax
+    display_name: Restaurants for 4 under S$200
+    group: general
+    party_size: 4
+    queries:
+      - "best restaurants Singapore for 4 pax affordable"
+      - "good value restaurants Singapore group of 4"
+      - "best restaurants under $50 per person Singapore"
+      - "best value dinner Singapore 4 people"
+      - "新加坡 平价 餐厅 推荐"
+    keywords: ["value", "worth it", "affordable", "sharing", "set menu"]
+    weights: {food: 0.20, value: 0.20, service: 0.05, ambience: 0.05}
+    hard_filters: {bill_range_sgd: [100, 200]}   # S$100 to S$200 for the table of 4 (about S$25 to S$50 each)
+
+  - key: occasion_4pax
+    display_name: Special occasions over S$200 for 4
+    group: general
+    party_size: 4
+    digest_only: true   # sent as one list every 2 weeks (sgfoodhunt/occasion.py), not as per-venue cards
+    queries:
+      - "best restaurants for birthday celebration Singapore"
+      - "special occasion restaurants Singapore"
+      - "best fine dining Singapore"
+      - "Michelin star restaurants Singapore"
+      - "best buffet Singapore birthday celebration"
+      - "best hotel buffet Singapore"
+      - "新加坡 生日 餐厅 推荐"
+      - "新加坡 自助餐 推荐"
+    keywords: ["birthday", "celebration", "special occasion", "buffet", "michelin", "tasting menu", "private room"]
+    weights: {food: 0.20, service: 0.10, ambience: 0.10, keyword_match: 0.10}
+    hard_filters: {bill_range_sgd: [201, 100000], price_required: true}
+
   - key: family_occasion
+    enabled: false   # only cafes and zi char are on (the owner, 2026-10-04); set true to bring it back
     display_name: Best restaurants or buffets for a family occasion
     group: family
     party_size: 6
@@ -84,6 +118,7 @@ categories:
     hard_filters: {open_weekends: true}
 
   - key: family_weekend
+    enabled: false   # only cafes and zi char are on (the owner, 2026-10-04); set true to bring it back
     display_name: Best restaurants for a family weekend meal
     group: family
     party_size: 4
@@ -127,6 +162,7 @@ categories:
     hard_filters: {open_weekends: true}
 
   - key: rooftop_waterfront_date
+    enabled: false   # only cafes and zi char are on (the owner, 2026-10-04); set true to bring it back
     display_name: Best rooftop or waterfront bars and restaurants for a date
     group: dating
     party_size: 2
@@ -142,6 +178,7 @@ categories:
     hard_filters: {}
 
   - key: dimsum_family
+    enabled: false   # only cafes and zi char are on (the owner, 2026-10-04); set true to bring it back
     display_name: Best dim sum restaurants for a family weekend meal
     group: family
     party_size: 5
@@ -156,6 +193,7 @@ categories:
     hard_filters: {open_weekends: true}
 
   - key: steamboat_family
+    enabled: false   # only cafes and zi char are on (the owner, 2026-10-04); set true to bring it back
     display_name: Best steamboat, hotpot or mookata places for a family gathering
     group: family
     party_size: 6
@@ -171,20 +209,24 @@ categories:
     hard_filters: {open_weekends: true}
 
   - key: hawker_family
-    display_name: Best hawker centres and food courts for a casual family meal
+    display_name: Best hawker stalls (Michelin Bib Gourmand and local favourites)
     group: family
-    party_size: 4
+    party_size: 2
     queries:
+      - "best hawker food Singapore"
+      - "Michelin Bib Gourmand hawker stalls Singapore"
+      - "Michelin star hawker Singapore"
+      - "best hawker stalls Singapore worth the queue"
       - "best hawker centres Singapore"
-      - "best food courts Singapore family"
-      - "hawker centre with parking Singapore"
-      - "best hawker centres for families Singapore"
+      - "hawker stalls Singapore locals love"
       - "新加坡 小贩中心 推荐"
-    keywords: ["hawker", "food court", "kopitiam", "stalls", "小贩"]
-    weights: {food: 0.15, value: 0.30, space: 0.10, parking: 0.15, ambience: 0.0, service: 0.0}
+      - "新加坡 米其林 小贩"
+    keywords: ["hawker", "stall", "bib gourmand", "michelin", "queue", "kopitiam", "小贩", "米其林"]
+    weights: {food: 0.30, value: 0.20, space: 0.0, parking: 0.0, ambience: 0.0, service: 0.0}
     hard_filters: {}
 
   - key: hightea_dessert_date
+    enabled: false   # only cafes and zi char are on (the owner, 2026-10-04); set true to bring it back
     display_name: Best high tea or dessert cafes for a date
     group: dating
     party_size: 2
@@ -200,6 +242,7 @@ categories:
     hard_filters: {}
 
   - key: private_room_family
+    enabled: false   # only cafes and zi char are on (the owner, 2026-10-04); set true to bring it back
     display_name: Best restaurants with private rooms for a family celebration
     group: family
     party_size: 8
@@ -233,6 +276,7 @@ categories:
     hard_filters: {opened_within_months: 1}
 
   - key: new_restaurants
+    enabled: false   # only cafes and zi char are on (the owner, 2026-10-04); set true to bring it back
     display_name: Newly opened restaurants
     group: general
     party_size: 2

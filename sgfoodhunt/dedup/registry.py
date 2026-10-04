@@ -78,6 +78,27 @@ FLAG_KEYS = (
 )
 
 
+MICHELIN_RE = re.compile(
+    r"\b(bib[- ]gourmand)\b|\b(one|two|three|[123])[- ]michelin[- ]stars?\b|\b(michelin[- ]starred)\b",
+    re.IGNORECASE,
+)
+_STARS = {"one": 1, "two": 2, "three": 3, "1": 1, "2": 2, "3": 3}
+
+
+def michelin_from_text(text: str) -> str | None:
+    """Bib Gourmand / N Star(s) / Star when a venue's own snippet says so. Deliberately strict:
+    'Selected' and loose 'three stars' (a rating) never count."""
+    m = MICHELIN_RE.search(text)
+    if not m:
+        return None
+    if m.group(1):
+        return "Bib Gourmand"
+    if m.group(2):
+        n = _STARS[m.group(2).lower()]
+        return f"{n} Star{'s' if n > 1 else ''}"
+    return "Star"
+
+
 @dataclass(slots=True)
 class MergeEvent:
     run_id: str
@@ -278,6 +299,10 @@ class VenueRegistry:
             venue.business_status = row["business_status"]
         if row.get("michelin") and (not venue.michelin or row["michelin"] != "Selected"):
             venue.michelin = row["michelin"]
+        if (
+            not venue.michelin
+        ):  # the official guide is off (robots.txt), so read it from the venue's own snippet
+            venue.michelin = michelin_from_text(row.get("snippet") or "")
         if row.get("hygiene_grade"):
             venue.hygiene_grade = row["hygiene_grade"]
         # flags from Google extras and text

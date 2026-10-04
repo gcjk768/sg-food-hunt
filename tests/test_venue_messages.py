@@ -8,7 +8,7 @@ import httpx
 
 from sgfoodhunt.config import load_config
 from sgfoodhunt.diff import RunDiff, venue_messages
-from sgfoodhunt.notify import esc, html_to_plain, send_telegram, split_message
+from sgfoodhunt.notify import html_to_plain, send_telegram, split_message
 from sgfoodhunt.scrapers.blogs import relevant_article
 from sgfoodhunt.scrapers.html import clean_venue_heading, strip_news_wording
 from sgfoodhunt.storage.runs import RunStore
@@ -48,11 +48,11 @@ def test_one_message_per_new_top_pick(tmp_path: Path) -> None:
     v4 = {"venue_id": "v4", "name": "Venue 4", "rank": 15}
     entered = CategoryDiff(cat_a, label, entered=[v4])
     third = venue_messages(config, store, RunDiff("r2", "r1", categories=[entered]))
-    assert f"🍽 <b>Venue 4</b> · #15 · {esc(label)}" in third
+    assert any(m.startswith("🍽 <b>Venue 4</b>") for m in third)
 
 
-def test_card_keeps_fields_in_order_and_escapes() -> None:
-    """the owner's fixed card: name / ranks / address · MRT / facts / summary / link / sources."""
+def test_card_is_simple_with_verdict_and_new_tag() -> None:
+    """Name (+ NEW) / verdict / address · MRT / facts / summary / link. No ranks, lists or sources."""
     from sgfoodhunt.diff import _card
 
     v = {
@@ -67,28 +67,97 @@ def test_card_keeps_fields_in_order_and_escapes() -> None:
         "booking_url": "https://chope.co/x?a=1&b=2",
         "evidence": [{"url": "https://www.sethlui.com/a"}, {"url": "https://eatbook.sg/b"}],
     }
-    card = _card(v, [(4, "Cafes"), (1, "Date night"), (2, "Brunch"), (9, "A"), (7, "B")])
+    card = _card(v, [(4, "Cafes"), (1, "Date night")], new=True)
     assert card.splitlines()[0] == (
-        "🍽 <b>Tom &amp; Jerry&#x27;s &lt;Bar&gt; (汤姆)</b> · #1 · Date night"
+        "🍽 <b>Tom &amp; Jerry&#x27;s &lt;Bar&gt; (汤姆)</b> 🆕 <b>NEW</b>"
     )
+    assert "✅ <b>Worth going</b> · ★ 4.5 from 120 reviews" in card
     assert "<script>" not in card and "&lt;script&gt;" in card
     assert 'href="https://chope.co/x?a=1&amp;b=2"' in card
-    assert card.endswith("</blockquote>") and "<blockquote expandable>" in card
+    assert "#1" not in card and "blockquote" not in card and "Sources" not in card
     plain = html_to_plain(card)
     fields = [
         "Tom & Jerry's <Bar> (汤姆)",
-        "#1 · Date night",
-        "#2 · Brunch",
-        "#4 · Cafes",
-        "…and top 3 in 2 more lists",
+        "Worth going",
         "📍 1 Raffles Pl #01-01 · 🚇 near Raffles Place MRT",
         "Japanese · $$ · ★ 4.5 (120)",
         "LLM says <script>alert(1)</script> & more",
         "Book a table (https://chope.co/x?a=1&b=2)",
-        "Sources: sethlui.com (https://www.sethlui.com/a)  ·  eatbook.sg (https://eatbook.sg/b)",
     ]
     pos = [plain.index(f) for f in fields]
     assert pos == sorted(pos)
+    assert "NEW" not in _card(v, [], new=False)
+
+
+def test_verdict_worth_or_not() -> None:
+    from sgfoodhunt.diff import verdict
+
+    def rated(r: float, n: int, **kw: Any) -> dict[str, Any]:
+        return {"ratings": {"google_places": {"rating": r, "review_count": n}}, **kw}
+
+    assert verdict(rated(4.6, 300), [])[0] is True
+    assert verdict(rated(3.8, 300), [(1, "x")]) == (False, "only ★ 3.8 from 300 reviews")
+    assert verdict(rated(4.6, 300, business_status="CLOSED_TEMPORARILY"), []) == (False, "closed")
+    assert verdict(rated(4.6, 300, rating_trend="declining"), []) == (False, "rating is falling")
+    assert verdict({"hygiene_grade": "C"}, [(2, "x")])[0] is False
+    assert verdict({}, [(7, "x")]) == (True, "#7 on its list")
+    two = {"evidence": [{"source_key": "eatbook"}, {"source_key": "sethlui"}]}
+    assert verdict(two, [])[0] is True
+    one = {"evidence": [{"source_key": "eatbook"}]}
+    assert verdict(one, []) == (False, "too little proof yet")
+
+
+def test_new_venue_gets_a_card_even_without_a_top_place(tmp_path: Path) -> None:
+    config = load_config(CONFIG)
+    cat = config.categories.categories[0].key
+    venues = [
+        {"id": "old", "name": "Old Cafe", "evidence": []},
+        {"id": "n", "name": "Fresh Cafe", "evidence": []},
+    ]
+    _write_run(tmp_path, "r1", {cat: [{"venue_id": "old", "rank": 1, "name": "old"}]}, venues[:1])
+    _write_run(tmp_path, "r2", {cat: [{"venue_id": "old", "rank": 1, "name": "old"}]}, venues)
+    diff = RunDiff("r2", "r1", new_venues=[{"venue_id": "n", "name": "Fresh Cafe"}])
+    out = venue_messages(config, RunStore(tmp_path), diff)
+    assert len(out) == 1 and "Fresh Cafe" in out[0] and "🆕 <b>NEW</b>" in out[0]
+    assert "❌ <b>Not worth going</b>" in out[0]
+
+
+def test_only_chosen_categories_are_on(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    monkeypatch.delenv("SGFH_ALL_CATEGORIES")
+    keys = {c.key for c in load_config(CONFIG).categories.categories}
+    assert keys == {
+        "cafes_date",
+        "brunch_date",
+        "new_cafes",
+        "zichar_family",
+        "new_zichar",
+        "restaurants_4pax",
+        "occasion_4pax",
+        "hawker_family",
+    }
+
+
+def test_michelin_awards_are_worth_going() -> None:
+    from sgfoodhunt.dedup.registry import michelin_from_text
+    from sgfoodhunt.diff import _card, verdict
+
+    assert verdict({"michelin": "Bib Gourmand"}, []) == (True, "Bib Gourmand")
+    assert verdict({"michelin": "1 Star"}, []) == (True, "Michelin 1 Star")
+    assert verdict({"michelin": "Selected"}, [])[0] is False  # listed, no award
+    assert verdict({"michelin": "Green Star"}, [])[0] is False
+    # an award never hides a closure or a bad hygiene grade
+    assert (
+        verdict({"michelin": "Bib Gourmand", "business_status": "CLOSED_PERMANENTLY"}, [])[0]
+        is False
+    )
+    assert verdict({"michelin": "2 Stars", "hygiene_grade": "C"}, [])[0] is False
+    assert "🏅 Bib Gourmand" in _card({"name": "Stall", "michelin": "Bib Gourmand"}, [])
+    assert "⭐ Michelin 3 Stars" in _card({"name": "X", "michelin": "3 Stars"}, [])
+    assert michelin_from_text("A Bib Gourmand stall since 2016") == "Bib Gourmand"
+    assert michelin_from_text("one Michelin star, still queueing") == "1 Star"
+    assert michelin_from_text("a Michelin-starred chef") == "Star"
+    assert michelin_from_text("three stars out of five, great char kway teow") is None
+    assert michelin_from_text("") is None
 
 
 def test_split_message_never_cuts_a_tag() -> None:
