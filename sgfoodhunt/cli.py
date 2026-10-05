@@ -7,25 +7,19 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import Annotated, Any
+from typing import Annotated
 
 import typer
 from rich.console import Console
 from rich.table import Table
 
 from sgfoodhunt import __version__
-from sgfoodhunt.ai.client import build_ai_client, claude_config_dir, claude_logged_in
+from sgfoodhunt.ai.client import claude_config_dir, claude_logged_in
 from sgfoodhunt.config import AppConfig, load_config
-from sgfoodhunt.diff import (
-    card_ranks,
-    compute_diff,
-    diff_markdown,
-    diff_plain_text,
-    venue_cards,
-)
+from sgfoodhunt.diff import compute_diff, diff_markdown, diff_plain_text
 from sgfoodhunt.http.cache import ResponseCache
 from sgfoodhunt.logging_setup import setup_logging
-from sgfoodhunt.notify import esc, html_to_plain, notify
+from sgfoodhunt.notify import notify
 from sgfoodhunt.pipeline import Collector, select_sources
 from sgfoodhunt.ranking import default_geocoder, rank_run
 from sgfoodhunt.reporting import (
@@ -34,17 +28,9 @@ from sgfoodhunt.reporting import (
     write_run_note,
     write_sources_note,
 )
-from sgfoodhunt.reporting.memory import (
-    CARD_SENT,
-    append_history,
-    history_entry,
-    last_card,
-    log_activity,
-    note_name_of,
-)
 from sgfoodhunt.schedule import parse_schedule
 from sgfoodhunt.storage.runs import RunStore
-from sgfoodhunt.storage.vault import VENUES, Vault
+from sgfoodhunt.storage.vault import Vault
 
 app = typer.Typer(
     help="Collect, rank and keep fresh a list of dining venues in Singapore.", no_args_is_help=True
@@ -178,29 +164,24 @@ def run(
         console.print(f"[red]{exc}[/red]")
         raise typer.Exit(code=2) from exc
     vault.ensure()
-    log_activity(vault, "▶️", "run started", "dry run" if dry_run else "")
-    try:
-        collector = Collector(config, store, cache, dry_run=dry_run, concurrency=concurrency)
-        record = asyncio.run(collector.collect(category, source))
-        csv_path, json_path = export_raw_candidates(
-            store, record.run_id, config.resolve(config.settings.paths.exports_dir)
+    collector = Collector(config, store, cache, dry_run=dry_run, concurrency=concurrency)
+    record = asyncio.run(collector.collect(category, source))
+    csv_path, json_path = export_raw_candidates(
+        store, record.run_id, config.resolve(config.settings.paths.exports_dir)
+    )
+    ranked = asyncio.run(
+        rank_run(
+            config,
+            store,
+            vault,
+            record.run_id,
+            hide_visited=hide_visited,
+            category_keys=category,
+            geocoder=default_geocoder(config, cache, dry_run=dry_run),
+            cache=cache,
+            social_offline=dry_run,
         )
-        ranked = asyncio.run(
-            rank_run(
-                config,
-                store,
-                vault,
-                record.run_id,
-                hide_visited=hide_visited,
-                category_keys=category,
-                geocoder=default_geocoder(config, cache, dry_run=dry_run),
-                cache=cache,
-                social_offline=dry_run,
-            )
-        )
-    except Exception as exc:
-        log_activity(vault, "❌", "run failed", type(exc).__name__)
-        raise
+    )
     record = store.load_run(record.run_id)
     robots = {
         k: ("denied" if "robots" in v else "") for k, v in collector.stats.sources_skipped.items()
@@ -209,21 +190,10 @@ def run(
     link = write_run_note(vault, store, record, config)
     write_home_note(vault, config, link)
     _print_run_summary(config, record)
-    st = record.stats or {}
-    log_activity(
-        vault,
-        "✅" if record.status == "ok" else "⚠️",
-        f"run finished ({record.status})",
-        f"{st.get('candidates', 0)} candidates · {len(ranked.venues)} venues "
-        f"({ranked.match_stats.created} new) · {st.get('errors', 0)} errors",
-        f"{link}|{record.run_id}",
-    )
     _print_rank_summary(config, ranked)
     if ranked.diff is not None:
         console.print(diff_markdown(ranked.diff))
         _notify(config, ranked.diff)
-    _occasion(config, store)
-    _promos(config, store)
     console.print(
         f"\nrun note: {vault.note_path('Runs', record.run_id)}\n"
         f"raw CSV: {csv_path}\nraw JSON: {json_path}\nlog: {log_path}"
@@ -237,73 +207,8 @@ def _notify(config: AppConfig, diff) -> None:  # type: ignore[no-untyped-def]
     if diff.is_empty and diff.prev_run_id is not None:
         log.info("diff is empty; notifications skipped")
         return
-    store, _, vault = _paths(config)
-    # long-term memory: never re-send a card the vault shows went out at the same ranks
-    fresh = []
-    for v, tops, html in venue_cards(config, store, diff):
-        name, ranks = note_name_of(v), card_ranks(tops)
-        if last_card(vault, name) == ranks:
-            log_activity(vault, "⏭️", "card skipped", f"already sent at {ranks}", _vlink(vault, v))
-        else:
-            fresh.append((name, ranks, v, html))
-    cards = [html for *_, html in fresh]
-    # Telegram gets only venue cards (the owner's fixed format); the text summary is for email
-    if not cards and n.telegram and not n.email:
-        log.info("no new venue cards; notifications skipped")
-        return
-    plain_cards = [html_to_plain(c) for c in cards]  # cards are Telegram HTML; email is plain
-    text = "\n\n".join([diff_plain_text(diff, title="SG Food Hunt update"), *plain_cards])
-    result = notify(config, text, subject=f"SG Food Hunt diff {diff.run_id}", messages=cards)
+    result = notify(config, diff_plain_text(diff), subject=f"SG Food Hunt diff {diff.run_id}")
     console.print(f"notifications: telegram {result.telegram}, email {result.email}")
-    if result.telegram == "sent":
-        for name, ranks, v, _html in fresh:
-            log_activity(vault, "📨", CARD_SENT, ranks, _vlink(vault, v))
-            append_history(vault, name, [history_entry("📨", CARD_SENT, ranks)])
-    for channel in ("telegram", "email"):
-        if getattr(result, channel, None) == "failed":  # no error text: it can carry the bot URL
-            log_activity(vault, "❌", f"{channel} send failed", f"{len(cards)} cards · see logs/")
-
-
-def _occasion(config: AppConfig, store: RunStore, force: bool = False) -> str:
-    """The special occasion list (one message), at most once every two weeks. Never fails a run."""
-    from sgfoodhunt.occasion import send_occasion
-
-    n = config.settings.notifications
-    if not (n.telegram or n.email):
-        return "notifications off"
-    try:
-        _, cache, _ = _paths(config)
-        out = send_occasion(
-            config, store, force=force, ai=build_ai_client(config.settings.ai, cache)
-        )
-    except Exception as exc:  # a broken list must not stop the weekly run
-        log.warning("special occasion list failed: %s", exc)
-        return "failed"
-    if out != "not due yet":
-        log.info("special occasion list: %s", out)
-    return out
-
-
-def _promos(config: AppConfig, store: RunStore, force: bool = False) -> str:
-    """The weekly promo message for the places on your lists. Never fails a run."""
-    from sgfoodhunt.promos import send_promos
-
-    n = config.settings.notifications
-    if not (n.telegram or n.email):
-        return "notifications off"
-    try:
-        _, cache, _ = _paths(config)
-        out = send_promos(config, store, build_ai_client(config.settings.ai, cache), force=force)
-    except Exception as exc:
-        log.warning("promo message failed: %s", exc)
-        return "failed"
-    if out != "not due yet":
-        log.info("promo message: %s", out)
-    return out
-
-
-def _vlink(vault: Vault, v: dict[str, Any]) -> str:
-    return f"{vault.link_target(VENUES, note_name_of(v))}|{v.get('name')}"
 
 
 def _print_rank_summary(config: AppConfig, ranked) -> None:  # type: ignore[no-untyped-def]
@@ -579,32 +484,6 @@ def doctor(
     raise typer.Exit(code=1 if problems else 0)
 
 
-@app.command()
-def occasion(
-    config_dir: ConfigOpt = Path("config"),
-    force: Annotated[
-        bool, typer.Option("--force", help="Send now, ignoring the 2 week gap")
-    ] = False,
-) -> None:
-    """Send the special occasion list (restaurants over S$200 for 4) from the latest run."""
-    config = _load(config_dir)
-    store, _, _ = _paths(config)
-    console.print(f"special occasion list: {_occasion(config, store, force=force)}")
-
-
-@app.command()
-def promos(
-    config_dir: ConfigOpt = Path("config"),
-    force: Annotated[
-        bool, typer.Option("--force", help="Send now, ignoring the 7 day gap")
-    ] = False,
-) -> None:
-    """Search for current promotions at the places on your lists and send them as one message."""
-    config = _load(config_dir)
-    store, _, _ = _paths(config)
-    console.print(f"promos: {_promos(config, store, force=force)}")
-
-
 @app.command("notify-test")
 def notify_test(config_dir: ConfigOpt = Path("config")) -> None:
     """Send a test message through the configured Telegram bot / email."""
@@ -621,13 +500,7 @@ def notify_test(config_dir: ConfigOpt = Path("config")) -> None:
         f"Vault: {config.resolve(config.settings.paths.vault_dir)}\n"
         "You will receive the diff report here after each run."
     )
-    card = (
-        "🍽 <b>SG FOOD HUNT</b> · connected\n\n"
-        f"⚙️ Config <code>{esc(config.config_dir)}</code>\n"
-        f"🗂 Vault <code>{esc(config.resolve(config.settings.paths.vault_dir))}</code>\n"
-        "<i>Venue cards land here after each run.</i>"
-    )
-    result = notify(config, text, subject="SG Food Hunt test message", messages=[card])
+    result = notify(config, text, subject="SG Food Hunt test message")
     console.print(f"telegram: {result.telegram}, email: {result.email}")
     for err in result.errors:
         console.print(f"[red]{err}[/red]")

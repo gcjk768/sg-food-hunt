@@ -19,15 +19,8 @@ from sgfoodhunt.enrich import EnrichStats, OneMapGeocoder, enrich_venues
 from sgfoodhunt.http.cache import ResponseCache, write_json
 from sgfoodhunt.http.client import AsyncApiClient
 from sgfoodhunt.reporting.exports import export_category_csvs, export_merged_json
-from sgfoodhunt.reporting.memory import (
-    MEMORY_CAP,
-    log_activity,
-    recent_activity,
-    venue_memory,
-)
 from sgfoodhunt.reporting.venue_notes import (
     read_personal_notes,
-    venue_note_name,
     write_category_notes,
     write_venue_notes,
 )
@@ -36,7 +29,7 @@ from sgfoodhunt.reviews.analysis import record_rating_history
 from sgfoodhunt.scoring import ScoredVenue, score_category
 from sgfoodhunt.social import SocialStats, run_social
 from sgfoodhunt.storage.runs import RunStore
-from sgfoodhunt.storage.vault import VENUES, Vault
+from sgfoodhunt.storage.vault import Vault
 
 log = logging.getLogger(__name__)
 
@@ -83,37 +76,6 @@ def default_geocoder(
         dry_run=dry_run,
     )
     return OneMapGeocoder(client)
-
-
-def _memory(
-    vault: Vault, config: AppConfig, venue: Venue, ranks: dict[str, int], activity: list[str]
-) -> str:
-    """Vault memory for a venue now in a top list; "" otherwise, so quiet venues keep their
-    cached AI answer (the prompt only changes when the venue's ranks or log change)."""
-    top_n = config.settings.scoring.top_n
-    labels = {c.key: c.display_name for c in config.categories.categories}
-
-    def tops(rs: object) -> str:
-        if not isinstance(rs, dict):
-            return ""
-        return "; ".join(
-            f"#{r} · {labels[k]}"
-            for k, r in sorted(rs.items(), key=lambda kv: kv[1])
-            if isinstance(r, int) and r <= top_n and k in labels
-        )
-
-    now = tops(ranks)
-    if not now:
-        return ""
-    name = venue_note_name(venue)
-    try:  # the note still holds last run's ranks (it is rewritten after this)
-        note = vault.read(VENUES, name)
-        before = tops(note.frontmatter.get("ranks")) if note else ""
-    except Exception:
-        before = ""
-    head = f"Now: {now}\nLast run: {before or 'not in a top list'}"
-    past = venue_memory(vault, name, activity, MEMORY_CAP - len(head) - 1)
-    return f"{head}\n{past}" if past else head
 
 
 async def rank_run(
@@ -189,13 +151,8 @@ async def rank_run(
         for sv in scored:
             if sv.rank:
                 ranks.setdefault(sv.venue_id, {})[key] = sv.rank
-    # 30 days, filtered per venue: a venue's lines only change when something happens to it,
-    # so its prompt (and the 90-day AI cache key) stays stable on quiet days
-    activity = recent_activity(vault, days=30) if ai is not None else []
     for v in venues.values():
-        live = ai is not None and v.last_seen_run == run_id
-        memory = _memory(vault, config, v, ranks.get(v.id, {}), activity) if live else ""
-        analyse_venue(v, config, ranks.get(v.id), ai=ai if live else None, memory=memory)
+        analyse_venue(v, config, ranks.get(v.id), ai=ai if v.last_seen_run == run_id else None)
     registry.save()
     write_json(run_dir / "venues.json", [v.to_dict() for v in seen])
     write_json(
@@ -208,16 +165,6 @@ async def rank_run(
     csvs = export_category_csvs(config, scores, venues, exports_dir)
     merged = export_merged_json(config, scores, venues, exports_dir, run_id)
     diff = compute_diff(config, store, run_id)
-    if diff.new_venues:
-        shown = [
-            f"[[{vault.link_target(VENUES, venue_note_name(venues[e['venue_id']]))}|{e['name']}]]"
-            for e in diff.new_venues[:10]
-            if e["venue_id"] in venues
-        ]
-        more = f" +{len(diff.new_venues) - 10} more" if len(diff.new_venues) > 10 else ""
-        log_activity(
-            vault, "🔎", f"{len(diff.new_venues)} new venues found", ", ".join(shown) + more
-        )
     sheets: list[str] = []
     if config.settings.exports.google_sheets:
         from sgfoodhunt.sheets import export_csvs_to_sheets

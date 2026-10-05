@@ -7,13 +7,6 @@ from typing import Any
 
 from sgfoodhunt.config import AppConfig, Category
 from sgfoodhunt.dedup.venue import Venue
-from sgfoodhunt.reporting.memory import (
-    history_entry,
-    history_lines,
-    log_activity,
-    rank_events,
-    with_history,
-)
 from sgfoodhunt.scoring import PersonalNote, ScoredVenue
 from sgfoodhunt.storage.frontmatter import Note
 from sgfoodhunt.storage.vault import CATEGORIES, VENUES, Vault
@@ -283,40 +276,12 @@ def write_venue_notes(
     for cat_key, scored in scores_by_category.items():
         for s in scored:
             by_venue.setdefault(s.venue_id, {})[cat_key] = s
-    top_n = config.settings.scoring.top_n
-    labels = {c.key: c.display_name for c in config.categories.categories}
     count = 0
     for venue in venues:
-        name = venue_note_name(venue)
         note = build_venue_note(venue, config, vault, by_venue.get(venue.id, {}), run_id)
-        try:
-            existing = vault.read(VENUES, name)
-            old_ranks = (
-                _top_ranks(existing.frontmatter.get("ranks"), top_n, scores_by_category)
-                if existing
-                else {}
-            )
-            new_ranks = _top_ranks(note.frontmatter.get("ranks"), top_n, scores_by_category)
-            events = rank_events(old_ranks, new_ranks, labels, top_n)
-            entries = [] if existing else [history_entry("🆕", "first seen", f"run {run_id}")]
-            entries += [history_entry(e, what, detail) for e, what, detail in events]
-            note.body = with_history(note.body, history_lines(existing) + entries)
-            vault.write(VENUES, name, note)
-        except Exception as exc:  # one bad note must not sink the run (vault is best-effort)
-            log.warning("venue note %s not written: %s", name, exc)
-            continue
-        link = f"{vault.link_target(VENUES, name)}|{venue.name}"
-        for e, what, detail in events:
-            log_activity(vault, e, what, f"{venue.name} · {detail}", link)
+        vault.write(VENUES, venue_note_name(venue), note)
         count += 1
     return count
-
-
-def _top_ranks(ranks: Any, top_n: int, scope: dict[str, Any]) -> dict[str, int]:
-    """Top-list ranks of the categories this run scored (a ``-c`` run leaves the rest alone)."""
-    if not isinstance(ranks, dict):
-        return {}
-    return {k: int(r) for k, r in ranks.items() if k in scope and isinstance(r, int) and r <= top_n}
 
 
 def build_category_note(

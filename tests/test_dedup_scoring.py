@@ -352,18 +352,3 @@ def test_newly_opened_filter(app_config: AppConfig) -> None:
     assert result["n1"].rank == 1 and result["n1"].excluded_reason is None
     assert "older than 30 days" in (result["n2"].excluded_reason or "")
     assert result["n3"].excluded_reason == "no dated evidence for opening"
-
-
-def test_four_pax_bill_range_filter(app_config: AppConfig) -> None:
-    from sgfoodhunt.scoring.score import hard_filter_reason
-
-    cat = app_config.categories.get("restaurants_4pax")
-    s, today = app_config.settings.scoring, date(2026, 10, 4)
-    assert cat.party_size == 4 and cat.hard_filters.bill_range_sgd == (100, 200)
-    reasons = {}
-    for level in (1, 2, 3, 4, None):
-        v = Venue(id=f"v{level}", name="V")
-        v.price_level = level
-        reasons[level] = hard_filter_reason(v, cat, s, today)
-    assert reasons[2] is None and reasons[None] is None  # S$140 for 4 fits; unknown price is kept
-    assert "S$60" in reasons[1] and "S$320" in reasons[3] and "S$640" in reasons[4]

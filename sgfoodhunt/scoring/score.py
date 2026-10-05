@@ -188,17 +188,6 @@ def hard_filter_reason(
         return "not halal"
     if hf.max_price_level and venue.price_level and venue.price_level > hf.max_price_level:
         return f"price level {venue.price_level} above {hf.max_price_level}"
-    if hf.price_required and not venue.price_level:
-        from sgfoodhunt.occasion import is_buffet, star_count
-
-        if not (star_count(venue.michelin) or venue.michelin == "Bib Gourmand" or is_buffet(venue)):
-            return "no price level"
-    if hf.bill_range_sgd and venue.price_level:
-        per_pax = s.price_per_pax_sgd.get(venue.price_level)
-        if per_pax is not None:
-            bill, (low, high) = per_pax * category.party_size, hf.bill_range_sgd
-            if not low <= bill <= high:
-                return f"estimated bill S${bill:.0f} outside S${low:.0f} to S${high:.0f}"
     if hf.opened_within_months:
         if not venue.earliest_evidence:
             return "no dated evidence for opening"

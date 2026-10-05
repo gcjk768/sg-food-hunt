@@ -38,7 +38,6 @@ RUN chmod +x /entrypoint.sh \
     && mkdir -p /app/config /app/data /app/logs /app/vault /app/social_exports /app/claude-config
 
 VOLUME ["/app/config", "/app/data", "/app/logs", "/app/vault", "/app/social_exports", "/app/claude-config"]
-# NAS is IO-loaded: doctor needs 40-90s just to import, so 20s timed out (NAS hotfix 2026-10-01)
-HEALTHCHECK --interval=5m --timeout=180s --start-period=3m CMD sgfh doctor -C /app/config --quiet || exit 1
+HEALTHCHECK --interval=5m --timeout=20s CMD sgfh doctor -C /app/config --quiet || exit 1
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["serve"]

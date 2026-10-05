@@ -20,7 +20,7 @@ from tests.conftest import FakeSession, MockApiFactory, fixture_text
 
 def test_select_helpers(app_config: AppConfig) -> None:
     assert [c.key for c in select_categories(app_config, ["zichar_family"])] == ["zichar_family"]
-    assert len(select_categories(app_config, None)) == 17
+    assert len(select_categories(app_config, None)) == 15
     runnable, skipped = select_sources(app_config, None)
     assert "tripadvisor" not in [s.key for s in runnable] and "disallowed" in skipped["tripadvisor"]
     runnable, skipped = select_sources(app_config, ["sethlui", "tripadvisor"])
@@ -34,10 +34,6 @@ def _wire_blog(app_config: AppConfig, fake_session: FakeSession) -> None:
     fake_session.add("https://example-blog.test/?s=*", fixture_text("blog_search.html"))
     fake_session.add(
         "https://example-blog.test/best-romantic-cafes-singapore/",
-        fixture_text("blog_article.html"),
-    )
-    fake_session.add(  # zi char queries open this one; cafe queries don't
-        "https://example-blog.test/best-zi-char-restaurants-singapore/",
         fixture_text("blog_article.html"),
     )
     fake_session.add(
@@ -54,7 +50,6 @@ async def test_collector_end_to_end(
     vault: Vault,
 ) -> None:
     _wire_blog(app_config, fake_session)
-    app_config.sources.get("google_places").enabled = True  # shipped off; test the no-key path
     cache = ResponseCache(app_config.settings.paths.cache_dir)
     http = PoliteClient(http_settings, cache, session=fake_session, sleep=lambda _s: None)
     factory = MockApiFactory(http_settings, cache, lambda r: httpx.Response(404))
@@ -66,17 +61,13 @@ async def test_collector_end_to_end(
     assert stats["sources_run"] == ["sethlui"]
     assert stats["sources_skipped"]["google_places"] == "GOOGLE_PLACES_API_KEY is not set"
     assert "tripadvisor" in stats["sources_skipped"]
-    # 2 venues x 4 queries (the Chinese and "cosy" queries match no slug)
-    assert stats["queries"] == 6 and stats["candidates"] == 8
-    assert stats["candidates_by_source"] == {"sethlui": 8}
-    assert stats["requests"] == 7  # 6 searches + 1 relevant article; the rest are cache hits
-    assert stats["cache_hits"] == 3
-    assert run_store.candidate_counts(run.run_id) == {"sethlui": 8}
+    assert stats["queries"] == 6 and stats["candidates"] == 12  # 2 venues x 6 query variants
+    assert stats["candidates_by_source"] == {"sethlui": 12}
+    assert stats["requests"] == 8  # 6 searches + 2 articles; the rest are cache hits
+    assert stats["cache_hits"] == 10
+    assert run_store.candidate_counts(run.run_id) == {"sethlui": 12}
     rows = list(run_store.iter_candidates(run.run_id))
-    assert {r["query"] for r in rows} == set(app_config.categories.get("cafes_date").queries) - {
-        "新加坡 约会 咖啡馆",  # English blog: no slug can match a Chinese query
-        "cosy cafes Singapore couples",  # slug says romantic, not cosy
-    }
+    assert {r["query"] for r in rows} == set(app_config.categories.get("cafes_date").queries)
     events = list(run_store.iter_events(run.run_id))
     assert any("GOOGLE_PLACES_API_KEY" in e["message"] for e in events)
 
@@ -84,14 +75,14 @@ async def test_collector_end_to_end(
         run_store, run.run_id, app_config.settings.paths.exports_dir
     )
     assert csv_path.read_text().splitlines()[0].startswith("source_key,category_key,query,name")
-    assert len(json.loads(json_path.read_text())) == 8
+    assert len(json.loads(json_path.read_text())) == 12
 
     link = write_run_note(vault, run_store, run, app_config)
     note_path = vault.note_path("Runs", run.run_id)
     text = note_path.read_text()
     assert link.endswith(run.run_id) and text.startswith("---\ntype: run\n")
-    assert "| Tiong Bahru Bakery | 4 |" in text
-    assert "Seth Lui | blog | 8 | ran" in text
+    assert "| Tiong Bahru Bakery | 6 |" in text
+    assert "Seth Lui | blog | 12 | ran" in text
     assert "skipped: GOOGLE_PLACES_API_KEY is not set" in text
     write_home_note(vault, app_config, link)
     home = (vault.root / "Home.md").read_text()
@@ -125,7 +116,7 @@ async def test_collector_dry_run_uses_cache_only(
             http_settings, cache, lambda r: httpx.Response(404), dry_run=True
         ),
     ).collect(["cafes_date"], ["sethlui"])
-    assert run.mode == "dry_run" and run.stats["candidates"] == 8 and run.stats["requests"] == 0
+    assert run.mode == "dry_run" and run.stats["candidates"] == 12 and run.stats["requests"] == 0
     assert len(fake_session.calls) == calls_before
 
 

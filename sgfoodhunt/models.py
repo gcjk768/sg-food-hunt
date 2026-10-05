@@ -18,44 +18,6 @@ def utcnow_iso() -> str:
     return datetime.now(UTC).replace(microsecond=0).isoformat()
 
 
-_MONTHS = frozenset(
-    [
-        "january",
-        "february",
-        "march",
-        "april",
-        "may",
-        "june",
-        "july",
-        "august",
-        "september",
-        "october",
-        "november",
-        "december",
-        "jan",
-        "feb",
-        "mar",
-        "apr",
-        "jun",
-        "jul",
-        "aug",
-        "sep",
-        "sept",
-        "oct",
-        "nov",
-        "dec",
-    ]
-)
-
-
-def is_date_only(name: str) -> bool:
-    """Month headings of monthly round-ups ("July 2026", "12 Feb", "2026") are not venues."""
-    words = re.findall(r"[a-z]+|\d+", name.lower())
-    if not words or not all(w.isdigit() or w in _MONTHS for w in words):
-        return False
-    return any(w in _MONTHS for w in words) or bool(re.fullmatch(r"(?:19|20)\d\d", "".join(words)))
-
-
 def extract_postal_code(text: str | None) -> str | None:
     """Return the first Singapore six digit postal code in ``text``."""
     if not text:
@@ -138,8 +100,6 @@ class VenueCandidate:
         self.name = re.sub(r"\s+", " ", self.name).strip()
         if not self.name:
             raise ValueError("candidate name must not be empty")
-        if is_date_only(self.name):
-            raise ValueError(f"not a venue name: {self.name!r}")
         if self.postal_code is None:
             self.postal_code = extract_postal_code(self.address)
         if self.phone is None:

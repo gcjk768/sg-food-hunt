@@ -78,7 +78,7 @@ def test_notify_test_command(app_config: AppConfig, monkeypatch: pytest.MonkeyPa
     monkeypatch.setattr(notify_module, "send_telegram", fake_send)
     res = runner.invoke(app, ["notify-test", "-C", cfg])
     assert res.exit_code == 0, res.output
-    assert sent and sent[0]["chat"] == "42" and "<b>SG FOOD HUNT</b>" in sent[0]["text"][0]
+    assert sent and sent[0]["chat"] == "42" and "SG Food Hunt is connected" in sent[0]["text"]
 
     def failing(token: str, chat_id: str, text: str, client=None, thread_id=None) -> None:  # type: ignore[no-untyped-def]
         raise httpx.HTTPError("boom")
@@ -131,32 +131,3 @@ def test_docker_files_are_consistent() -> None:
     assert "/app/claude-config" in dockerfile and "./claude-config:/app/claude-config" in compose
     assert "CLAUDE_CONFIG_DIR=/app/claude-config" in dockerfile
     assert cli_module.serve.__doc__ and "scheduler" in cli_module.serve.__doc__.lower()
-
-
-def test_telegram_gets_only_venue_cards(
-    app_config: AppConfig, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    from sgfoodhunt.diff import RunDiff
-
-    app_config.settings.notifications.telegram = True
-    sent: list[list[str] | None] = []
-    emails: list[str] = []
-    cards = ["🍽 <b>High &amp; House</b> · #15 · Rooftop bars"]
-    venue = {"id": "v", "name": "High & House"}
-    monkeypatch.setattr(
-        cli_module, "venue_cards", lambda *a, **k: [(venue, [(15, "Rooftop bars")], cards[0])]
-    )
-
-    def fake_notify(config, text, subject, messages=None):  # type: ignore[no-untyped-def]
-        sent.append(messages)
-        emails.append(text)
-        return type("R", (), {"telegram": "sent", "email": None})()
-
-    monkeypatch.setattr(cli_module, "notify", fake_notify)
-    change = RunDiff(run_id="r2", prev_run_id="r1", new_venues=[{"venue_id": "v", "name": "A"}])
-    cli_module._notify(app_config, change)
-    assert sent == [cards]  # cards only, no summary message
-    assert "🍽 High & House · #15" in emails[0] and "<b>" not in emails[0]  # email is plain
-    monkeypatch.setattr(cli_module, "venue_cards", lambda *a, **k: [])
-    cli_module._notify(app_config, change)  # a change with no venue card sends nothing
-    assert len(sent) == 1

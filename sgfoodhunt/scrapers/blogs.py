@@ -18,101 +18,6 @@ from sgfoodhunt.scrapers.html import (
     looks_like_venue_entry,
 )
 
-#: an article slug must name food to be opened; keeps out cruise/tour/hotel/"things to do" guides
-FOOD_SLUG_RE = re.compile(
-    r"(?:^|[-/])(?:food|foodie|eat|eats|eatery|eateries|restaurant|cafe|coffee|dining|dine|dinner|"
-    r"lunch|buffet|hawker|brunch|dim-sum|dimsum|steamboat|hotpot|hot-pot|zi-char|zichar|dessert|"
-    r"high-tea|tea|bakery|bakeries|bakehouse|omakase|menu|steak|steakhouse|sushi|ramen|bbq|"
-    r"seafood|noodle|laksa|bistro|brasserie|kitchen|cuisine|halal|vegetarian|pizza|burger|"
-    r"dumpling|kopitiam|bar|bars|supper|ice-cream|gelato|korean|japanese|chinese|thai|italian|"
-    r"indian|western)s?(?=[-/]|$)"
-)
-#: guides to other cities (same blogs cover JB, Bali, Phuket...)
-OVERSEAS_SLUG_RE = re.compile(
-    r"(?:^|[-/])(?:johor|jb|malaysia|kuala-lumpur|kl|penang|melaka|malacca|batam|bintan|bali|"
-    r"seminyak|phuket|bangkok|thailand|hong-kong|taipei|taiwan|tokyo|osaka|japan|seoul|korea)"
-    r"(?=[-/]|$)"
-)
-#: query words too generic to show an article matches the query
-_GENERIC_WORDS = frozenset(
-    [
-        "best",
-        "top",
-        "singapore",
-        "sg",
-        "for",
-        "a",
-        "an",
-        "the",
-        "in",
-        "of",
-        "and",
-        "with",
-        "to",
-        "near",
-        "new",
-        "places",
-        "spots",
-        "guide",
-        "date",
-        "night",
-        "couples",
-        "couple",
-        "family",
-        "families",
-        "kids",
-        "weekend",
-        "instagrammable",
-        "tiktok",
-        "viral",
-        "group",
-        "latest",
-        "newly",
-        "opened",
-        "openings",
-        "this",
-        "month",
-    ]
-)
-NEWNESS_QUERY_RE = re.compile(r"(?i)(?:^|\s)(?:new|newly|latest|openings?|opened)(?=\s|$)")
-NEWNESS_SLUG_RE = re.compile(
-    r"(?:^|[-/])(?:new|opening|openings|opened|latest|january|february|march|april|may|june|"
-    r"july|august|september|october|november|december|20\d\d)(?=[-/]|$)"
-)
-#: food words every food listicle shares; a match on these alone says nothing about the query
-_FOOD_WORDS = frozenset(["restaurant", "food", "cafe", "place", "spot", "dining", "eat", "eatery"])
-
-
-def _stem(word: str) -> str:
-    return word[:-1] if len(word) > 3 and word.endswith("s") else word
-
-
-def _words(text: str) -> set[str]:
-    return {_stem(w) for w in re.findall(r"[a-z]+", text.lower())} - _STEMMED_GENERIC
-
-
-_STEMMED_GENERIC = frozenset(_stem(w) for w in _GENERIC_WORDS)
-
-
-def relevant_article(url: str, query: str) -> bool:
-    """A search page also links sidebar/"latest" posts that ignore the query; those came back for
-    every query and put the same unrelated article in every category. Keep a link only when its
-    slug names food and matches the query's distinctive words: both of them when it has two or
-    more ("weekend dim sum brunch" needs dim+sum, not just "brunch"), else the one it has."""
-    slug = urlsplit(url).path.lower()
-    if not FOOD_SLUG_RE.search(slug) or OVERSEAS_SLUG_RE.search(slug):
-        return False
-    words = _words(query)
-    if not words:  # a Chinese query on an English blog: its search can't have matched anything
-        return False
-    if NEWNESS_QUERY_RE.search(query) and not NEWNESS_SLUG_RE.search(slug):
-        return False  # "new restaurants" wants an openings roundup, not an evergreen best-of
-    distinctive = words - _FOOD_WORDS or words  # "instagrammable cafe" -> {"cafe"}
-    slug_words = _words(slug)
-    hits = {w for w in distinctive if w in slug_words or (len(w) > 4 and w in slug)}
-    return len(hits) >= min(2, len(distinctive))
-
-
 DEFAULT_CONTENT_SELECTORS = (
     "article .entry-content",
     "div.entry-content",
@@ -155,7 +60,7 @@ class ListicleBlogScraper(BaseScraper):
     def _max_articles(self) -> int:
         return int(self.source.options.get("max_articles", self.max_articles))
 
-    def article_links(self, soup, search_url: str, query: str = "") -> list[str]:  # type: ignore[no-untyped-def]
+    def article_links(self, soup, search_url: str) -> list[str]:  # type: ignore[no-untyped-def]
         scope = self.source.options.get("results_selector", self.results_selector)
         roots = (soup.select(str(scope)) if scope else []) or [soup]
         links = list(
@@ -169,9 +74,7 @@ class ListicleBlogScraper(BaseScraper):
         links = [
             u
             for u in links
-            if urlsplit(u).netloc == host
-            and u.rstrip("/") != search_url.rstrip("/")
-            and relevant_article(u, query)
+            if urlsplit(u).netloc == host and u.rstrip("/") != search_url.rstrip("/")
         ]
 
         # Prefer listicle looking URLs; keep document order otherwise.
@@ -189,7 +92,7 @@ class ListicleBlogScraper(BaseScraper):
             return result
         soup, page = fetched
         result.pages.append(page)
-        links = self.article_links(soup, search_url, query.text)
+        links = self.article_links(soup, search_url)
         if not links:
             result.warnings.append(f"no article links found on {search_url}")
         for url in links:

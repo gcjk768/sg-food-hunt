@@ -213,10 +213,10 @@ async def test_blog_falls_back_to_ai_when_no_venue_details(
     )
     fake_session.add(
         "https://example-blog.test/?s=romantic+cafes+Singapore",
-        '<html><body><main><a href="https://example-blog.test/romantic-cafes-prose-article/">x</a></main></body></html>',
+        '<html><body><main><a href="https://example-blog.test/prose-style-article-here/">x</a></main></body></html>',
     )
     fake_session.add(
-        "https://example-blog.test/romantic-cafes-prose-article/",
+        "https://example-blog.test/prose-style-article-here/",
         "<html><head><title>Prose</title></head><body><article><div class='entry-content'><p>We wandered from a bakery in Tiong Bahru to a rooftop by the river and loved both.</p></div></article></body></html>",
     )
     fake = FakeClaude(

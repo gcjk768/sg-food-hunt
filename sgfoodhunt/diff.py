@@ -10,7 +10,6 @@ from typing import Any
 
 from sgfoodhunt.config import AppConfig
 from sgfoodhunt.http.cache import read_json, write_json
-from sgfoodhunt.notify import esc
 from sgfoodhunt.storage.runs import RunRecord, RunStore
 
 
@@ -175,7 +174,7 @@ def compute_diff(
                             "delta": round(delta, 2),
                         }
                     )
-            if (v.get("business_status") or "").startswith("CLOSED") and not str(
+            if v.get("business_status", "").startswith("CLOSED") and not str(
                 pv.get("business_status") or ""
             ).startswith("CLOSED"):
                 diff.newly_closed.append(
@@ -274,131 +273,3 @@ def diff_plain_text(diff: RunDiff, title: str = "SG Food Hunt weekly diff") -> s
         md.replace("**", "").replace("`", "").replace("▲", "+").replace("▼", "-").replace("→", "->")
     )
     return f"{title} ({diff.run_id})\n\n{text}"
-
-
-def _link(url: str, label: str) -> str:
-    return f'<a href="{esc(url)}">{esc(label)}</a>'
-
-
-def michelin_award(v: dict[str, Any]) -> str | None:
-    """'Michelin 1 Star' or 'Bib Gourmand' for an awarded venue; 'Selected' and 'Green Star' are not awards."""
-    m = str(v.get("michelin") or "")
-    if m == "Bib Gourmand":
-        return m
-    if "Star" in m and m != "Green Star":
-        return f"Michelin {m}"
-    return None
-
-
-def verdict(v: dict[str, Any], tops: list[tuple[int, str]]) -> tuple[bool, str]:
-    """Worth going or not, with the one reason that decided it. Not worth: closed, a low Google
-    rating, a bad hygiene grade or a falling rating. Worth: a strong rating, a top 10 place or two
-    independent sources. Anything else is too thin to recommend yet."""
-    g = (v.get("ratings") or {}).get("google_places") or {}
-    rating, reviews = g.get("rating"), g.get("review_count") or 0
-    if str(v.get("business_status") or "").startswith("CLOSED"):
-        return False, "closed"
-    if rating is not None and reviews >= 20 and rating < 4.0:
-        return False, f"only ★ {rating} from {reviews} reviews"
-    if str(v.get("hygiene_grade") or "").upper() in ("C", "D"):
-        return False, f"hygiene grade {v['hygiene_grade']}"
-    award = michelin_award(v)
-    if award:
-        return True, award
-    if v.get("rating_trend") == "declining":
-        return False, "rating is falling"
-    if rating is not None and reviews >= 20 and rating >= 4.2:
-        return True, f"★ {rating} from {reviews} reviews"
-    if tops and min(tops)[0] <= 10:
-        return True, f"#{min(tops)[0]} on its list"
-    n = len({e.get("source_key") for e in v.get("evidence", []) if e.get("source_key")})
-    if n >= 2:
-        return True, f"recommended by {n} sources"
-    return False, "too little proof yet"
-
-
-def _card(v: dict[str, Any], tops: list[tuple[int, str]], new: bool = False) -> str:
-    """Telegram HTML card: name (+ NEW) / verdict / address · MRT / facts / summary / link.
-    No ranks, lists or source links. Every value is escaped."""
-    name = v["name"] + (f" ({v['name_zh']})" if v.get("name_zh") else "")
-    worth, why = verdict(v, tops)
-    lines = [f"🍽 <b>{esc(name)}</b>" + (" 🆕 <b>NEW</b>" if new else "")]
-    lines.append(
-        f"✅ <b>Worth going</b> · {esc(why)}"
-        if worth
-        else f"❌ <b>Not worth going</b> · {esc(why)}"
-    )
-    award = michelin_award(v)
-    if award:
-        lines.append(f"{'🏅' if award == 'Bib Gourmand' else '⭐'} {esc(award)}")
-    where = v.get("address") or v.get("district") or v.get("region")
-    if where:
-        mrt = f" · 🚇 near {esc(v['nearest_mrt'])} MRT" if v.get("nearest_mrt") else ""
-        lines.append(f"📍 <code>{esc(where)}</code>{mrt}")
-    g = (v.get("ratings") or {}).get("google_places") or {}
-    facts = [
-        ", ".join(v.get("cuisine") or []),
-        (v.get("price_text") or "").strip(" ·|"),
-        f"★ {g['rating']} ({g.get('review_count', '?')})" if g.get("rating") else "",
-    ]
-    if any(facts):
-        lines.append("🍴 " + esc(" · ".join(f for f in facts if f)))
-    if v.get("summary"):
-        lines.append(f"💬 {esc(v['summary'])}")
-    if v.get("booking_url"):
-        lines.append("🔗 " + _link(v["booking_url"], "Book a table"))
-    elif v.get("website"):
-        lines.append("🔗 " + _link(v["website"], "Website"))
-    return "\n".join(lines)
-
-
-def card_ranks(tops: list[tuple[int, str]]) -> str:
-    """The ranks a card is sent at, e.g. ``#2 · Zi char; #9 · Hawker`` (vault dedupe key)."""
-    return "; ".join(f"#{r} · {label}" for r, label in sorted(tops)) or "new"
-
-
-def venue_messages(
-    config: AppConfig, store: RunStore, diff: RunDiff, per_category: int = 3
-) -> list[str]:
-    """One message per venue that is newly in a category's top ``per_category`` (every top pick on
-    the first run), best rank first. Venues in several top lists get one message listing them."""
-    return [html for _v, _tops, html in venue_cards(config, store, diff, per_category)]
-
-
-def venue_cards(
-    config: AppConfig, store: RunStore, diff: RunDiff, per_category: int = 3
-) -> list[tuple[dict[str, Any], list[tuple[int, str]], str]]:
-    """``venue_messages`` with the venue dict and its (rank, list) pairs kept alongside. A venue
-    gets a card when it enters a top list, or when it is new to the tool (🆕 NEW), so a new place
-    that is not worth going to still shows up with that verdict."""
-    cur_dir = store.run_dir(diff.run_id)
-    cur_scores, venues = _load_scores(cur_dir), _load_venues(cur_dir)
-    prev_scores = _load_scores(store.run_dir(diff.prev_run_id)) if diff.prev_run_id else {}
-    tops: dict[str, list[tuple[int, str]]] = {}
-    new_ids = {n["venue_id"] for n in diff.new_venues} if diff.prev_run_id else set()
-    for key, scored in cur_scores.items():
-        if not config.categories.has(key) or config.categories.get(key).digest_only:
-            continue  # switched off since this run was stored, or sent as the fortnightly list
-        label = config.categories.get(key).display_name
-        prev_top = _top(prev_scores.get(key, []), per_category)
-        for vid, s in _top(scored, per_category).items():
-            if vid not in prev_top and not s.get("hidden"):
-                tops.setdefault(vid, []).append((s["rank"], label))
-                if key.startswith("new_"):
-                    new_ids.add(vid)
-    # any venue that entered a top list (e.g. #15) also gets a card, so every update is a card
-    for cd in diff.categories:
-        if not config.categories.has(cd.key) or config.categories.get(cd.key).digest_only:
-            continue
-        for e in cd.entered:
-            pairs = tops.setdefault(e["venue_id"], [])
-            if (e["rank"], cd.display_name) not in pairs:
-                pairs.append((e["rank"], cd.display_name))
-    for vid in new_ids:  # new venues without a top place still get a card
-        tops.setdefault(vid, [])
-    order = sorted(tops, key=lambda vid: (min(tops[vid])[0] if tops[vid] else 99, -len(tops[vid])))
-    return [
-        (venues[vid], tops[vid], _card(venues[vid], tops[vid], new=vid in new_ids))
-        for vid in order
-        if vid in venues
-    ]

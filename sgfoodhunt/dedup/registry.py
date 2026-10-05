@@ -29,7 +29,6 @@ from rapidfuzz import fuzz
 from sgfoodhunt.config import AppConfig
 from sgfoodhunt.dedup.venue import Evidence, Venue
 from sgfoodhunt.http.cache import read_json, write_json
-from sgfoodhunt.models import is_date_only
 from sgfoodhunt.normalise import (
     name_key,
     normalise_cuisines,
@@ -38,7 +37,6 @@ from sgfoodhunt.normalise import (
     region_for_postal,
     split_brand_outlet,
 )
-from sgfoodhunt.scrapers.html import strip_news_wording
 
 log = logging.getLogger(__name__)
 
@@ -76,27 +74,6 @@ FLAG_KEYS = (
     "private_room",
     "halal",
 )
-
-
-MICHELIN_RE = re.compile(
-    r"\b(bib[- ]gourmand)\b|\b(one|two|three|[123])[- ]michelin[- ]stars?\b|\b(michelin[- ]starred)\b",
-    re.IGNORECASE,
-)
-_STARS = {"one": 1, "two": 2, "three": 3, "1": 1, "2": 2, "3": 3}
-
-
-def michelin_from_text(text: str) -> str | None:
-    """Bib Gourmand / N Star(s) / Star when a venue's own snippet says so. Deliberately strict:
-    'Selected' and loose 'three stars' (a rating) never count."""
-    m = MICHELIN_RE.search(text)
-    if not m:
-        return None
-    if m.group(1):
-        return "Bib Gourmand"
-    if m.group(2):
-        n = _STARS[m.group(2).lower()]
-        return f"{n} Star{'s' if n > 1 else ''}"
-    return "Star"
 
 
 @dataclass(slots=True)
@@ -153,11 +130,6 @@ class VenueRegistry:
         data = read_json(self.path)
         for raw in data.get("venues", []):
             venue = Venue.from_dict(raw)
-            clean = strip_news_wording(venue.name)  # names saved before the cleaner learned a rule
-            if clean and clean != venue.name:
-                venue.name = clean
-                brand, outlet = split_brand_outlet(clean)
-                venue.brand, venue.outlet = (brand if outlet else None), outlet
             self.venues[venue.id] = venue
             self._index(venue)
         self._next = int(data.get("next_id", len(self.venues) + 1))
@@ -239,11 +211,10 @@ class VenueRegistry:
         return vid
 
     def create(self, row: dict[str, Any], run_id: str) -> Venue:
-        name = strip_news_wording(row["name"])
-        brand, outlet = split_brand_outlet(name)
+        brand, outlet = split_brand_outlet(row["name"])
         venue = Venue(
             id=self._new_id(),
-            name=name,
+            name=row["name"],
             brand=brand if outlet else None,
             outlet=outlet,
             first_seen_run=run_id,
@@ -299,10 +270,6 @@ class VenueRegistry:
             venue.business_status = row["business_status"]
         if row.get("michelin") and (not venue.michelin or row["michelin"] != "Selected"):
             venue.michelin = row["michelin"]
-        if (
-            not venue.michelin
-        ):  # the official guide is off (robots.txt), so read it from the venue's own snippet
-            venue.michelin = michelin_from_text(row.get("snippet") or "")
         if row.get("hygiene_grade"):
             venue.hygiene_grade = row["hygiene_grade"]
         # flags from Google extras and text
@@ -438,39 +405,6 @@ class VenueRegistry:
         return stats
 
 
-def prune_blog_evidence(registry: VenueRegistry, config: AppConfig) -> int:
-    """Re-check stored blog evidence with today's relevance rule. Evidence persists across runs,
-    so articles an older scraper opened for every query (sidebar posts) kept putting hotels in the
-    hawker list. Keeps the queries the article really matches, re-derives its categories from
-    them, and drops evidence that matches none. Returns the number dropped."""
-    from sgfoodhunt.scrapers.blogs import relevant_article
-
-    blogs = {s.key for s in config.sources.sources if s.kind == "blog"}
-    cats_of: dict[str, set[str]] = {}
-    for cat in config.categories.categories:
-        for q in cat.queries:
-            cats_of.setdefault(q, set()).add(cat.key)
-    dropped = 0
-    for venue in registry.venues.values():
-        if is_date_only(venue.name):  # a month heading saved as a venue by an older scraper
-            dropped += len(venue.evidence)
-            venue.evidence = []
-            continue
-        kept = []
-        for ev in venue.evidence:
-            if ev.source_key in blogs and ev.url and ev.queries:
-                queries = [q for q in ev.queries if relevant_article(ev.url, q)]
-                if not queries:
-                    dropped += 1
-                    continue
-                ev.queries = queries
-                cats = sorted({c for q in queries for c in cats_of.get(q, ())})
-                ev.category_keys = cats or ev.category_keys
-            kept.append(ev)
-        venue.evidence = kept
-    return dropped
-
-
 def build_venues(
     config: AppConfig, rows: Iterable[dict[str, Any]], run_id: str, run_dir: Path
 ) -> tuple[VenueRegistry, MatchStats]:
@@ -481,9 +415,6 @@ def build_venues(
     )
     independent = {s.key for s in config.sources.sources if s.independent}
     stats = registry.ingest(rows, run_id, independent)
-    pruned = prune_blog_evidence(registry, config)
-    if pruned:
-        log.info("dedup: dropped %d blog evidence entries that match none of their queries", pruned)
     registry.save()
     seen = [v for v in registry.venues.values() if v.last_seen_run == run_id]
     write_json(run_dir / "venues.json", [v.to_dict() for v in seen])

@@ -10,7 +10,7 @@ from sgfoodhunt.config import AppConfig, CategoriesConfig, Category, HardFilters
 
 def test_real_config_loads(app_config: AppConfig) -> None:
     keys = [c.key for c in app_config.categories.categories]
-    assert len(keys) == 17
+    assert len(keys) == 15
     assert keys[-3:] == ["new_cafes", "new_restaurants", "new_zichar"]
     assert keys[0] == "cafes_date"
     assert app_config.sources.get("google_places").kind == "api"

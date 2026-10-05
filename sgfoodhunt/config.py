@@ -99,7 +99,6 @@ class AiTasks(BaseModel):
     article_extraction: bool = True
     review_analysis: bool = True
     social_matching: bool = True
-    promo_search: bool = True  # web search for current promotions (weekly message, occasion list)
 
 
 class AiSettings(BaseModel):
@@ -146,8 +145,6 @@ class HardFilters(BaseModel):
     requires_private_room: bool = False
     halal_only: bool = False
     max_price_level: int | None = None
-    price_required: bool = False  # drop venues with no price level (Michelin and buffets are kept)
-    bill_range_sgd: tuple[float, float] | None = None  # estimated bill for the party, [low, high]
     opened_within_months: int | None = None  # keep only venues first seen / opened recently
 
 
@@ -160,8 +157,6 @@ class Category(BaseModel):
     keywords: list[str] = Field(default_factory=list)
     weights: dict[str, float] = Field(default_factory=dict)
     hard_filters: HardFilters = Field(default_factory=HardFilters)
-    digest_only: bool = False  # ranked for the fortnightly list, never sent as per-venue cards
-    enabled: bool = True  # false = kept in the file but never searched, ranked or sent
 
     @field_validator("weights")
     @classmethod
@@ -203,9 +198,6 @@ class CategoriesConfig(BaseModel):
             group_kw = self.defaults.group_keywords.get(cat.group, [])
             cat.keywords = list(dict.fromkeys([*group_kw, *cat.keywords]))
         return self
-
-    def has(self, key: str) -> bool:
-        return any(c.key == key for c in self.categories)
 
     def get(self, key: str) -> Category:
         for cat in self.categories:
@@ -326,8 +318,6 @@ def load_config(config_dir: Path | str = "config", env_file: Path | str | None =
         load_dotenv(dotenv_path, override=False)
     settings = Settings(**_load_yaml(cdir / "settings.yaml"))
     categories = CategoriesConfig(**_load_yaml(cdir / "categories.yaml"))
-    if not os.environ.get("SGFH_ALL_CATEGORIES"):  # tests set it so every category stays loadable
-        categories.categories = [c for c in categories.categories if c.enabled]
     sources = SourcesConfig(**_load_yaml(cdir / "sources.yaml"))
     return AppConfig(
         settings=settings,

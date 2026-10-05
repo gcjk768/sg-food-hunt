@@ -109,16 +109,9 @@ class AiClient:
 
     # -- core call ----------------------------------------------------------------------------
     def ask(
-        self,
-        task: str,
-        system: str,
-        prompt: str,
-        schema: dict[str, Any],
-        web: bool = False,
-        ttl_days: int | None = None,
+        self, task: str, system: str, prompt: str, schema: dict[str, Any]
     ) -> dict[str, Any] | None:
-        """Return the structured answer, or None (disabled, over budget, offline miss, failure).
-        ``web=True`` lets Claude use web search (promotions); every other task runs with no tools."""
+        """Return the structured answer, or None (disabled, over budget, offline miss, failure)."""
         if not self.task_enabled(task):
             self.stats.skipped_disabled += 1
             return None
@@ -159,7 +152,8 @@ class AiClient:
             self.settings.effort,
             "--system-prompt",
             system,
-            *(["--allowedTools", "WebSearch", "--max-turns", "8"] if web else ["--tools", ""]),
+            "--tools",
+            "",
             "--no-session-persistence",
             # --bare only authenticates with ANTHROPIC_API_KEY; with a subscription/OAuth login
             # (CLAUDE_CODE_OAUTH_TOKEN or `claude /login`) every call fails with 0 tokens.
@@ -210,7 +204,7 @@ class AiClient:
             200,
             json.dumps(result, ensure_ascii=False).encode(),
             "application/json",
-            timedelta(days=ttl_days or self.settings.cache_ttl_days),
+            timedelta(days=self.settings.cache_ttl_days),
         )
         return result
 

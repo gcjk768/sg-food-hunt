@@ -6,7 +6,6 @@ Vault layout (inside ``vault_dir / vault_folder``)::
     Venues/<Venue>.md           one note per venue (stage 2+), properties in frontmatter
     Categories/<Category>.md    top 15 and full ranking per category (stage 2+)
     Runs/<run_id>.md            run summary and diff report
-    Activity/YYYY-MM-DD.md      movement log, one line per event (reporting/memory.py)
     Sources.md                  source registry with robots / ToS status
 
 User edits survive regeneration: frontmatter keys ``status``, ``my_rating``, ``my_comment``,
@@ -29,7 +28,6 @@ from sgfoodhunt.storage.frontmatter import (
 VENUES = "Venues"
 CATEGORIES = "Categories"
 RUNS = "Runs"
-ACTIVITY = "Activity"
 
 
 class Vault:
@@ -39,7 +37,7 @@ class Vault:
         self.folder = folder
 
     def ensure(self) -> None:
-        for sub in (VENUES, CATEGORIES, RUNS, ACTIVITY):
+        for sub in (VENUES, CATEGORIES, RUNS):
             (self.root / sub).mkdir(parents=True, exist_ok=True)
 
     def note_path(self, subfolder: str | None, name: str) -> Path:

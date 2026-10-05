@@ -136,22 +136,11 @@ def extract_listicle(ai: AiClient, title: str | None, text: str) -> list[Extract
     return None if payload is None else _venues(payload, 0.9)
 
 
-def analyse_reviews(
-    ai: AiClient, venue_name: str, texts: list[str], memory: str = ""
-) -> ReviewAnalysis | None:
-    """``memory`` is the capped vault excerpt (newest first): current top ranks, past moves and
-    cards sent. Empty memory leaves the prompt (and its cache key) exactly as before."""
+def analyse_reviews(ai: AiClient, venue_name: str, texts: list[str]) -> ReviewAnalysis | None:
     snippets = "\n".join(f"- {t.strip()}" for t in texts if t.strip())
     if not snippets:
         return None
     prompt = f"Venue: {venue_name}\n\nSnippets:\n{_clip(snippets)}"
-    if memory:
-        prompt += (
-            "\n\nWhat you already did and learned about this venue (vault log, newest first):\n"
-            f"{memory}\n\nIf it is new on a list or moved up, say so in a few words at the start "
-            "of the summary (e.g. 'New on the list:' or 'Moved up to #2:'). Don't repeat a move "
-            "the log shows was already announced."
-        )
     payload = ai.ask("review_analysis", SYSTEM_REVIEWS, prompt, REVIEW_SCHEMA)
     if payload is None:
         return None
