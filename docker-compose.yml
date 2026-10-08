@@ -2,6 +2,7 @@
 # Claude: log in once from the container terminal (`claude`, then /login), same as trading-desk.
 services:
   sgfoodhunt:
+    networks: [default, scrape-net]   # shared Playwright server ws://playwright:3000/
     build:
       context: ./data/_src # a476a67; fetched from GitHub (NAS docker has no git)
       args:
@@ -42,4 +43,6 @@ services:
       interval: 5m
       timeout: 180s
       start_period: 3m
-networks: {}
+networks:
+  scrape-net:
+    external: true
