@@ -12,6 +12,7 @@ services:
     restart: unless-stopped
     env_file: .env # TELEGRAM_BOT_TOKEN (+ optional GOOGLE_PLACES_API_KEY etc.)
     environment:
+      PLAYWRIGHT_WS_URL: ws://playwright:3000/
       TZ: Asia/Singapore
       SGFH_SCHEDULE: daily 08:00
       SGFH_RUN_ON_START: "false"
