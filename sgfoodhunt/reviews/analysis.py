@@ -452,8 +452,12 @@ def analyse_venue(
     ranks: dict[str, int] | None = None,
     today: date | None = None,
     ai: AiClient | None = None,
+    memory: str = "",
 ) -> None:
     """Fill the stage 3 fields on ``venue`` in place (summary needs ranks, so it may run twice).
+
+    ``memory`` (vault excerpt + current top ranks) goes into the AI summary prompt; if that call
+    gets no answer (budget, failure) the memory-free prompt is tried, usually a cache hit.
 
     With ``ai`` (and ``ai.tasks.review_analysis``), Claude supplies the aspect scores, noise level
     and summary from the same anonymised snippets; the lexicon path fills anything it leaves out.
@@ -466,7 +470,9 @@ def analyse_venue(
     venue.rating_trend = rating_trend(venue, today)
     venue.summary = summarise(venue, config)
     if ai is not None and ai.task_enabled("review_analysis") and len(texts) >= MIN_TEXTS_FOR_AI:
-        analysis = ai_analyse_reviews(ai, venue.name, texts)
+        analysis = ai_analyse_reviews(ai, venue.name, texts, memory) if memory else None
+        if analysis is None:
+            analysis = ai_analyse_reviews(ai, venue.name, texts)
         if analysis is not None:
             venue.aspects = {**venue.aspects, **analysis.aspects}
             venue.noise_level = analysis.noise_level or venue.noise_level

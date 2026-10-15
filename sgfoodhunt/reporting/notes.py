@@ -8,9 +8,10 @@ from typing import Any
 from sgfoodhunt.config import AppConfig
 from sgfoodhunt.diff import RunDiff, diff_markdown
 from sgfoodhunt.http.cache import read_json
+from sgfoodhunt.reporting.memory import activity_rel, now_sgt
 from sgfoodhunt.storage.frontmatter import Note
 from sgfoodhunt.storage.runs import RunRecord, RunStore
-from sgfoodhunt.storage.vault import CATEGORIES, RUNS, VENUES, Vault
+from sgfoodhunt.storage.vault import ACTIVITY, CATEGORIES, RUNS, VENUES, Vault
 
 
 def _md_table(headers: list[str], rows: list[list[Any]]) -> str:
@@ -213,6 +214,11 @@ def write_home_note(vault: Vault, config: AppConfig, latest_run_link: str | None
         for c in config.categories.categories
     )
     latest = f"Latest run: [[{latest_run_link}]]" if latest_run_link else "No runs yet."
+    today = now_sgt()
+    latest += (
+        f"\nMovement log: [[{vault.folder}/{activity_rel(today)}|Activity {today:%Y-%m-%d}]] "
+        f"(one note per day in `{ACTIVITY}/YYYY/MM/`; each venue note keeps a `## History`)."
+    )
     body = f"""# SG Food Hunt
 
 {latest}

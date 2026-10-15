@@ -55,8 +55,11 @@ def cache_key(method: str, url: str, body: bytes | str | None = None) -> str:
     return h.hexdigest()
 
 
-_UMASK = os.umask(0)
-os.umask(_UMASK)
+def _umask() -> int:
+    """Current umask, read at write time (the CLI sets 002 after import; see cli._version)."""
+    cur = os.umask(0)
+    os.umask(cur)
+    return cur
 
 
 def atomic_write_bytes(path: Path, data: bytes) -> None:
@@ -68,7 +71,7 @@ def atomic_write_bytes(path: Path, data: bytes) -> None:
             fh.write(data)
         # mkstemp always creates 0600; give the file normal umask-based permissions so vault notes
         # written by the container (root) stay readable/editable from Obsidian on the host.
-        os.chmod(tmp, 0o666 & ~_UMASK)
+        os.chmod(tmp, 0o666 & ~_umask())
         os.replace(tmp, path)
     except BaseException:
         if os.path.exists(tmp):

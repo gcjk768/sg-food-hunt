@@ -4,11 +4,14 @@ services:
   sgfoodhunt:
     networks: [default, scrape-net]   # shared Playwright server ws://playwright:3000/
     build:
-      context: ./data/_src # a476a67; fetched from GitHub (NAS docker has no git)
+      context: . # this folder is the source of truth (nas-sync pushes it to GitHub main); bump the tag to rebuild
       args:
         WITH_CLAUDE: "true"
-    image: sgfoodhunt:a476a67
+    image: sgfoodhunt:20261015-activity
     container_name: sgfoodhunt
+    # uid 0 keeps the shared Claude login (/app/claude-config: root 600, rewritten by trading-desk) usable;
+    # gid 10 (admin) + umask 002 in the entrypoint make every written file editable by the owner (664/775).
+    user: "0:10"
     restart: unless-stopped
     env_file: .env # TELEGRAM_BOT_TOKEN (+ optional GOOGLE_PLACES_API_KEY etc.)
     environment:

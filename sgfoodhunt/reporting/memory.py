@@ -1,6 +1,6 @@
 """Vault movement log + memory (NAS vault standard).
 
-* ``Activity/YYYY-MM-DD.md``: one line per event, ``- HH:MM emoji **what** · detail · [[entity]]``
+* ``Activity/YYYY/MM/YYYY-MM-DD.md``: one line per event, ``- HH:MM emoji **what** · detail · [[entity]]``
   in SGT, append-only.
 * Venue notes carry an append-only ``## History`` section (rank / list changes, cards sent).
 * ``venue_memory()`` reads both back as a capped excerpt (newest first) for the AI prompt, and
@@ -37,6 +37,11 @@ def _one_line(text: str) -> str:
     return " ".join(str(text).split())
 
 
+def activity_rel(when: datetime) -> str:
+    """``Activity/YYYY/MM/YYYY-MM-DD`` inside the app folder (NAS vault layout, the owner 2026-10-02)."""
+    return f"{ACTIVITY}/{when:%Y/%m/%Y-%m-%d}"
+
+
 def activity_line(
     emoji: str, what: str, detail: str = "", link: str | None = None, when: datetime | None = None
 ) -> str:
@@ -60,7 +65,7 @@ def log_activity(
     """Append one event to today's Activity note. Never raises."""
     try:
         when = (when or now_sgt()).astimezone(SGT)
-        path = vault.root / ACTIVITY / f"{when:%Y-%m-%d}.md"
+        path = vault.root / f"{activity_rel(when)}.md"
         path.parent.mkdir(parents=True, exist_ok=True)
         head = (
             ""
@@ -68,7 +73,7 @@ def log_activity(
             else f"---\ntags: [sgfoodhunt/activity]\nupdated: {when:%Y-%m-%d}\n---\n"
             f"# Activity {when:%Y-%m-%d}\n\n"
         )
-        with path.open("a", encoding="utf-8") as fh:  # umask 000 in the image -> 0666
+        with path.open("a", encoding="utf-8") as fh:  # umask 002 + gid 10 in the image -> 0664 root:admin
             fh.write(head + activity_line(emoji, what, detail, link, when) + "\n")
     except Exception as exc:
         log.warning("vault activity log skipped: %s", exc)
@@ -137,7 +142,7 @@ def recent_activity(vault: Vault, days: int = 7, today: datetime | None = None) 
     for i in range(days):
         day = today - timedelta(days=i)
         try:
-            path = vault.root / ACTIVITY / f"{day:%Y-%m-%d}.md"
+            path = vault.root / f"{activity_rel(day)}.md"
             if not path.exists():
                 continue
             lines = [

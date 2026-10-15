@@ -38,13 +38,22 @@ def test_activity_line_format_in_sgt(vault: Vault) -> None:
     log_activity(
         vault, "📨", "card sent", "#2 · Zi char", "SG Food Hunt/Venues/Kok Sen|Kok Sen", when=WHEN
     )
-    text = (vault.root / "Activity" / "2026-10-02.md").read_text(encoding="utf-8")
+    text = (vault.root / "Activity" / "2026" / "10" / "2026-10-02.md").read_text(encoding="utf-8")
     assert text.startswith("---\ntags: [sgfoodhunt/activity]\nupdated: 2026-10-02\n---\n")
     assert text.count("# Activity 2026-10-02") == 1  # header written once, then append-only
     assert text.splitlines()[-2:] == [
         "- 03:40 ▶️ **run started** · dry run",
         "- 03:40 📨 **card sent** · #2 · Zi char · [[SG Food Hunt/Venues/Kok Sen|Kok Sen]]",
     ]
+
+
+def test_flat_activity_notes_move_into_year_month(vault: Vault) -> None:
+    flat = vault.root / "Activity" / "2026-10-02.md"
+    flat.write_text("- 03:40 x\n", encoding="utf-8")
+    vault.ensure()  # what serve and run call at startup
+    moved = vault.root / "Activity" / "2026" / "10" / "2026-10-02.md"
+    assert not flat.exists() and moved.read_text(encoding="utf-8") == "- 03:40 x\n"
+    assert recent_activity(vault, days=1, today=WHEN) == ["2026-10-02 03:40 x"]
 
 
 def _scores(app_config: AppConfig, rank: int) -> dict[str, list[ScoredVenue]]:

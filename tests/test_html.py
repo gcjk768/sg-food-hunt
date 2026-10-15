@@ -64,6 +64,7 @@ def test_absolute_links_dedup_and_pattern() -> None:
     )
     assert links == [
         "https://example-blog.test/best-romantic-cafes-singapore/",
+        "https://example-blog.test/best-zi-char-restaurants-singapore/",
         "https://example-blog.test/hawker-guide-to-tiong-bahru/",
     ]
 

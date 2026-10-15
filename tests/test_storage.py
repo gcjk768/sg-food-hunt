@@ -141,9 +141,15 @@ def test_atomic_write_uses_umask_not_mkstemp_0600(tmp_path) -> None:  # type: ig
     import os
     import stat
 
-    from sgfoodhunt.http.cache import _UMASK, atomic_write_text
+    from sgfoodhunt.http.cache import _umask, atomic_write_text
 
     p = tmp_path / "note.md"
     atomic_write_text(p, "x")
     if os.name == "posix":
-        assert stat.S_IMODE(p.stat().st_mode) == 0o666 & ~_UMASK
+        assert stat.S_IMODE(p.stat().st_mode) == 0o666 & ~_umask()
+        old = os.umask(0o002)  # read at write time, not import time (cli sets 002 after import)
+        try:
+            atomic_write_text(p, "y")
+            assert stat.S_IMODE(p.stat().st_mode) == 0o664
+        finally:
+            os.umask(old)

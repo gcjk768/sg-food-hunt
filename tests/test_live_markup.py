@@ -59,5 +59,5 @@ def test_blog_ignores_offsite_links(make_scraper) -> None:  # type: ignore[no-un
         '<a href="https://www.misstamchiak.com/best-zi-char-singapore/">post</a>',
         "lxml",
     )
-    links = scraper.article_links(soup, "https://www.misstamchiak.com/?s=zi+char")
+    links = scraper.article_links(soup, "https://www.misstamchiak.com/?s=zi+char", "zi char")
     assert links == ["https://www.misstamchiak.com/best-zi-char-singapore/"]

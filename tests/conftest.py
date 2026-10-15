@@ -116,6 +116,12 @@ def polite_client(
     return PoliteClient(http_settings, cache, session=fake_session, sleep=lambda _s: None)
 
 
+@pytest.fixture(autouse=True)
+def _all_categories(monkeypatch: pytest.MonkeyPatch) -> None:
+    """config/categories.yaml switches most categories off; tests keep them all loadable."""
+    monkeypatch.setenv("SGFH_ALL_CATEGORIES", "1")
+
+
 @pytest.fixture()
 def app_config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> AppConfig:
     """The real config files, copied to a temp dir with paths and options pointed at temp dirs."""
