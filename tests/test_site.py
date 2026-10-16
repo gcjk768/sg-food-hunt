@@ -101,6 +101,20 @@ def test_build_site_groups_ranked_venues(app_config: AppConfig, run_store: RunSt
         {"category": "cafes_date", "label": "x", "id": "v1", "rank": 1}
     ]
     assert data["changes"]["new_venues"] == ["v1"] and data["promos"]["count"] == 1
+    # a list the previous run did not have (just switched on) does not flood "since the last run"
+    diff_path = run_store.run_dir("20260908T000000Z") / "diff.json"
+    diff = read_json(diff_path)
+    diff["categories"].append(
+        {
+            "key": "hawker_family",
+            "display_name": "h",
+            "entered": [{"venue_id": "v2", "name": "Beta", "rank": 1}],
+            "left": [],
+        }
+    )
+    write_json(diff_path, diff)
+    entered = read_json(build_site(app_config, run_store))["changes"]["entered"]
+    assert [e["category"] for e in entered] == ["cafes_date"]
 
 
 def _jwt(exp: float) -> str:
@@ -122,3 +136,20 @@ def test_onemap_token_choice(tmp_path: Path) -> None:
     assert (
         onemap_token(Secrets(onemap_email="a@b.c", onemap_password="p"), tmp_path, now) == "saved"
     )
+
+
+def test_site_reads_ranked_venues_missing_from_the_run(
+    app_config: AppConfig, run_store: RunStore
+) -> None:
+    """A price tier ranks registry venues this run did not see; the page shows them, no rank gaps."""
+    seen, old = _venue("v1", "Alpha"), _venue("v9", "Old Place")
+    _write_run(
+        run_store, "20260908T000000Z", [seen], _scores([("v9", "Old Place"), ("v1", "Alpha")])
+    )
+    write_json(
+        app_config.resolve(app_config.settings.paths.data_dir) / "venues.json",
+        {"next_id": 10, "venues": [seen, old]},
+    )
+    data = read_json(build_site(app_config, run_store))
+    assert [r["id"] for r in data["categories"]["cafes_date"]["ranked"]] == ["v9", "v1"]
+    assert data["venues"]["v9"]["name"] == "Old Place"

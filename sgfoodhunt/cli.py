@@ -374,6 +374,7 @@ def rank(
     _print_rank_summary(config, ranked)
     link = write_run_note(vault, store, store.load_run(run_id), config)
     write_home_note(vault, config, link)
+    _site(config, store)
 
 
 def _print_run_summary(config: AppConfig, record) -> None:  # type: ignore[no-untyped-def]

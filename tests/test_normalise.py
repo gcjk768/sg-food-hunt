@@ -51,6 +51,14 @@ def test_split_brand_outlet() -> None:
         ("$8", 1),
         ("", None),
         ("cheap", None),
+        ("4-course lunch S$108; 6-course dinner S$198", 3),
+        ("6-course S$188; Dim Sum Lunch Buffet S$55", 4),
+        ("RM20 – RM40 per pax", None),
+        ("~$15/pax", 1),
+        ("Rice dumplings $18–$28", 1),
+        ("Buffet Dinner S$138++ per pax", 4),
+        ("30 per pax", 2),
+        ("Open 7 days, 2 outlets", None),
     ],
 )
 def test_price_level_from_text(text: str, level: int | None) -> None:

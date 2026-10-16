@@ -256,6 +256,57 @@ categories:
     weights: {space: 0.25, service: 0.10, parking: 0.10, food: 0.10, value: 0.05}
     hard_filters: {open_weekends: true, requires_private_room: true}
 
+  # --- restaurant price tiers (website only: digest_only = no Telegram cards). They rank every
+  # restaurant the other lists ever found (pool_from) plus their own searches, by price level:
+  # 1 = about S$15 a person, 2 = about S$35, 3-4 = S$80 and up (scoring.price_per_pax_sgd).
+  - key: restaurants_cheap
+    display_name: Cheap eats (about S$15 a person)
+    group: general
+    party_size: 2
+    digest_only: true
+    pool_from: &restaurant_lists [restaurants_date, restaurants_4pax, occasion_4pax, family_occasion, family_weekend, zichar_family, new_zichar, dimsum_family, steamboat_family, private_room_family, rooftop_waterfront_date, new_restaurants]
+    queries:
+      - "best cheap eats Singapore"
+      - "cheap restaurants Singapore under $15"
+      - "budget restaurants Singapore"
+      - "best affordable food Singapore under $10"
+      - "新加坡 便宜 好吃 餐厅"
+    keywords: ["cheap", "budget", "affordable", "value", "under $10", "under $15", "wallet"]
+    weights: {food: 0.25, value: 0.25, service: 0.0, ambience: 0.0}
+    hard_filters: {price_levels: [1]}
+
+  - key: restaurants_affordable
+    display_name: Affordable restaurants (about S$35 a person)
+    group: general
+    party_size: 2
+    digest_only: true
+    pool_from: *restaurant_lists
+    queries:
+      - "affordable restaurants Singapore"
+      - "best mid range restaurants Singapore"
+      - "good value restaurants Singapore under $40"
+      - "best casual dining Singapore"
+      - "新加坡 平价 餐厅"
+    keywords: ["affordable", "value", "worth it", "reasonable", "set lunch", "casual"]
+    weights: {food: 0.20, value: 0.20, service: 0.05, ambience: 0.05}
+    hard_filters: {price_levels: [2]}
+
+  - key: restaurants_expensive
+    display_name: Expensive restaurants (S$80 and up a person)
+    group: general
+    party_size: 2
+    digest_only: true
+    pool_from: *restaurant_lists
+    queries:
+      - "best fine dining restaurants Singapore"
+      - "best luxury restaurants Singapore"
+      - "best omakase Singapore"
+      - "expensive restaurants Singapore worth it"
+      - "新加坡 高级 餐厅 推荐"
+    keywords: ["fine dining", "tasting menu", "omakase", "degustation", "michelin", "wine pairing", "luxury"]
+    weights: {food: 0.25, service: 0.15, ambience: 0.15, value: 0.0}
+    hard_filters: {price_levels: [3, 4]}
+
   # --- "what's new" categories: recency matters more than review volume, so the rating weight
   # is lowered and recommendations (recent articles) raised. opened_within_months keeps only
   # venues whose earliest evidence (article date, first Google review, first seen by this tool)

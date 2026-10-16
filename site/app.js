@@ -13,7 +13,18 @@
 
   let D = null; // data.json
   let rankIndex = {}; // venue id -> [{rank, cat, label}]
-  const state = { group: null, cat: null, view: "list", shown: PAGE, q: "" };
+  const state = { group: null, cat: null, view: "list", shown: PAGE, q: "", near: null, picking: false, big: false };
+  const NEAR_KEY = "sgfh-near";
+  const km = (a, b, c, d) => {
+    const r = Math.PI / 180;
+    const x = Math.sin((c - a) * r / 2) ** 2 + Math.cos(a * r) * Math.cos(c * r) * Math.sin((d - b) * r / 2) ** 2;
+    return 12742 * Math.asin(Math.sqrt(x));
+  };
+  const fmtKm = (d) => (d < 1 ? `${Math.max(50, Math.round(d * 20) * 50)} m` : `${d.toFixed(1)} km`);
+  // Esri World Imagery: free with attribution. Labels come from Esri's reference layer on top.
+  const SAT = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
+  const SAT_LABELS = "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}";
+  const SAT_ATTRIB = 'Imagery &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener">Esri</a>, Maxar, Earthstar Geographics';
   let map, tiles, markers = {}, layer;
 
   // ------------------------------------------------------------ boot
@@ -37,6 +48,7 @@
     renderPromosView();
     initMap();
     wireFilters();
+    wireNear();
     addEventListener("hashchange", route);
     route();
   }
@@ -76,7 +88,7 @@
     $("promos-link").dataset.count = String(D.promos.count || 0);
     $("foot").innerHTML =
       `<span>Sources: ${esc(D.sources.join(", "))}</span>` +
-      `<span>Basemap ${ATTRIB}</span>` +
+      `<span>Basemap ${ATTRIB}, ${SAT_ATTRIB}</span>` +
       `<span>Blog and review data, not a booking. Check hours before you go.</span>` +
       `<span>Run <code>${esc(D.run_id)}</code></span>`;
   }
@@ -143,18 +155,32 @@
     const f = filters();
     if (state.q) {
       const q = state.q.toLowerCase();
-      return Object.values(D.venues).filter((v) => matches(v, q) && passes(v, f))
+      return nearSort(Object.values(D.venues).filter((v) => matches(v, q) && passes(v, f))
         .map((v) => ({ v, rank: (rankIndex[v.id] || [])[0] }))
-        .sort((a, b) => (a.rank?.rank ?? 999) - (b.rank?.rank ?? 999));
+        .sort((a, b) => (a.rank?.rank ?? 999) - (b.rank?.rank ?? 999)));
     }
-    return D.categories[state.cat].ranked.map((r) => ({ v: D.venues[r.id], rank: { rank: r.rank, cat: state.cat }, scored: r }))
-      .filter((x) => passes(x.v, f));
+    return nearSort(D.categories[state.cat].ranked.map((r) => ({ v: D.venues[r.id], rank: { rank: r.rank, cat: state.cat }, scored: r }))
+      .filter((x) => passes(x.v, f)));
+  }
+  // Near me: keep places with coordinates inside the radius, closest first
+  function nearSort(items) {
+    if (!state.near) return items;
+    const rad = Number($("near-radius").value) || Infinity;
+    return items.filter((x) => x.v.lat != null && x.v.lng != null)
+      .map((x) => ({ ...x, dist: km(state.near.lat, state.near.lng, x.v.lat, x.v.lng) }))
+      .filter((x) => x.dist <= rad)
+      .sort((a, b) => a.dist - b.dist);
   }
 
   function renderList() {
     const items = currentItems();
     const total = state.q ? Object.keys(D.venues).length : D.categories[state.cat].ranked.length;
     $("list-count").textContent = items.length === total ? `${items.length} places` : `${items.length} of ${total} places`;
+    const base = state.q ? [] : D.categories[state.cat].ranked.map((r) => D.venues[r.id]);
+    const worthN = base.filter((v) => v.worth).length;
+    $("worth-chip").hidden = !base.length;
+    $("worth-chip").setAttribute("aria-pressed", String($("f-worth").checked));
+    $("worth-chip").innerHTML = `<i class="ph ph-fill ph-check-circle"></i>${worthN} worth going`;
     const page = items.slice(0, state.shown);
     $("rows").innerHTML = page.length ? page.map((x, i) => rowHtml(x, i)).join("") :
       `<li class="empty"><b>Nothing matches</b>Loosen a filter or clear the search.</li>`;
@@ -168,10 +194,11 @@
     renderMarkers(items.map((x) => x.v));
   }
 
-  function rowHtml({ v, rank }, i) {
+  function rowHtml({ v, rank, dist }, i) {
     const r = rank ? rank.rank : null;
     const rankLabel = rank && state.q ? `<small style="font:500 0.7rem var(--mono);display:block;color:var(--ink-3)">${esc(shortLabel(rank.cat))}</small>` : "";
     const meta = [
+      dist != null ? `<span class="dist"><i class="ph ph-navigation-arrow"></i>${fmtKm(dist)}</span>` : "",
       v.cuisine.length ? `<span><i class="ph ph-fork-knife"></i>${esc(v.cuisine.slice(0, 3).join(", "))}</span>` : "",
       v.price_level ? `<span><i class="ph ph-coins"></i>${"$".repeat(v.price_level)}${v.per_pax ? ` about S$${Math.round(v.per_pax)} each` : ""}</span>` : (v.price_text ? `<span><i class="ph ph-coins"></i>${esc(v.price_text)}</span>` : ""),
       v.mrt ? `<span><i class="ph ph-train"></i>${esc(v.mrt)}</span>` : (v.region ? `<span><i class="ph ph-map-pin"></i>${esc(v.region)}</span>` : ""),
@@ -192,30 +219,121 @@
       (badges ? `<div class="badges">${badges}</div>` : "") + `</span>` +
       `<span class="side">${verdictBadge(v)}</span></button></li>`;
   }
-  const verdictBadge = (v) => v.worth
+  const verdictBadge = (v) => (v.worth
     ? `<span class="badge worth"><i class="ph ph-fill ph-check-circle"></i>Worth going</span>`
-    : `<span class="badge nope"><i class="ph ph-x-circle"></i>Not yet</span>`;
+    : `<span class="badge nope"><i class="ph ph-x-circle"></i>${v.why === "too little proof yet" ? "Not yet" : "Skip"}</span>`) +
+    `<small class="why">${esc(v.why)}</small>`;
   const shortLabel = (cat) => D.categories[cat]?.label.replace(/^Best /, "") || cat;
 
   function wireFilters() {
     $("filters").querySelectorAll("input,select").forEach((el) => el.onchange = () => { state.shown = PAGE; renderList(); });
     $("f-reset").onclick = () => { $("filters").querySelectorAll("input").forEach((i) => i.checked = false); $("filters").querySelectorAll("select").forEach((s) => s.value = ""); state.shown = PAGE; renderList(); };
     $("more").onclick = () => { state.shown += PAGE; renderList(); };
+    $("worth-chip").onclick = () => { $("f-worth").checked = !$("f-worth").checked; state.shown = PAGE; renderList(); };
     let t;
     $("q").oninput = () => { clearTimeout(t); t = setTimeout(() => { state.q = $("q").value.trim(); state.shown = PAGE; if (state.view !== "list") setHash(listHash()); renderTabs(); renderList(); }, 120); };
     $("close").onclick = () => closeDrawer();
     $("scrim").onclick = () => closeDrawer();
-    addEventListener("keydown", (e) => { if (e.key === "Escape") closeDrawer(); });
+    addEventListener("keydown", (e) => { if (e.key !== "Escape") return; if (state.big) expandMap(false); else closeDrawer(); });
     DARK.addEventListener("change", () => tiles && tiles.setUrl(TILES(DARK.matches)));
   }
 
   // ------------------------------------------------------------ map
   function initMap() {
     map = L.map("map", { zoomControl: true, attributionControl: true, scrollWheelZoom: false }).setView([1.3521, 103.8198], 11);
-    tiles = L.tileLayer(TILES(DARK.matches), { attribution: ATTRIB, maxZoom: 19, minZoom: 11, detectRetina: true }).addTo(map);
+    tiles = L.tileLayer(TILES(DARK.matches), { attribution: ATTRIB, maxZoom: 19, minZoom: 11, detectRetina: true });
+    const satellite = L.layerGroup([
+      L.tileLayer(SAT, { attribution: SAT_ATTRIB, maxZoom: 19, minZoom: 11 }),
+      L.tileLayer(SAT_LABELS, { maxZoom: 19, minZoom: 11 }),
+    ]).addTo(map);
+    L.control.layers({ Satellite: satellite, Street: tiles }, null, { position: "bottomleft", collapsed: false }).addTo(map);
     map.setMaxBounds([[1.144, 103.535], [1.494, 104.502]]);
     layer = L.layerGroup().addTo(map);
-    map.on("click", () => map.scrollWheelZoom.enable());
+    map.on("click", (e) => {
+      if (state.picking) return setNear(e.latlng.lat, e.latlng.lng, "the spot you tapped");
+      if (!state.big) expandMap(true);
+    });
+    L.DomEvent.disableClickPropagation(document.querySelector(".map-tools"));
+    $("expand-btn").onclick = () => expandMap(!state.big);
+    $("near-btn").onclick = () => nearMe();
+  }
+  function expandMap(on) {
+    state.big = on;
+    document.querySelector(".map-wrap").classList.toggle("expanded", on);
+    document.body.classList.toggle("map-open", on);
+    $("expand-btn").setAttribute("aria-pressed", String(on));
+    $("expand-btn").setAttribute("aria-label", on ? "Close full-screen map" : "Expand map");
+    $("expand-btn").innerHTML = `<i class="ph ph-${on ? "x" : "arrows-out"}" aria-hidden="true"></i>`;
+    if (on) map.scrollWheelZoom.enable(); else map.scrollWheelZoom.disable();
+    setTimeout(() => map.invalidateSize(), 60);
+  }
+  function nearMe() {
+    const ask = (why) => {
+      state.picking = true;
+      map.getContainer().classList.add("picking");
+      if (state.view !== "list") setHash(listHash());
+      $("near-form").hidden = false;
+      $("near-hint").textContent = why;
+      if (!state.big) $("near-q").focus();
+    };
+    if (!navigator.geolocation || !window.isSecureContext) {
+      return ask("Browsers only share GPS with https sites, so type where you are or tap the map.");
+    }
+    $("near-btn").disabled = true;
+    navigator.geolocation.getCurrentPosition(
+      (p) => { $("near-btn").disabled = false; setNear(p.coords.latitude, p.coords.longitude, "your location"); },
+      () => { $("near-btn").disabled = false; ask("Location is off. Type where you are or tap the map."); },
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 });
+  }
+  function setNear(lat, lng, label, save = true) {
+    state.near = { lat, lng, label };
+    state.picking = false;
+    state.shown = PAGE;
+    map.getContainer().classList.remove("picking");
+    $("near-form").hidden = true;
+    $("near-results").innerHTML = "";
+    $("near-bar").hidden = false;
+    $("near-label").textContent = `Near ${label}`;
+    if (save) { try { localStorage.setItem(NEAR_KEY, JSON.stringify(state.near)); } catch (_) { /* private mode */ } }
+    renderList();
+  }
+  function clearNear() {
+    state.near = null;
+    state.picking = false;
+    map.getContainer().classList.remove("picking");
+    $("near-bar").hidden = true;
+    $("near-form").hidden = true;
+    try { localStorage.removeItem(NEAR_KEY); } catch (_) { /* private mode */ }
+    renderList();
+  }
+  const title = (s) => s.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+  function wireNear() {
+    $("near-form").onsubmit = (e) => {
+      e.preventDefault();
+      const q = $("near-q").value.trim();
+      if (!q) return;
+      $("near-results").innerHTML = "<li><small>Searching OneMap...</small></li>";
+      fetch(`https://www.onemap.gov.sg/api/common/elastic/search?searchVal=${encodeURIComponent(q)}&returnGeom=Y&getAddrDetails=N&pageNum=1`)
+        .then((r) => r.json())
+        .then((d) => {
+          const res = (d.results || []).slice(0, 5);
+          $("near-results").innerHTML = res.length
+            ? res.map((r, i) => `<li><button type="button" data-i="${i}">${esc(title(r.SEARCHVAL))}</button></li>`).join("")
+            : "<li><small>Nothing found. Try a postal code or an MRT name.</small></li>";
+          $("near-results").querySelectorAll("button").forEach((b) => {
+            b.onclick = () => { const r = res[b.dataset.i]; setNear(Number(r.LATITUDE), Number(r.LONGITUDE), title(r.SEARCHVAL)); };
+          });
+        })
+        .catch(() => { $("near-results").innerHTML = "<li><small>OneMap search did not answer. Tap the map instead.</small></li>"; });
+    };
+    $("near-cancel").onclick = () => { state.picking = false; map.getContainer().classList.remove("picking"); $("near-form").hidden = true; };
+    $("near-change").onclick = () => nearMe();
+    $("near-clear").onclick = clearNear;
+    $("near-radius").onchange = () => { state.shown = PAGE; renderList(); };
+    try {
+      const saved = JSON.parse(localStorage.getItem(NEAR_KEY) || "null");
+      if (saved && typeof saved.lat === "number") setNear(saved.lat, saved.lng, saved.label, false);
+    } catch (_) { /* bad saved value */ }
   }
   function renderMarkers(venues) {
     layer.clearLayers(); markers = {};
@@ -231,8 +349,16 @@
       markers[v.id] = m;
       pts.push([v.lat, v.lng]);
     }
-    $("map-note").textContent = pts.length ? `${pts.length} on the map` : "No coordinates yet";
-    if (pts.length) map.fitBounds(pts, { padding: [24, 24], maxZoom: 14, animate: false });
+    $("map-note").textContent = pts.length ? `${pts.length} on the map` : (state.near ? "Nothing in range" : "No coordinates yet");
+    if (state.near) {
+      const me = [state.near.lat, state.near.lng];
+      L.marker(me, { icon: L.divIcon({ className: "", html: `<div class="pin me"></div>`, iconSize: [18, 18], iconAnchor: [9, 9] }), keyboard: false, title: state.near.label, zIndexOffset: 1000 }).addTo(layer);
+      const rad = Number($("near-radius").value);
+      if (rad) L.circle(me, { radius: rad * 1000, color: "#2f7de1", weight: 1, fillOpacity: 0.06, interactive: false }).addTo(layer);
+      pts.push(me);
+    }
+    if (pts.length > 1) map.fitBounds(pts, { padding: [24, 24], maxZoom: 15, animate: false });
+    else if (pts.length) map.setView(pts[0], 15, { animate: false });
   }
   function hot(id, on) {
     const el = document.querySelector(`.pin[data-pin="${id}"]`);
@@ -243,6 +369,7 @@
   function openVenue(id, push = true) {
     const v = D.venues[id];
     if (!v) return;
+    if (state.big) expandMap(false);
     if (push) setHash(`${listHash()}/${id}`);
     $("drawer-body").innerHTML = drawerHtml(v);
     $("drawer").setAttribute("open", "");

@@ -367,3 +367,33 @@ def test_four_pax_bill_range_filter(app_config: AppConfig) -> None:
         reasons[level] = hard_filter_reason(v, cat, s, today)
     assert reasons[2] is None and reasons[None] is None  # S$140 for 4 fits; unknown price is kept
     assert "S$60" in reasons[1] and "S$320" in reasons[3] and "S$640" in reasons[4]
+
+
+def test_price_tier_filter(app_config: AppConfig) -> None:
+    from sgfoodhunt.scoring.score import hard_filter_reason
+
+    s, today = app_config.settings.scoring, date(2026, 10, 17)
+    tiers = {
+        k: app_config.categories.get(k)
+        for k in ("restaurants_cheap", "restaurants_affordable", "restaurants_expensive")
+    }
+    assert all(c.digest_only and "restaurants_date" in c.pool_from for c in tiers.values())
+
+    def ok(level: int | None, key: str, found_by: str = "restaurants_date") -> bool:
+        v = Venue(id="v", name="V", price_level=level)
+        v.evidence = [
+            Evidence(source_key="eatbook", url="https://x.test", category_keys=[found_by])
+        ]
+        return hard_filter_reason(v, tiers[key], s, today) is None
+
+    assert ok(1, "restaurants_cheap") and not ok(2, "restaurants_cheap")
+    assert ok(2, "restaurants_affordable") and not ok(1, "restaurants_affordable")
+    assert (
+        ok(3, "restaurants_expensive")
+        and ok(4, "restaurants_expensive")
+        and not ok(2, "restaurants_expensive")
+    )
+    # no price: only when the tier's own search found it
+    assert not ok(None, "restaurants_cheap") and ok(
+        None, "restaurants_cheap", found_by="restaurants_cheap"
+    )

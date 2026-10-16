@@ -177,7 +177,8 @@ async def rank_run(
     trends = {v.id: v.rating_trend or "unknown" for v in venues.values()}
     for key in wanted:
         cat = config.categories.get(key)
-        pool = [v for v in venues.values() if key in v.category_keys]
+        sources = {key, *cat.pool_from}
+        pool = [v for v in venues.values() if sources.intersection(v.category_keys)]
         if not pool:
             continue
         scores[key] = score_category(
@@ -191,7 +192,10 @@ async def rank_run(
             hide_visited=hide_visited,
         )
     ranks: dict[str, dict[str, int]] = {}
+    tiers = {c.key for c in config.categories.categories if c.pool_from}
     for key, scored in scores.items():
+        if key in tiers:
+            continue  # website-only lists: keep AI prompts (and their cache) and best_for unchanged
         for sv in scored:
             if sv.rank:
                 ranks.setdefault(sv.venue_id, {})[key] = sv.rank

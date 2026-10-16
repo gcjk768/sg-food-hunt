@@ -193,6 +193,12 @@ def hard_filter_reason(
 
         if not (star_count(venue.michelin) or venue.michelin == "Bib Gourmand" or is_buffet(venue)):
             return "no price level"
+    if hf.price_levels:
+        if venue.price_level is None:
+            if category.key not in venue.category_keys:
+                return "no price level"
+        elif venue.price_level not in hf.price_levels:
+            return f"price level {venue.price_level} not in this tier"
     if hf.bill_range_sgd and venue.price_level:
         per_pax = s.price_per_pax_sgd.get(venue.price_level)
         if per_pax is not None:

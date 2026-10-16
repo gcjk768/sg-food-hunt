@@ -38,6 +38,7 @@ from sgfoodhunt.normalise import (
     region_for_postal,
     split_brand_outlet,
 )
+from sgfoodhunt.normalise.price import DOLLAR_RE as DOLLAR_SYMBOLS_RE
 from sgfoodhunt.scrapers.html import strip_news_wording
 
 log = logging.getLogger(__name__)
@@ -158,6 +159,10 @@ class VenueRegistry:
                 venue.name = clean
                 brand, outlet = split_brand_outlet(clean)
                 venue.brand, venue.outlet = (brand if outlet else None), outlet
+            if venue.price_text and not venue.google_place_id:  # levels saved before the parser fix
+                text = venue.price_text.strip()
+                if not DOLLAR_SYMBOLS_RE.match(text):
+                    venue.price_level = price_level_from_text(text)
             self.venues[venue.id] = venue
             self._index(venue)
         self._next = int(data.get("next_id", len(self.venues) + 1))

@@ -148,6 +148,9 @@ class HardFilters(BaseModel):
     max_price_level: int | None = None
     price_required: bool = False  # drop venues with no price level (Michelin and buffets are kept)
     bill_range_sgd: tuple[float, float] | None = None  # estimated bill for the party, [low, high]
+    # price tier: keep venues whose price level is in the list; a venue with no price is kept only
+    # when this category's own queries found it (the article put it in the tier)
+    price_levels: list[int] | None = None
     opened_within_months: int | None = None  # keep only venues first seen / opened recently
 
 
@@ -160,7 +163,10 @@ class Category(BaseModel):
     keywords: list[str] = Field(default_factory=list)
     weights: dict[str, float] = Field(default_factory=dict)
     hard_filters: HardFilters = Field(default_factory=HardFilters)
-    digest_only: bool = False  # ranked for the fortnightly list, never sent as per-venue cards
+    # never sent as per-venue cards (fortnightly list, website-only lists)
+    digest_only: bool = False
+    # also rank venues found by these categories' queries (a price tier reuses every restaurant)
+    pool_from: list[str] = Field(default_factory=list)
     enabled: bool = True  # false = kept in the file but never searched, ranked or sent
 
     @field_validator("weights")

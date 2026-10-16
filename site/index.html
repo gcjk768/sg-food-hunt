@@ -39,6 +39,10 @@
     <div class="map-wrap">
       <div id="map" role="region" aria-label="Map of the places in this list"></div>
       <div class="map-note" id="map-note"></div>
+      <div class="map-tools">
+        <button type="button" id="near-btn"><i class="ph ph-crosshair" aria-hidden="true"></i>Near me</button>
+        <button type="button" id="expand-btn" aria-label="Expand map" aria-pressed="false"><i class="ph ph-arrows-out" aria-hidden="true"></i></button>
+      </div>
     </div>
   </section>
 
@@ -51,8 +55,23 @@
     <div class="list-head">
       <h2 id="list-title">Cafes &amp; brunch</h2>
       <span class="count" id="list-count"></span>
+      <button type="button" class="worth-chip" id="worth-chip" aria-pressed="false" hidden></button>
     </div>
     <ul class="tabs" id="tabs" role="tablist"></ul>
+    <form class="near-form" id="near-form" hidden>
+      <label for="near-q">Where are you?</label>
+      <input id="near-q" type="search" placeholder="Postal code, MRT or place" autocomplete="off">
+      <button type="submit">Find</button>
+      <button type="button" class="ghost" id="near-cancel">Cancel</button>
+      <small id="near-hint">Or tap the map where you are.</small>
+      <ul id="near-results"></ul>
+    </form>
+    <div class="near-bar" id="near-bar" hidden>
+      <i class="ph ph-fill ph-map-pin" aria-hidden="true"></i><span id="near-label"></span>
+      <label>Within <select id="near-radius"><option value="1">1 km</option><option value="2" selected>2 km</option><option value="5">5 km</option><option value="">any distance</option></select></label>
+      <button type="button" class="ghost" id="near-change">Change</button>
+      <button type="button" class="ghost" id="near-clear">Clear</button>
+    </div>
     <div class="filters" id="filters">
       <label><input type="checkbox" id="f-worth"> Worth going only</label>
       <label>Region

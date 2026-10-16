@@ -352,6 +352,11 @@ def _card(v: dict[str, Any], tops: list[tuple[int, str]], new: bool = False) -> 
     return "\n".join(lines)
 
 
+def _carded(categories: list[str] | None, carded: set[str]) -> bool:
+    """A new venue gets a card unless only website-only lists (digest_only) found it."""
+    return not categories or bool(carded.intersection(categories))
+
+
 def card_ranks(tops: list[tuple[int, str]]) -> str:
     """The ranks a card is sent at, e.g. ``#2 · Zi char; #9 · Hawker`` (vault dedupe key)."""
     return "; ".join(f"#{r} · {label}" for r, label in sorted(tops)) or "new"
@@ -375,7 +380,12 @@ def venue_cards(
     cur_scores, venues = _load_scores(cur_dir), _load_venues(cur_dir)
     prev_scores = _load_scores(store.run_dir(diff.prev_run_id)) if diff.prev_run_id else {}
     tops: dict[str, list[tuple[int, str]]] = {}
-    new_ids = {n["venue_id"] for n in diff.new_venues} if diff.prev_run_id else set()
+    carded = {c.key for c in config.categories.categories if not c.digest_only}
+    new_ids = (
+        {n["venue_id"] for n in diff.new_venues if _carded(n.get("categories"), carded)}
+        if diff.prev_run_id
+        else set()
+    )
     for key, scored in cur_scores.items():
         if not config.categories.has(key) or config.categories.get(key).digest_only:
             continue  # switched off since this run was stored, or sent as the fortnightly list

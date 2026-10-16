@@ -32,6 +32,12 @@ NEW_DAYS = 14  # a venue first seen this recently is new, unless the tool itself
 # may sit in two groups (new cafes are cafes and new). Groups with no scored category are dropped.
 GROUPS: list[tuple[str, str, str, list[str]]] = [
     (
+        "restaurants",
+        "Restaurants",
+        "fork-knife",
+        ["restaurants_cheap", "restaurants_affordable", "restaurants_expensive"],
+    ),
+    (
         "cafes",
         "Cafes & brunch",
         "coffee",
@@ -164,6 +170,14 @@ def build_site_data(
         run_id = runs[-1].run_id
     run_dir = store.run_dir(run_id)
     scores, venues = _load_scores(run_dir), _load_venues(run_dir)
+    registry_path = config.resolve(config.settings.paths.data_dir) / "venues.json"
+    ranked_ids = {s["venue_id"] for scored in scores.values() for s in scored if s.get("rank")}
+    if (
+        ranked_ids - set(venues) and registry_path.exists()
+    ):  # price tiers rank older registry venues
+        for v in read_json(registry_path).get("venues", []):
+            if v["id"] in ranked_ids and v["id"] not in venues:
+                venues[v["id"]] = v
     record = store.load_run(run_id)
     labels = {c.key: c for c in config.categories.categories}
     data_dir = config.resolve(config.settings.paths.data_dir)
@@ -228,11 +242,13 @@ def build_site_data(
 
     diff_path = run_dir / "diff.json"
     diff = read_json(diff_path) if diff_path.exists() else {}
+    prev_id = diff.get("prev_run_id")
+    prev_keys = set(_load_scores(store.run_dir(prev_id))) if prev_id else set()
     entered = [
         {"category": c["key"], "label": c["display_name"], "id": e["venue_id"], "rank": e["rank"]}
         for c in diff.get("categories") or []
         for e in c.get("entered") or []
-        if e["venue_id"] in out_venues and c["key"] in categories
+        if e["venue_id"] in out_venues and c["key"] in categories and c["key"] in prev_keys
     ]
     return {
         "generated_at": datetime.now(UTC).replace(microsecond=0).isoformat(),

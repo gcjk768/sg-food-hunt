@@ -134,6 +134,9 @@ def test_only_chosen_categories_are_on(monkeypatch) -> None:  # type: ignore[no-
         "restaurants_4pax",
         "occasion_4pax",
         "hawker_family",
+        "restaurants_cheap",
+        "restaurants_affordable",
+        "restaurants_expensive",
     }
 
 
@@ -333,3 +336,25 @@ def test_month_headings_are_not_venues() -> None:
         assert is_date_only(bad), bad
     for ok in ["Marina 2026", "1880", "Summer Hill", "May Cafe", "54° Steakhouse"]:
         assert not is_date_only(ok), ok
+
+
+def test_new_venue_found_only_by_a_website_tier_gets_no_card(tmp_path: Path) -> None:
+    config = load_config(CONFIG)
+    cat = config.categories.categories[0].key
+    venues = [
+        {"id": "old", "name": "Old Cafe", "evidence": []},
+        {"id": "t", "name": "Omakase Bar", "evidence": []},
+        {"id": "c", "name": "Fresh Cafe", "evidence": []},
+    ]
+    _write_run(tmp_path, "r1", {cat: [{"venue_id": "old", "rank": 1, "name": "old"}]}, venues[:1])
+    _write_run(tmp_path, "r2", {cat: [{"venue_id": "old", "rank": 1, "name": "old"}]}, venues)
+    diff = RunDiff(
+        "r2",
+        "r1",
+        new_venues=[
+            {"venue_id": "t", "name": "Omakase Bar", "categories": ["restaurants_expensive"]},
+            {"venue_id": "c", "name": "Fresh Cafe", "categories": ["restaurants_cheap", cat]},
+        ],
+    )
+    out = venue_messages(config, RunStore(tmp_path), diff)
+    assert len(out) == 1 and "Fresh Cafe" in out[0]
