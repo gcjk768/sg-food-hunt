@@ -22,6 +22,7 @@ PROMO_EVERY_DAYS = 7
 BATCH = 12  # venues per search call
 MAX_VENUES = 24
 STATE_FILE = "promos_state.json"
+PROMOS_FILE = "promos.json"  # latest deals, read by the website (sgfoodhunt/site.py)
 FESTIVE = (
     "christmas",
     "festive",
@@ -162,20 +163,27 @@ def due(config: AppConfig, now: datetime | None = None) -> bool:
 def send_promos(
     config: AppConfig, store: RunStore, ai: AiClient | None, force: bool = False
 ) -> str:
+    """Search when due, save the deals for the website, then message them if a channel is on."""
     if not force and not due(config):
         return "not due yet"
     latest = store.latest_run(status=None)
     if latest is None:
         return "no runs yet"
+    if not ai or not ai.task_enabled("promo_search"):
+        return "AI layer off"
     promos = find_promos(ai, tracked_names(config, store, latest.run_id))
+    data_dir = config.resolve(config.settings.paths.data_dir)
+    now = datetime.now(UTC).isoformat()
+    write_json(data_dir / PROMOS_FILE, {"found_at": now, "run_id": latest.run_id, "promos": promos})
+    n = config.settings.notifications
+    if not (n.telegram or n.email):  # website only
+        write_json(data_dir / STATE_FILE, {"last_sent": now})
+        return f"saved {len(promos)} promos for the website"
     text = promo_message(promos)
     if not text:
-        return "no current promos found" if ai else "AI layer off"
+        return "no current promos found"
     result = notify(config, html_to_plain(text), subject="SG Food Hunt promos", messages=[text])
     if result.telegram == "sent" or result.email == "sent":
-        write_json(
-            config.resolve(config.settings.paths.data_dir) / STATE_FILE,
-            {"last_sent": datetime.now(UTC).isoformat()},
-        )
+        write_json(data_dir / STATE_FILE, {"last_sent": now})
         return f"sent {len(promos)} promos"
     return f"not sent (telegram {result.telegram}, email {result.email})"

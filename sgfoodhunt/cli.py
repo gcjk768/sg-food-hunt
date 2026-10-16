@@ -43,6 +43,7 @@ from sgfoodhunt.reporting.memory import (
     note_name_of,
 )
 from sgfoodhunt.schedule import parse_schedule
+from sgfoodhunt.site import build_site, serve_site
 from sgfoodhunt.storage.runs import RunStore
 from sgfoodhunt.storage.vault import VENUES, Vault
 
@@ -79,7 +80,9 @@ def _paths(config: AppConfig) -> tuple[RunStore, ResponseCache, Vault]:
 def _version(
     version: Annotated[bool, typer.Option("--version", help="Show version and exit")] = False,
 ) -> None:
-    os.umask(0o002)  # files 664 / dirs 775 (editable by gid 10) however sgfh is launched (exec, healthcheck)
+    os.umask(
+        0o002
+    )  # files 664 / dirs 775 (editable by gid 10) however sgfh is launched (exec, healthcheck)
     if version:
         console.print(f"sgfoodhunt {__version__}")
         raise typer.Exit()
@@ -225,6 +228,7 @@ def run(
         _notify(config, ranked.diff)
     _occasion(config, store)
     _promos(config, store)
+    _site(config, store)
     console.print(
         f"\nrun note: {vault.note_path('Runs', record.run_id)}\n"
         f"raw CSV: {csv_path}\nraw JSON: {json_path}\nlog: {log_path}"
@@ -286,12 +290,10 @@ def _occasion(config: AppConfig, store: RunStore, force: bool = False) -> str:
 
 
 def _promos(config: AppConfig, store: RunStore, force: bool = False) -> str:
-    """The weekly promo message for the places on your lists. Never fails a run."""
+    """The weekly promo search for the places on your lists: saved for the website, messaged when
+    a channel is on. Never fails a run."""
     from sgfoodhunt.promos import send_promos
 
-    n = config.settings.notifications
-    if not (n.telegram or n.email):
-        return "notifications off"
     try:
         _, cache, _ = _paths(config)
         out = send_promos(config, store, build_ai_client(config.settings.ai, cache), force=force)
@@ -301,6 +303,17 @@ def _promos(config: AppConfig, store: RunStore, force: bool = False) -> str:
     if out != "not due yet":
         log.info("promo message: %s", out)
     return out
+
+
+def _site(config: AppConfig, store: RunStore) -> str:
+    """Rebuild the website's data file. Never fails a run."""
+    try:
+        path = build_site(config, store)
+    except Exception as exc:
+        log.warning("site data not built: %s", exc)
+        return "failed"
+    log.info("site data written to %s", path)
+    return str(path)
 
 
 def _vlink(vault: Vault, v: dict[str, Any]) -> str:
@@ -552,6 +565,10 @@ def doctor(
                 "ai: no API key and no CLI login found; run `claude` once (docker: `docker compose run --rm -it sgfoodhunt claude`) "
                 "or set CLAUDE_CODE_OAUTH_TOKEN from `claude setup-token`"
             )
+    from sgfoodhunt.enrich.geocode import onemap_state
+
+    om = onemap_state(secrets)
+    (warnings if "EXPIRED" in om else notes).append(om)
     runnable, skipped = select_sources(config, None)
     notes.append(
         f"{len(runnable)} sources will run, {len(skipped)} skipped ({', '.join(skipped) or 'none'})"
@@ -697,6 +714,28 @@ def serve(
         job()
         if once:
             return
+
+
+@app.command()
+def site(
+    config_dir: ConfigOpt = Path("config"),
+    serve: Annotated[
+        bool, typer.Option("--serve", help="Also serve site/ + data/site locally (preview)")
+    ] = False,
+    port: int = 8783,
+) -> None:
+    """Write data/site/data.json for the website from the latest scored run."""
+    config = _load(config_dir)
+    store, _, _ = _paths(config)
+    try:
+        path = build_site(config, store)
+    except FileNotFoundError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(code=2) from exc
+    console.print(f"site data: {path}")
+    if serve:
+        site_dir = Path(__file__).resolve().parents[1] / "site"
+        serve_site(site_dir, config.resolve(config.settings.paths.data_dir), port)
 
 
 @app.command()

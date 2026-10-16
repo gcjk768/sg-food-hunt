@@ -16,6 +16,7 @@ from sgfoodhunt.dedup import Venue, build_venues
 from sgfoodhunt.dedup.registry import MatchStats
 from sgfoodhunt.diff import RunDiff, compute_diff
 from sgfoodhunt.enrich import EnrichStats, OneMapGeocoder, enrich_venues
+from sgfoodhunt.enrich.geocode import onemap_token
 from sgfoodhunt.http.cache import ResponseCache, write_json
 from sgfoodhunt.http.client import AsyncApiClient
 from sgfoodhunt.reporting.exports import export_category_csvs, export_merged_json
@@ -82,7 +83,12 @@ def default_geocoder(
         rpm=config.settings.api_rate_limits.get("onemap", 60),
         dry_run=dry_run,
     )
-    return OneMapGeocoder(client)
+    token = (
+        None
+        if dry_run
+        else onemap_token(config.secrets, config.resolve(config.settings.paths.data_dir))
+    )
+    return OneMapGeocoder(client, token=token)
 
 
 def _memory(

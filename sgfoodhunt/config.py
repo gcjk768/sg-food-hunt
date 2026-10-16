@@ -272,6 +272,9 @@ class Secrets(BaseModel):
     telegram_bot_token: str | None = None
     telegram_chat_id: str | None = None
     telegram_thread_id: str | None = None  # forum topic id (the last number in a t.me/c/... link)
+    onemap_email: str | None = None  # OneMap login (free registration): the token renews itself
+    onemap_password: str | None = None
+    onemap_access_token: str | None = None  # or a pasted token, valid 3 days
 
     @classmethod
     def from_env(cls) -> Secrets:
@@ -290,6 +293,9 @@ class Secrets(BaseModel):
             telegram_bot_token=get("TELEGRAM_BOT_TOKEN"),
             telegram_chat_id=get("TELEGRAM_CHAT_ID"),
             telegram_thread_id=get("TELEGRAM_THREAD_ID"),
+            onemap_email=get("ONEMAP_EMAIL"),
+            onemap_password=get("ONEMAP_PASSWORD"),
+            onemap_access_token=get("ONEMAP_ACCESS_TOKEN"),
         )
 
 

@@ -44,6 +44,7 @@ The step numbers match the diagram.
 5. **Analyse.** The stored, anonymised review and article snippets are scored for food, service, ambience and value, plus a noise level and a rating trend. This uses lexicons, or Claude when it's available.
 6. **Score.** Each of the 15 categories ranks every venue with its own weights. Bonuses: Michelin, multiple sources, social buzz (capped). Penalties: declining rating trend, poor SFA hygiene grade, temporarily closed.
 7. **Diff + publish.** Venue, category and run notes go to the Obsidian vault, and CSV/JSON exports go to `data/exports/<run_id>/`. The diff goes to Telegram, and optionally to email and Google Sheets.
+8. **Website.** `sgfoodhunt/site.py` writes `data/site/data.json` after every run (or `sgfh site`): every venue that holds a rank, grouped the way people ask (cafes and brunch, zi char, hawker, dinner for four, special occasions, new openings), with its worth-going verdict, nearest MRT, hours, score breakdown, sources and any current promo. The static page in `site/` (plain HTML, CSS and JS, Leaflet on OneMap tiles) is served by the `food-site` nginx container on port 8783. The same data drives the Telegram cards, so the site can replace them.
 
 ## Tech stack
 
@@ -83,6 +84,9 @@ REDDIT_CLIENT_ID=
 REDDIT_CLIENT_SECRET=
 REDDIT_USER_AGENT=sgfoodhunt/0.1 by <your_reddit_username>
 GOOGLE_PLACES_API_KEY=          # only if you enable google_places in sources.yaml
+ONEMAP_EMAIL=                   # optional OneMap account (free): the token renews itself
+ONEMAP_PASSWORD=
+ONEMAP_ACCESS_TOKEN=            # or a pasted token, valid about 3 days; `sgfh doctor` shows the expiry
 ANTHROPIC_API_KEY=              # AI layer: one of these two, or log the CLI in
 CLAUDE_CODE_OAUTH_TOKEN=
 TELEGRAM_BOT_TOKEN=
@@ -109,7 +113,7 @@ docker compose build
 docker compose run --rm sgfoodhunt doctor          # paths writable, keys present, schedule valid
 docker compose run --rm sgfoodhunt notify-test     # test message to Telegram
 docker compose run --rm sgfoodhunt run -c zichar_family -s sethlui   # small live run
-docker compose up -d                               # weekly scheduler (SGFH_SCHEDULE)
+docker compose up -d                               # scheduler (SGFH_SCHEDULE) + the website on :8783
 docker compose run --rm -it sgfoodhunt claude      # one-time Claude CLI login, persisted in ./claude-config
 ```
 
@@ -131,6 +135,7 @@ sgfh run --dry-run                 # cached responses only, no network
 sgfh rank --offline                # re-score the latest run after changing weights or notes
 sgfh runs                          # run history
 sgfh show <run_id>                 # per-source counts for one run
+sgfh site --serve                  # website preview at http://localhost:8783 (data/site/data.json + site/)
 sgfh dashboard                     # Streamlit dashboard
 ```
 
@@ -148,6 +153,8 @@ sgfoodhunt/
   reviews/ ai/          lexicon analysis, Claude CLI client and tasks
   scoring/ ranking.py   per-category scores
   social/               optional buzz module (exports, oEmbed, SERP, hashtag API)
+  site.py               data/site/data.json for the website
+site/                   the website (index.html, app.js, styles.css, nginx.conf), served by the food-site container
   diff.py notify.py     run-to-run diff, Telegram / email
   reporting/ storage/   vault notes, exports, run store
   dashboard/            Streamlit app

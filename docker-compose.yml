@@ -7,7 +7,7 @@ services:
       context: . # this folder is the source of truth (nas-sync pushes it to GitHub main); bump the tag to rebuild
       args:
         WITH_CLAUDE: "true"
-    image: sgfoodhunt:20261015-activity
+    image: sgfoodhunt:20261017-site
     container_name: sgfoodhunt
     # uid 0 keeps the shared Claude login (/app/claude-config: root 600, rewritten by trading-desk) usable;
     # gid 10 (admin) + umask 002 in the entrypoint make every written file editable by the owner (664/775).
@@ -47,6 +47,23 @@ services:
       interval: 5m
       timeout: 180s
       start_period: 3m
+  # Website: site/index.html plus data/site/data.json, which sgfh rewrites after every run (sgfh site).
+  # LAN: http://<LAN_IP>:8783. Same shape as the property site (nginx + two read-only mounts).
+  food-site:
+    image: nginx:1.27-alpine
+    container_name: food-site
+    ports:
+      - "8783:80"
+    volumes:
+      - ./site:/usr/share/nginx/html:ro
+      - ./data/site:/usr/share/nginx/html/live:ro
+      - ./site/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
 networks:
   scrape-net:
     external: true

@@ -1,0 +1,336 @@
+/* SG Food Hunt website. Reads live/data.json (written by `sgfh site` after every run) and renders
+   the lists, the map and the venue drawer. No build step, no framework. */
+(() => {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+  const DAY_LABEL = { mon: "Mon", tue: "Tue", wed: "Wed", thu: "Thu", fri: "Fri", sat: "Sat", sun: "Sun" };
+  const PAGE = 30;
+  const DARK = matchMedia("(prefers-color-scheme: dark)");
+  const TILES = (dark) => `https://www.onemap.gov.sg/maps/tiles/${dark ? "Night" : "Default"}/{z}/{x}/{y}.png`;
+  const ATTRIB = '<a href="https://www.onemap.gov.sg/" target="_blank" rel="noopener">OneMap</a> &copy; <a href="https://www.sla.gov.sg/" target="_blank" rel="noopener">Singapore Land Authority</a>';
+
+  let D = null; // data.json
+  let rankIndex = {}; // venue id -> [{rank, cat, label}]
+  const state = { group: null, cat: null, view: "list", shown: PAGE, q: "" };
+  let map, tiles, markers = {}, layer;
+
+  // ------------------------------------------------------------ boot
+  fetch("live/data.json", { cache: "no-cache" })
+    .then((r) => { if (!r.ok) throw new Error("data.json " + r.status); return r.json(); })
+    .then(setup)
+    .catch((e) => {
+      $("lede").textContent = "The data file is missing. Run `sgfh site` once and reload.";
+      console.error(e);
+    });
+
+  function setup(data) {
+    D = data;
+    for (const [key, c] of Object.entries(D.categories)) {
+      for (const r of c.ranked) (rankIndex[r.id] ||= []).push({ rank: r.rank, cat: key, label: c.label });
+    }
+    for (const list of Object.values(rankIndex)) list.sort((a, b) => a.rank - b.rank);
+    renderLede();
+    renderGroups();
+    renderChanges();
+    renderPromosView();
+    initMap();
+    wireFilters();
+    addEventListener("hashchange", route);
+    route();
+  }
+
+  // ------------------------------------------------------------ routing
+  function route() {
+    const parts = location.hash.replace(/^#/, "").split("/").filter(Boolean);
+    if (parts[0] === "promos") { state.view = "promos"; showView(); return; }
+    state.view = "list";
+    const groups = D.groups;
+    const g = groups.find((x) => x.key === parts[0]) || groups[0];
+    state.group = g.key;
+    state.cat = g.categories.includes(parts[1]) ? parts[1] : g.categories[0];
+    state.shown = PAGE;
+    showView();
+    renderGroups();
+    renderTabs();
+    renderList();
+    if (parts[2] && D.venues[parts[2]]) openVenue(parts[2], false);
+    else closeDrawer(false);
+  }
+  const setHash = (h) => { if (location.hash !== "#" + h) location.hash = h; else route(); };
+  const listHash = () => `${state.group}/${state.cat}`;
+
+  function showView() {
+    $("list-view").hidden = state.view !== "list";
+    $("promos-view").hidden = state.view !== "promos";
+    $("changes").hidden = state.view !== "list" || !($("changes-list").children.length);
+  }
+
+  // ------------------------------------------------------------ hero
+  function renderLede() {
+    const n = Object.keys(D.venues).length;
+    const src = D.sources.length ? listJoin(D.sources) : "the food blogs";
+    const when = D.run_finished_at ? fmtDate(D.run_finished_at) : D.run_id;
+    $("lede").textContent = `${n} places from ${src}, re-ranked every morning. Last run ${when}.`;
+    $("promos-link").dataset.count = String(D.promos.count || 0);
+    $("foot").innerHTML =
+      `<span>Sources: ${esc(D.sources.join(", "))}</span>` +
+      `<span>Basemap ${ATTRIB}</span>` +
+      `<span>Blog and review data, not a booking. Check hours before you go.</span>` +
+      `<span>Run <code>${esc(D.run_id)}</code></span>`;
+  }
+
+  function renderGroups() {
+    $("groups").innerHTML = D.groups.map((g) => {
+      const n = new Set(g.categories.flatMap((c) => D.categories[c].ranked.map((r) => r.id))).size;
+      return `<li><button type="button" data-g="${esc(g.key)}" aria-pressed="${g.key === state.group && state.view === "list"}">` +
+        `<i class="ph ph-${esc(g.icon)}" aria-hidden="true"></i>${esc(g.label)} <span class="n">${n}</span></button></li>`;
+    }).join("");
+    $("groups").querySelectorAll("button").forEach((b) => b.onclick = () => { $("q").value = ""; state.q = ""; setHash(b.dataset.g); });
+  }
+
+  function renderChanges() {
+    const items = [];
+    for (const e of D.changes.entered) {
+      const v = D.venues[e.id];
+      items.push({ id: e.id, name: v.name, sub: `#${e.rank} on ${e.label}` });
+    }
+    for (const id of D.changes.new_venues) {
+      if (items.some((i) => i.id === id)) continue;
+      const v = D.venues[id];
+      items.push({ id, name: v.name, sub: "New to the lists" });
+    }
+    $("changes-list").innerHTML = items.slice(0, 12).map((i) =>
+      `<li><button type="button" data-v="${esc(i.id)}"><b>${esc(i.name)}</b><small>${esc(i.sub)}</small></button></li>`).join("");
+    $("changes-list").querySelectorAll("button").forEach((b) => b.onclick = () => openVenue(b.dataset.v));
+  }
+
+  // ------------------------------------------------------------ list
+  function renderTabs() {
+    const g = D.groups.find((x) => x.key === state.group);
+    $("list-title").textContent = state.q ? "Search results" : g.label;
+    const tabs = g.categories.map((c) => {
+      const cat = D.categories[c];
+      return `<li role="presentation"><button type="button" role="tab" data-c="${esc(c)}" aria-selected="${c === state.cat}">${esc(cat.label)}</button></li>`;
+    });
+    $("tabs").innerHTML = g.categories.length > 1 ? tabs.join("") : "";
+    $("tabs").querySelectorAll("button").forEach((b) => b.onclick = () => setHash(`${state.group}/${b.dataset.c}`));
+  }
+
+  function filters() {
+    return {
+      worth: $("f-worth").checked, region: $("f-region").value, price: $("f-price").value,
+      halal: $("f-halal").checked, weekend: $("f-weekend").checked, michelin: $("f-michelin").checked, fresh: $("f-new").checked,
+    };
+  }
+  function passes(v, f) {
+    if (f.worth && !v.worth) return false;
+    if (f.region && v.region !== f.region) return false;
+    if (f.price && v.price_level && v.price_level > Number(f.price)) return false;
+    if (f.halal && !v.halal) return false;
+    if (f.weekend && v.open_weekends === false) return false;
+    if (f.michelin && !v.michelin) return false;
+    if (f.fresh && !v.new) return false;
+    return true;
+  }
+  function matches(v, q) {
+    const hay = [v.name, v.name_zh, ...(v.cuisine || []), v.mrt, v.district, v.region, v.address, ...(v.tags || [])].join(" ").toLowerCase();
+    return q.split(/\s+/).every((w) => hay.includes(w));
+  }
+
+  function currentItems() {
+    const f = filters();
+    if (state.q) {
+      const q = state.q.toLowerCase();
+      return Object.values(D.venues).filter((v) => matches(v, q) && passes(v, f))
+        .map((v) => ({ v, rank: (rankIndex[v.id] || [])[0] }))
+        .sort((a, b) => (a.rank?.rank ?? 999) - (b.rank?.rank ?? 999));
+    }
+    return D.categories[state.cat].ranked.map((r) => ({ v: D.venues[r.id], rank: { rank: r.rank, cat: state.cat }, scored: r }))
+      .filter((x) => passes(x.v, f));
+  }
+
+  function renderList() {
+    const items = currentItems();
+    const total = state.q ? Object.keys(D.venues).length : D.categories[state.cat].ranked.length;
+    $("list-count").textContent = items.length === total ? `${items.length} places` : `${items.length} of ${total} places`;
+    const page = items.slice(0, state.shown);
+    $("rows").innerHTML = page.length ? page.map((x, i) => rowHtml(x, i)).join("") :
+      `<li class="empty"><b>Nothing matches</b>Loosen a filter or clear the search.</li>`;
+    $("rows").querySelectorAll(".row").forEach((b) => {
+      b.onclick = () => openVenue(b.dataset.v);
+      b.onmouseenter = () => hot(b.dataset.v, true);
+      b.onmouseleave = () => hot(b.dataset.v, false);
+    });
+    $("more").hidden = items.length <= state.shown;
+    $("more").textContent = `Show ${Math.min(PAGE, items.length - state.shown)} more`;
+    renderMarkers(items.map((x) => x.v));
+  }
+
+  function rowHtml({ v, rank }, i) {
+    const r = rank ? rank.rank : null;
+    const rankLabel = rank && state.q ? `<small style="font:500 0.7rem var(--mono);display:block;color:var(--ink-3)">${esc(shortLabel(rank.cat))}</small>` : "";
+    const meta = [
+      v.cuisine.length ? `<span><i class="ph ph-fork-knife"></i>${esc(v.cuisine.slice(0, 3).join(", "))}</span>` : "",
+      v.price_level ? `<span><i class="ph ph-coins"></i>${"$".repeat(v.price_level)}${v.per_pax ? ` about S$${Math.round(v.per_pax)} each` : ""}</span>` : (v.price_text ? `<span><i class="ph ph-coins"></i>${esc(v.price_text)}</span>` : ""),
+      v.mrt ? `<span><i class="ph ph-train"></i>${esc(v.mrt)}</span>` : (v.region ? `<span><i class="ph ph-map-pin"></i>${esc(v.region)}</span>` : ""),
+      v.rating ? `<span><i class="ph ph-star"></i>${v.rating} (${v.reviews ?? "?"})</span>` : "",
+    ].filter(Boolean).join("");
+    const badges = [
+      v.new ? `<span class="badge new">New</span>` : "",
+      v.michelin ? `<span class="badge mich"><i class="ph ph-fill ph-medal"></i>${esc(v.michelin)}</span>` : "",
+      v.promo ? `<span class="badge promo"><i class="ph ph-gift"></i>Promo</span>` : "",
+      v.buffet ? `<span class="badge">Buffet</span>` : "",
+      v.halal ? `<span class="badge">Halal</span>` : "",
+    ].filter(Boolean).join("");
+    return `<li><button type="button" class="row" style="--i:${Math.min(i, 20)}" data-v="${esc(v.id)}" data-rank="${r ?? ""}">` +
+      `<span class="rank">${r ?? "·"}${rankLabel}</span>` +
+      `<span><h3 class="name">${esc(v.name)}${v.name_zh ? `<span class="zh">${esc(v.name_zh)}</span>` : ""}</h3>` +
+      `<div class="meta">${meta}</div>` +
+      (v.summary ? `<p class="summary">${esc(v.summary)}</p>` : "") +
+      (badges ? `<div class="badges">${badges}</div>` : "") + `</span>` +
+      `<span class="side">${verdictBadge(v)}</span></button></li>`;
+  }
+  const verdictBadge = (v) => v.worth
+    ? `<span class="badge worth"><i class="ph ph-fill ph-check-circle"></i>Worth going</span>`
+    : `<span class="badge nope"><i class="ph ph-x-circle"></i>Not yet</span>`;
+  const shortLabel = (cat) => D.categories[cat]?.label.replace(/^Best /, "") || cat;
+
+  function wireFilters() {
+    $("filters").querySelectorAll("input,select").forEach((el) => el.onchange = () => { state.shown = PAGE; renderList(); });
+    $("f-reset").onclick = () => { $("filters").querySelectorAll("input").forEach((i) => i.checked = false); $("filters").querySelectorAll("select").forEach((s) => s.value = ""); state.shown = PAGE; renderList(); };
+    $("more").onclick = () => { state.shown += PAGE; renderList(); };
+    let t;
+    $("q").oninput = () => { clearTimeout(t); t = setTimeout(() => { state.q = $("q").value.trim(); state.shown = PAGE; if (state.view !== "list") setHash(listHash()); renderTabs(); renderList(); }, 120); };
+    $("close").onclick = () => closeDrawer();
+    $("scrim").onclick = () => closeDrawer();
+    addEventListener("keydown", (e) => { if (e.key === "Escape") closeDrawer(); });
+    DARK.addEventListener("change", () => tiles && tiles.setUrl(TILES(DARK.matches)));
+  }
+
+  // ------------------------------------------------------------ map
+  function initMap() {
+    map = L.map("map", { zoomControl: true, attributionControl: true, scrollWheelZoom: false }).setView([1.3521, 103.8198], 11);
+    tiles = L.tileLayer(TILES(DARK.matches), { attribution: ATTRIB, maxZoom: 19, minZoom: 11, detectRetina: true }).addTo(map);
+    map.setMaxBounds([[1.144, 103.535], [1.494, 104.502]]);
+    layer = L.layerGroup().addTo(map);
+    map.on("click", () => map.scrollWheelZoom.enable());
+  }
+  function renderMarkers(venues) {
+    layer.clearLayers(); markers = {};
+    const pts = [];
+    for (const v of venues) {
+      if (v.lat == null || v.lng == null) continue;
+      const m = L.marker([v.lat, v.lng], {
+        icon: L.divIcon({ className: "", html: `<div class="pin${v.worth ? "" : " dim"}" data-pin="${esc(v.id)}"></div>`, iconSize: [14, 14], iconAnchor: [7, 7] }),
+        keyboard: false, title: v.name,
+      }).addTo(layer);
+      m.bindPopup(`<b>${esc(v.name)}</b><br>${esc(v.mrt ? v.mrt + " MRT" : v.region || "")}<br><a href="#" data-open="${esc(v.id)}">Details</a>`);
+      m.on("popupopen", (e) => { e.popup.getElement().querySelector("[data-open]").onclick = (ev) => { ev.preventDefault(); openVenue(v.id); }; });
+      markers[v.id] = m;
+      pts.push([v.lat, v.lng]);
+    }
+    $("map-note").textContent = pts.length ? `${pts.length} on the map` : "No coordinates yet";
+    if (pts.length) map.fitBounds(pts, { padding: [24, 24], maxZoom: 14, animate: false });
+  }
+  function hot(id, on) {
+    const el = document.querySelector(`.pin[data-pin="${id}"]`);
+    if (el) el.classList.toggle("hot", on);
+  }
+
+  // ------------------------------------------------------------ drawer
+  function openVenue(id, push = true) {
+    const v = D.venues[id];
+    if (!v) return;
+    if (push) setHash(`${listHash()}/${id}`);
+    $("drawer-body").innerHTML = drawerHtml(v);
+    $("drawer").setAttribute("open", "");
+    $("scrim").classList.add("on");
+    $("drawer").scrollTop = 0;
+    $("drawer-body").querySelectorAll("[data-copy]").forEach((b) => b.onclick = () => navigator.clipboard?.writeText(b.dataset.copy).then(() => { b.textContent = "Copied"; setTimeout(() => (b.textContent = "Copy"), 1200); }));
+    const m = markers[id];
+    if (m) m.openPopup();
+  }
+  function closeDrawer(push = true) {
+    if (!$("drawer").hasAttribute("open") && !push) return;
+    $("drawer").removeAttribute("open");
+    $("scrim").classList.remove("on");
+    if (push && location.hash.split("/").length > 2) history.replaceState(null, "", "#" + listHash());
+  }
+
+  function drawerHtml(v) {
+    const ranks = rankIndex[v.id] || [];
+    const scored = ranks.find((r) => r.cat === state.cat) || ranks[0];
+    const entry = scored && D.categories[scored.cat].ranked.find((r) => r.id === v.id);
+    const la = Number(v.lat).toFixed(6), lo = Number(v.lng).toFixed(6); // public OneMap static map, no token
+    const img = v.lat != null ? `https://www.onemap.gov.sg/api/staticmap/getStaticImage?layerchosen=${DARK.matches ? "night" : "default"}&latitude=${la}&longitude=${lo}&zoom=16&height=320&width=512&points=[${la},${lo},%22196,58,38%22,%22%22]` : null;
+    const gmaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([v.name, v.address || v.region || "Singapore"].join(" "))}`;
+    const facts = [
+      v.address ? `<li class="wide"><i class="ph ph-map-pin"></i><span>${esc(v.address)} <button type="button" class="badge" data-copy="${esc(v.address)}">Copy</button></span></li>` : "",
+      v.mrt ? `<li><i class="ph ph-train"></i><span>${esc(v.mrt)} MRT${v.mrt_lines.length ? ` <small style="color:var(--ink-3)">${esc(v.mrt_lines.join(", "))}</small>` : ""}</span></li>` : "",
+      v.district ? `<li><i class="ph ph-compass"></i><span>${esc(v.district)}</span></li>` : "",
+      v.cuisine.length ? `<li><i class="ph ph-fork-knife"></i><span>${esc(v.cuisine.join(", "))}</span></li>` : "",
+      v.price_level || v.price_text ? `<li><i class="ph ph-coins"></i><span>${v.price_level ? "$".repeat(v.price_level) : ""}${v.per_pax ? ` about S$${Math.round(v.per_pax)} a person` : ""}${v.price_text ? ` <small style="color:var(--ink-3)">${esc(v.price_text)}</small>` : ""}</span></li>` : "",
+      v.rating ? `<li><i class="ph ph-star"></i><span>${v.rating} from ${v.reviews ?? "?"} Google reviews${v.trend ? `, ${esc(v.trend)}` : ""}</span></li>` : "",
+      v.phone ? `<li><i class="ph ph-phone"></i><span><a href="tel:${esc(v.phone.replace(/\s/g, ""))}">${esc(v.phone)}</a></span></li>` : "",
+      v.hygiene ? `<li><i class="ph ph-shield-check"></i><span>SFA hygiene grade ${esc(v.hygiene)}</span></li>` : "",
+      v.best_for && v.best_for !== "not ranked yet" ? `<li class="wide"><i class="ph ph-heart"></i><span>Best for ${esc(v.best_for)}</span></li>` : "",
+    ].filter(Boolean).join("");
+    const chips = [v.new ? "New" : "", v.michelin, v.buffet ? "Buffet" : "", v.halal ? "Halal" : "", v.kids ? "Kid friendly" : "", v.private_room ? "Private room" : "", v.noise ? `${v.noise} noise` : "", ...(v.tags || [])].filter(Boolean);
+    return (img ? `<div class="photo-wrap"><img class="photo" src="${img}" alt="Map around ${esc(v.name)}" loading="lazy"><span class="photo-note">OneMap</span></div>` : "") +
+      `<div class="body">` +
+      `<h2>${esc(v.name)}${v.name_zh ? `<span class="zh">${esc(v.name_zh)}</span>` : ""}</h2>` +
+      (ranks.length ? `<div class="chips">${ranks.map((r) => `<span>#${r.rank} ${esc(shortLabel(r.cat))}</span>`).join("")}</div>` : "") +
+      `<div class="verdict ${v.worth ? "good" : "bad"}"><i class="ph ph-fill ${v.worth ? "ph-check-circle" : "ph-x-circle"}"></i>${v.worth ? "Worth going" : "Not worth going yet"} <small>${esc(v.why)}</small></div>` +
+      (v.promo ? `<div class="promo-box"><b><i class="ph ph-gift"></i> ${esc(v.promo.deal)}</b>${v.promo.ends ? ` <small>until ${esc(v.promo.ends)}</small>` : ""} <a href="${esc(v.promo.url)}" target="_blank" rel="noopener">source</a></div>` : "") +
+      (v.summary ? `<p>${esc(v.summary)}</p>` : "") +
+      `<ul class="facts">${facts}</ul>` +
+      `<div class="actions">` +
+      (v.booking_url ? `<a class="primary" href="${esc(v.booking_url)}" target="_blank" rel="noopener"><i class="ph ph-calendar-check"></i>Book a table</a>` : "") +
+      `<a href="${gmaps}" target="_blank" rel="noopener"><i class="ph ph-navigation-arrow"></i>Directions</a>` +
+      (v.website && v.website !== v.booking_url ? `<a href="${esc(v.website)}" target="_blank" rel="noopener"><i class="ph ph-globe"></i>Website</a>` : "") +
+      `</div>` +
+      (v.dishes.length ? `<h3>Dishes people mention</h3><div class="chips">${v.dishes.map((d) => `<span>${esc(d)}</span>`).join("")}</div>` : "") +
+      (chips.length ? `<h3>Good to know</h3><div class="chips">${chips.map((d) => `<span>${esc(d)}</span>`).join("")}</div>` : "") +
+      `<h3>Opening hours</h3>${hoursHtml(v.hours)}` +
+      (entry && Object.keys(entry.components).length ? `<h3>Why it ranks #${entry.rank} on ${esc(shortLabel(scored.cat))}</h3>${scoreHtml(entry)}` : "") +
+      (v.sources.length ? `<h3>Where it was recommended</h3><ul class="sources">${v.sources.map((s) => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a><small>${esc(s.source)}${s.date ? ` ${s.date.slice(0, 7)}` : ""}</small></li>`).join("")}</ul>` : "") +
+      `</div>`;
+  }
+
+  function hoursHtml(h) {
+    if (!h || !Object.keys(h).length) return `<p style="color:var(--ink-3)">Not known. Check before you go.</p>`;
+    const today = DAYS[(new Date().getDay() + 6) % 7];
+    return `<table class="hours">${DAYS.map((d) => {
+      const slots = h[d];
+      const txt = slots && slots.length ? slots.map((s) => `${s[0]} to ${s[1]}`).join(", ") : "Closed";
+      return `<tr class="${d === today ? "today" : ""}"><td>${DAY_LABEL[d]}</td><td>${esc(txt)}</td></tr>`;
+    }).join("")}</table>`;
+  }
+  function scoreHtml(entry) {
+    const parts = Object.entries(entry.components).sort((a, b) => b[1] - a[1]);
+    const max = parts[0][1] || 1;
+    const adj = Object.entries(entry.adjustments || {}).map(([k, v]) => `${k.replace(/_/g, " ")} ${v > 0 ? "+" : ""}${v}`);
+    return `<div class="score">${parts.map(([k, v]) => `<div><span>${esc(k.replace(/_/g, " "))}</span><i style="transform:scaleX(${(v / max).toFixed(3)})"></i><span>${v.toFixed(2)}</span></div>`).join("")}</div>` +
+      `<p style="color:var(--ink-3);font-size:0.85rem;margin-top:0.5rem">Score ${entry.score}${adj.length ? `, with ${esc(adj.join(", "))}` : ""}. Weights per list are in config/categories.yaml.</p>`;
+  }
+
+  // ------------------------------------------------------------ promos view
+  function renderPromosView() {
+    const deals = Object.values(D.venues).filter((v) => v.promo).sort((a, b) => a.name.localeCompare(b.name));
+    $("promos-count").textContent = deals.length ? `${deals.length} deals${D.promos.found_at ? `, found ${fmtDate(D.promos.found_at)}` : ""}` : "";
+    $("deals").innerHTML = deals.length ? deals.map((v) =>
+      `<li><button type="button" class="deal" data-v="${esc(v.id)}"><b>${esc(v.name)}</b><span class="what"><i class="ph ph-${v.promo.festive ? "tree-evergreen" : "gift"}"></i> ${esc(v.promo.deal)}</span>` +
+      `<small>${v.promo.ends ? `Until ${esc(v.promo.ends)}` : "End date not stated"}${v.mrt ? ` · ${esc(v.mrt)} MRT` : ""}</small></button></li>`).join("") :
+      `<li class="empty"><b>No current deals</b>The weekly search found nothing for the places on these lists. It runs again after the next weekly search.</li>`;
+    $("deals").querySelectorAll("button").forEach((b) => b.onclick = () => openVenue(b.dataset.v));
+  }
+
+  // ------------------------------------------------------------ helpers
+  function fmtDate(iso) {
+    const d = new Date(iso);
+    return isNaN(d) ? iso : d.toLocaleString("en-SG", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Singapore" });
+  }
+  function listJoin(a) { return a.length < 2 ? a.join("") : `${a.slice(0, -1).join(", ")} and ${a[a.length - 1]}`; }
+})();
