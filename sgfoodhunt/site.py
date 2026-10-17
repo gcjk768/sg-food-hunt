@@ -37,6 +37,7 @@ GROUPS: list[tuple[str, str, str, list[str]]] = [
         "fork-knife",
         ["restaurants_cheap", "restaurants_affordable", "restaurants_expensive"],
     ),
+    ("michelin", "Michelin", "medal", ["michelin_stars", "michelin_bib"]),
     (
         "cafes",
         "Cafes & brunch",

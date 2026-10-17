@@ -307,6 +307,39 @@ categories:
     weights: {food: 0.25, service: 0.15, ambience: 0.15, value: 0.0}
     hard_filters: {price_levels: [3, 4]}
 
+  # --- Michelin (website only). They rank every venue any list ever found (pool_from) plus their own
+  # searches; the award comes from the venue's own article text (the official guide is off: robots.txt).
+  - key: michelin_stars
+    display_name: Michelin-starred restaurants
+    group: general
+    party_size: 2
+    digest_only: true
+    pool_from: &all_lists [cafes_date, restaurants_date, restaurants_4pax, occasion_4pax, family_occasion, family_weekend, zichar_family, brunch_date, rooftop_waterfront_date, dimsum_family, steamboat_family, hawker_family, hightea_dessert_date, private_room_family, new_cafes, new_restaurants, new_zichar, restaurants_cheap, restaurants_affordable, restaurants_expensive]
+    queries:
+      - "Michelin star restaurants Singapore 2026"
+      - "one Michelin star restaurants Singapore"
+      - "two Michelin star restaurants Singapore"
+      - "three Michelin star restaurants Singapore"
+      - "新加坡 米其林 星级 餐厅"
+    keywords: ["michelin", "starred", "tasting menu", "degustation", "omakase"]
+    weights: {michelin: 0.45, food: 0.15, service: 0.05, ambience: 0.05, value: 0.0}
+    hard_filters: {michelin: [star]}
+
+  - key: michelin_bib
+    display_name: Michelin Bib Gourmand
+    group: general
+    party_size: 2
+    digest_only: true
+    pool_from: *all_lists
+    queries:
+      - "Michelin Bib Gourmand Singapore 2026"
+      - "Bib Gourmand hawker stalls Singapore"
+      - "Bib Gourmand restaurants Singapore"
+      - "新加坡 必比登 推荐"
+    keywords: ["bib gourmand", "michelin", "hawker", "value"]
+    weights: {food: 0.25, value: 0.20, service: 0.0, ambience: 0.0}
+    hard_filters: {michelin: [bib]}
+
   # --- "what's new" categories: recency matters more than review volume, so the rating weight
   # is lowered and recommendations (recent articles) raised. opened_within_months keeps only
   # venues whose earliest evidence (article date, first Google review, first seen by this tool)

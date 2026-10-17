@@ -23,6 +23,7 @@ WEIGHT_COMPONENTS: tuple[str, ...] = (
     "parking",
     "weekend_open",
     "quiet",
+    "michelin",  # award level: 3 stars 1.0, 2 stars 0.85, 1 star 0.7, Bib Gourmand 0.5
 )
 
 CategoryGroup = Literal["dating", "family", "general"]
@@ -151,6 +152,7 @@ class HardFilters(BaseModel):
     # price tier: keep venues whose price level is in the list; a venue with no price is kept only
     # when this category's own queries found it (the article put it in the tier)
     price_levels: list[int] | None = None
+    michelin: list[str] | None = None  # keep only these awards: "star" and/or "bib"
     opened_within_months: int | None = None  # keep only venues first seen / opened recently
 
 

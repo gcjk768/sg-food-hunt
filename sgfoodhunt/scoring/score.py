@@ -170,7 +170,22 @@ def components_for(
         "parking": PARKING_SCORES.get(str(flags.get("parking"))) if flags.get("parking") else None,
         "weekend_open": weekend,
         "quiet": noise_component(venue),
+        "michelin": michelin_level(venue.michelin),
     }
+
+
+def michelin_level(award: str | None) -> float | None:
+    """1.0 for 3 stars down to 0.5 for Bib Gourmand; None for no award ('Selected' is not one)."""
+    m = str(award or "")
+    if m == "Bib Gourmand":
+        return 0.5
+    if m in ("Star", "1 Star"):
+        return 0.7
+    if m == "2 Stars":
+        return 0.85
+    if m == "3 Stars":
+        return 1.0
+    return None
 
 
 # --- filters ----------------------------------------------------------------------------------
@@ -193,6 +208,11 @@ def hard_filter_reason(
 
         if not (star_count(venue.michelin) or venue.michelin == "Bib Gourmand" or is_buffet(venue)):
             return "no price level"
+    if hf.michelin:
+        level = michelin_level(venue.michelin)
+        kind = "bib" if level == 0.5 else "star" if level else None
+        if kind not in hf.michelin:
+            return "no Michelin star" if "star" in hf.michelin else "not Bib Gourmand"
     if hf.price_levels:
         if venue.price_level is None:
             if category.key not in venue.category_keys:

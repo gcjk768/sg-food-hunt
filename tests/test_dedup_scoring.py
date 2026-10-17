@@ -397,3 +397,69 @@ def test_price_tier_filter(app_config: AppConfig) -> None:
     assert not ok(None, "restaurants_cheap") and ok(
         None, "restaurants_cheap", found_by="restaurants_cheap"
     )
+
+
+def test_michelin_detector_is_strict() -> None:
+    from sgfoodhunt.dedup.registry import michelin_from_text as m
+
+    # real snippets from the NAS registry, 2026-10-17
+    assert (
+        m("the world's first Michelin-starred Peranakan restaurant calls our Little Red Dot home")
+        == "Star"
+    )
+    assert m("it's the only two-Michelin-starred sushi spot in Singapore") == "2 Stars"
+    assert (
+        m("This two Michelin-starred restaurant knows a thing or two about fine dining")
+        == "2 Stars"
+    )
+    assert m("Psst: with its one Michelin star, t") == "1 Star"
+    assert m("Chuan Kee Boneless Braised Duck, a Bib Gourmand stall") == "Bib Gourmand"
+    # someone else's award
+    assert (
+        m("Cafe Natsu is the brainchild of Lewis Barker, head chef of Michelin-starred Sommer.")
+        is None
+    )
+    assert (
+        m("Fans of one Michelin-starred Whitegrass and master tea artisan Hvala can look forward")
+        is None
+    )
+    assert (
+        m("the great mind that brought us the one-Michelin-starred restaurant, Waku Ghin") is None
+    )
+    assert m("a different personality with the same amazing Michelin-starred food") is None
+    assert (
+        m("chef-owner Louisa Lim, who led three Michelin-starred restaurant Odette's pastry")
+        is None
+    )
+    # a later sentence about this venue still counts
+    assert (
+        m("Head chef of Michelin-starred Sommer opens here. Psst: it holds one Michelin star")
+        == "1 Star"
+    )
+
+
+def test_michelin_lists(app_config: AppConfig) -> None:
+    from sgfoodhunt.scoring.score import hard_filter_reason
+
+    s, today = app_config.settings.scoring, date(2026, 10, 17)
+    stars, bib = (
+        app_config.categories.get("michelin_stars"),
+        app_config.categories.get("michelin_bib"),
+    )
+    assert stars.digest_only and bib.digest_only and "hawker_family" in bib.pool_from
+
+    def venue(award: str | None) -> Venue:
+        return Venue(id=award or "none", name="V", michelin=award)
+
+    assert hard_filter_reason(venue("2 Stars"), stars, s, today) is None
+    assert hard_filter_reason(venue("Star"), stars, s, today) is None
+    assert hard_filter_reason(venue("Bib Gourmand"), stars, s, today) == "no Michelin star"
+    assert hard_filter_reason(venue("Bib Gourmand"), bib, s, today) is None
+    assert hard_filter_reason(venue("1 Star"), bib, s, today) == "not Bib Gourmand"
+    assert hard_filter_reason(venue("Selected"), stars, s, today) == "no Michelin star"
+    assert hard_filter_reason(venue(None), bib, s, today) == "not Bib Gourmand"
+    # more stars rank higher, other things equal
+    ranked = score_category(
+        stars, [venue("1 Star"), venue("3 Stars"), venue("2 Stars")], s, today=today
+    )
+    assert [r.venue_id for r in ranked if r.rank] == ["3 Stars", "2 Stars", "1 Star"]

@@ -80,7 +80,14 @@ FLAG_KEYS = (
 
 
 MICHELIN_RE = re.compile(
-    r"\b(bib[- ]gourmand)\b|\b(one|two|three|[123])[- ]michelin[- ]stars?\b|\b(michelin[- ]starred)\b",
+    r"\b(bib[- ]gourmand)\b|\b(one|two|three|[123])[- ]michelin[- ](?:stars?|starred)\b|\b(michelin[- ]starred)\b",
+    re.IGNORECASE,
+)
+# the award belongs to another place: "head chef of Michelin-starred Sommer", "fans of one
+# Michelin-starred Whitegrass", "brought us the one-Michelin-starred Waku Ghin", "the same Michelin-starred food"
+OTHER_PLACE_RE = re.compile(
+    r"\b(?:chef (?:of|at|from)|head chef|behind|brought us|fans of|led|leads|alum(?:ni)? of|former|sister|same|"
+    r"team (?:of|from|behind)|trained (?:at|under)|worked (?:at|in)|creators? of|owners? of|sibling)\b",
     re.IGNORECASE,
 )
 _STARS = {"one": 1, "two": 2, "three": 3, "1": 1, "2": 2, "3": 3}
@@ -89,8 +96,12 @@ _STARS = {"one": 1, "two": 2, "three": 3, "1": 1, "2": 2, "3": 3}
 def michelin_from_text(text: str) -> str | None:
     """Bib Gourmand / N Star(s) / Star when a venue's own snippet says so. Deliberately strict:
     'Selected' and loose 'three stars' (a rating) never count."""
-    m = MICHELIN_RE.search(text)
-    if not m:
+    for m in MICHELIN_RE.finditer(text):
+        sentence = re.split(r"[.!?]\s", text[: m.start()])[-1][-80:]
+        if OTHER_PLACE_RE.search(sentence):
+            continue  # someone else's award
+        break
+    else:
         return None
     if m.group(1):
         return "Bib Gourmand"
@@ -163,6 +174,12 @@ class VenueRegistry:
                 text = venue.price_text.strip()
                 if not DOLLAR_SYMBOLS_RE.match(text):
                     venue.price_level = price_level_from_text(text)
+            if not any(
+                e.source_key == "michelin" for e in venue.evidence
+            ):  # awards read before the strict rule
+                venue.michelin = next(
+                    (a for e in venue.evidence if (a := michelin_from_text(e.snippet or ""))), None
+                )
             self.venues[venue.id] = venue
             self._index(venue)
         self._next = int(data.get("next_id", len(self.venues) + 1))

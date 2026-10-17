@@ -137,6 +137,8 @@ def test_only_chosen_categories_are_on(monkeypatch) -> None:  # type: ignore[no-
         "restaurants_cheap",
         "restaurants_affordable",
         "restaurants_expensive",
+        "michelin_stars",
+        "michelin_bib",
     }
 
 

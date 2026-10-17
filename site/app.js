@@ -49,7 +49,7 @@
       ((rankIndex[b.id]?.length ?? 0) - (rankIndex[a.id]?.length ?? 0)) ||
       a.name.localeCompare(b.name));
     // website labels: zi char reads oddly in English, so it is shown in Chinese
-    const LABELS = { zichar: "煮炒", zichar_family: "Best 煮炒 for a family meal", new_zichar: "Newly opened 煮炒" };
+    const LABELS = { zichar: "煮炒", zichar_family: "Best 煮炒 for a family meal", new_zichar: "Newly opened 煮炒", hawker_family: "Best hawker stalls" };
     for (const g of D.groups) if (LABELS[g.key]) g.label = LABELS[g.key];
     for (const [k, c] of Object.entries(D.categories)) if (LABELS[k]) c.label = LABELS[k];
     for (const list of Object.values(rankIndex)) for (const r of list) if (LABELS[r.cat]) r.label = LABELS[r.cat];
