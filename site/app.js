@@ -48,6 +48,11 @@
       ((rankIndex[a.id]?.[0]?.rank ?? 999) - (rankIndex[b.id]?.[0]?.rank ?? 999)) ||
       ((rankIndex[b.id]?.length ?? 0) - (rankIndex[a.id]?.length ?? 0)) ||
       a.name.localeCompare(b.name));
+    // website labels: zi char reads oddly in English, so it is shown in Chinese
+    const LABELS = { zichar: "煮炒", zichar_family: "Best 煮炒 for a family meal", new_zichar: "Newly opened 煮炒" };
+    for (const g of D.groups) if (LABELS[g.key]) g.label = LABELS[g.key];
+    for (const [k, c] of Object.entries(D.categories)) if (LABELS[k]) c.label = LABELS[k];
+    for (const list of Object.values(rankIndex)) for (const r of list) if (LABELS[r.cat]) r.label = LABELS[r.cat];
     D.categories.all = { key: "all", label: "All places", ranked: everyone.map((v, i) => ({ id: v.id, rank: i + 1, score: 0, components: {}, adjustments: {} })) };
     D.groups.unshift({ key: "all", label: "All", icon: "squares-four", categories: ["all"] });
     renderLede();
@@ -114,7 +119,7 @@
     const items = [];
     for (const e of D.changes.entered) {
       const v = D.venues[e.id];
-      items.push({ id: e.id, name: v.name, sub: `#${e.rank} on ${e.label}` });
+      items.push({ id: e.id, name: v.name, sub: `#${e.rank} on ${D.categories[e.category]?.label || e.label}` });
     }
     for (const id of D.changes.new_venues) {
       if (items.some((i) => i.id === id)) continue;
