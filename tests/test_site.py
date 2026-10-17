@@ -153,3 +153,37 @@ def test_site_reads_ranked_venues_missing_from_the_run(
     data = read_json(build_site(app_config, run_store))
     assert [r["id"] for r in data["categories"]["cafes_date"]["ranked"]] == ["v9", "v1"]
     assert data["venues"]["v9"]["name"] == "Old Place"
+
+
+def test_michelin_tabs_per_star_level(app_config: AppConfig, run_store: RunStore) -> None:
+    v3, v2, vs = _venue("a", "Odette"), _venue("b", "Jaan"), _venue("c", "Candlenut")
+    v3["michelin"], v2["michelin"], vs["michelin"] = "3 Stars", "2 Stars", "Star"
+    scores = {
+        "michelin_stars": [
+            {
+                "venue_id": vid,
+                "name": n,
+                "score": 1 - i / 10,
+                "rank": i + 1,
+                "components": {},
+                "adjustments": {},
+                "excluded_reason": None,
+                "hidden": False,
+            }
+            for i, (vid, n) in enumerate([("b", "Jaan"), ("a", "Odette"), ("c", "Candlenut")])
+        ]
+    }
+    _write_run(run_store, "20260908T000000Z", [v3, v2, vs], scores)
+    data = read_json(build_site(app_config, run_store))
+    assert "michelin_stars" not in data["categories"]
+    assert [r["id"] for r in data["categories"]["michelin_3"]["ranked"]] == ["a"]
+    assert data["categories"]["michelin_2"]["ranked"][0] == {
+        **data["categories"]["michelin_2"]["ranked"][0],
+        "id": "b",
+        "rank": 1,
+    }
+    assert data["categories"]["michelin_star"]["label"].startswith("Michelin-starred")
+    assert "michelin_1" not in data["categories"]  # no 1-star venue: no empty tab
+    assert [g["categories"] for g in data["groups"] if g["key"] == "michelin"] == [
+        ["michelin_3", "michelin_2", "michelin_star"]
+    ]

@@ -160,7 +160,10 @@ def test_michelin_awards_are_worth_going() -> None:
     assert "⭐ Michelin 3 Stars" in _card({"name": "X", "michelin": "3 Stars"}, [])
     assert michelin_from_text("A Bib Gourmand stall since 2016") == "Bib Gourmand"
     assert michelin_from_text("one Michelin star, still queueing") == "1 Star"
-    assert michelin_from_text("a Michelin-starred chef") == "Star"
+    assert michelin_from_text("a Michelin-starred restaurant") == "Star"
+    assert (
+        michelin_from_text("a Michelin-starred chef") is None
+    )  # the chef's award, not the venue's
     assert michelin_from_text("three stars out of five, great char kway teow") is None
     assert michelin_from_text("") is None
 

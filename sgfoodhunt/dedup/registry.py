@@ -87,7 +87,8 @@ MICHELIN_RE = re.compile(
 # Michelin-starred Whitegrass", "brought us the one-Michelin-starred Waku Ghin", "the same Michelin-starred food"
 OTHER_PLACE_RE = re.compile(
     r"\b(?:chef (?:of|at|from)|head chef|behind|brought us|fans of|led|leads|alum(?:ni)? of|former|sister|same|"
-    r"team (?:of|from|behind)|trained (?:at|under)|worked (?:at|in)|creators? of|owners? of|sibling)\b",
+    r"team (?:of|from|behind)|trained (?:at|under)|worked (?:at|in)|creators? of|owners? of|sibling|"
+    r"founders? of|outpost of|branch of)\b",
     re.IGNORECASE,
 )
 _STARS = {"one": 1, "two": 2, "three": 3, "1": 1, "2": 2, "3": 3}
@@ -100,6 +101,17 @@ def michelin_from_text(text: str) -> str | None:
         sentence = re.split(r"[.!?]\s", text[: m.start()])[-1][-80:]
         if OTHER_PLACE_RE.search(sentence):
             continue  # someone else's award
+        if re.search(r"\bof(?: the| a)?\s*$", sentence, re.IGNORECASE):
+            continue  # "chef Mauro Colagreco of the three Michelin-starred Mirazur"
+        after = text[m.end() : m.end() + 40]
+        if m.group(0).lower().endswith("starred") and not after.strip(" .,"):
+            continue  # snippet cut off right after the phrase: whose award is unknown
+        if re.match(
+            r"[\s,]*(?:award-winning\s+)?(?:chefs?|vision|team|founders?|owners?|restaurateurs?)\b",
+            after,
+            re.IGNORECASE,
+        ):
+            continue  # a person's award: "a Michelin-starred chef", "a three Michelin-starred vision"
         break
     else:
         return None

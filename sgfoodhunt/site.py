@@ -26,6 +26,12 @@ log = logging.getLogger(__name__)
 SITE_DIR = "site"  # under data_dir
 DATA_FILE = "data.json"
 MAX_SOURCES = 6
+MICHELIN_TABS = [  # (tab key, label, the venue's stored award)
+    ("michelin_3", "3 Michelin stars", "3 Stars"),
+    ("michelin_2", "2 Michelin stars", "2 Stars"),
+    ("michelin_1", "1 Michelin star", "1 Star"),
+    ("michelin_star", "Michelin-starred (stars not stated)", "Star"),
+]
 NEW_DAYS = 14  # a venue first seen this recently is new, unless the tool itself was new then
 
 # How the lists are grouped on the page: (key, label, Phosphor icon, category keys). A category
@@ -37,7 +43,12 @@ GROUPS: list[tuple[str, str, str, list[str]]] = [
         "fork-knife",
         ["restaurants_cheap", "restaurants_affordable", "restaurants_expensive"],
     ),
-    ("michelin", "Michelin", "medal", ["michelin_stars", "michelin_bib"]),
+    (
+        "michelin",
+        "Michelin",
+        "medal",
+        ["michelin_3", "michelin_2", "michelin_1", "michelin_star", "michelin_bib"],
+    ),
     (
         "cafes",
         "Cafes & brunch",
@@ -226,6 +237,16 @@ def build_site_data(
             "digest_only": cat.digest_only,
             "ranked": ranked,
         }
+
+    # the Michelin stars list is shown as one tab per level, each in the list's own order
+    if "michelin_stars" in categories:
+        base = categories.pop("michelin_stars")
+        for key, label, award in MICHELIN_TABS:
+            rows = [dict(r) for r in base["ranked"] if venues[r["id"]].get("michelin") == award]
+            for i, r in enumerate(rows, 1):
+                r["rank"] = i
+            if rows:
+                categories[key] = {**base, "key": key, "label": label, "ranked": rows}
 
     groups = []
     for gkey, glabel, icon, keys in GROUPS:

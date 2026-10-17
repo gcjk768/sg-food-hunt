@@ -431,6 +431,34 @@ def test_michelin_detector_is_strict() -> None:
         m("chef-owner Louisa Lim, who led three Michelin-starred restaurant Odette's pastry")
         is None
     )
+    # round 2, real snippets
+    assert (
+        m("Conceptualised by chef Mauro Colagreco of the three Michelin-starred Mirazur in France")
+        is None
+    )
+    assert (
+        m("Founded by Michelin-starred chef Tetsuya Wakuda, this celebrity chef restaurant") is None
+    )
+    assert (
+        m("an underwater dining experience with a menu created by a Michelin-starred chef. That")
+        is None
+    )
+    assert m("What do you get when a three Michelin-starred vision meets Hyundai") is None
+    assert (
+        m(
+            "the founder of Wagamama chain and Michelin-starred award-winning Hakkasan, launched Madame Fan"
+        )
+        is None
+    )
+    assert (
+        m(
+            "The only Asian outpost of Chef Nancy Silverton's one Michelin starred Osteria Mozza in Los Angeles"
+        )
+        is None
+    )
+    assert m("head to Cherry Garden by Chef Fei, where Michelin-starred") is None
+    assert m("Les Amis delivers a three Michelin-starred fine dining experience") == "3 Stars"
+    assert m("Take Michelin-starred Restaurant Jag, for instance.") == "Star"
     # a later sentence about this venue still counts
     assert (
         m("Head chef of Michelin-starred Sommer opens here. Psst: it holds one Michelin star")
