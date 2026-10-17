@@ -145,6 +145,7 @@ body.map-open { overflow: hidden; }
 .near-bar span { font-weight: 600; margin-right: auto; }
 .near-bar .ph { color: var(--accent); }
 .row .meta .dist { color: var(--accent); font-weight: 600; }
+.row .meta .best { color: var(--ink); font-weight: 600; }
 .leaflet-control-attribution { font-size: 10px; background: color-mix(in srgb, var(--bg-2) 85%, transparent) !important; color: var(--ink-2) !important; }
 .leaflet-control-attribution a { color: inherit !important; }
 .leaflet-control-layers { background: var(--bg-2) !important; color: var(--ink) !important; border: 1px solid var(--line) !important; border-radius: 8px !important; box-shadow: none !important; font-size: 0.8rem; }

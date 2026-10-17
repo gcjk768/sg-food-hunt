@@ -8,7 +8,6 @@
   const DAY_LABEL = { mon: "Mon", tue: "Tue", wed: "Wed", thu: "Thu", fri: "Fri", sat: "Sat", sun: "Sun" };
   const PAGE = 30;
   const DARK = matchMedia("(prefers-color-scheme: dark)");
-  const TILES = (dark) => `https://www.onemap.gov.sg/maps/tiles/${dark ? "Night" : "Default"}/{z}/{x}/{y}.png`;
   const ATTRIB = '<a href="https://www.onemap.gov.sg/" target="_blank" rel="noopener">OneMap</a> &copy; <a href="https://www.sla.gov.sg/" target="_blank" rel="noopener">Singapore Land Authority</a>';
 
   let D = null; // data.json
@@ -25,7 +24,7 @@
   const SAT = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
   const SAT_LABELS = "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}";
   const SAT_ATTRIB = 'Imagery &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener">Esri</a>, Maxar, Earthstar Geographics';
-  let map, tiles, markers = {}, layer;
+  let map, markers = {}, layer;
 
   // ------------------------------------------------------------ boot
   fetch("live/data.json", { cache: "no-cache" })
@@ -42,6 +41,15 @@
       for (const r of c.ranked) (rankIndex[r.id] ||= []).push({ rank: r.rank, cat: key, label: c.label });
     }
     for (const list of Object.values(rankIndex)) list.sort((a, b) => a.rank - b.rank);
+    // All: every place on the site in one list (built after rankIndex so it never shows as a rank chip).
+    // Worth going first, then the best rank in any list, then the number of lists, then the name.
+    const everyone = Object.values(D.venues).sort((a, b) =>
+      (b.worth - a.worth) ||
+      ((rankIndex[a.id]?.[0]?.rank ?? 999) - (rankIndex[b.id]?.[0]?.rank ?? 999)) ||
+      ((rankIndex[b.id]?.length ?? 0) - (rankIndex[a.id]?.length ?? 0)) ||
+      a.name.localeCompare(b.name));
+    D.categories.all = { key: "all", label: "All places", ranked: everyone.map((v, i) => ({ id: v.id, rank: i + 1, score: 0, components: {}, adjustments: {} })) };
+    D.groups.unshift({ key: "all", label: "All", icon: "squares-four", categories: ["all"] });
     renderLede();
     renderGroups();
     renderChanges();
@@ -196,9 +204,12 @@
 
   function rowHtml({ v, rank, dist }, i) {
     const r = rank ? rank.rank : null;
+    const best = (rankIndex[v.id] || [])[0];
     const rankLabel = rank && state.q ? `<small style="font:500 0.7rem var(--mono);display:block;color:var(--ink-3)">${esc(shortLabel(rank.cat))}</small>` : "";
+    const bestLine = !state.q && state.cat === "all" && best ? `<span class="best"><i class="ph ph-trophy"></i>#${best.rank} ${esc(shortLabel(best.cat))}</span>` : "";
     const meta = [
       dist != null ? `<span class="dist"><i class="ph ph-navigation-arrow"></i>${fmtKm(dist)}</span>` : "",
+      bestLine,
       v.cuisine.length ? `<span><i class="ph ph-fork-knife"></i>${esc(v.cuisine.slice(0, 3).join(", "))}</span>` : "",
       v.price_level ? `<span><i class="ph ph-coins"></i>${"$".repeat(v.price_level)}${v.per_pax ? ` about S$${Math.round(v.per_pax)} each` : ""}</span>` : (v.price_text ? `<span><i class="ph ph-coins"></i>${esc(v.price_text)}</span>` : ""),
       v.mrt ? `<span><i class="ph ph-train"></i>${esc(v.mrt)}</span>` : (v.region ? `<span><i class="ph ph-map-pin"></i>${esc(v.region)}</span>` : ""),
@@ -235,18 +246,15 @@
     $("close").onclick = () => closeDrawer();
     $("scrim").onclick = () => closeDrawer();
     addEventListener("keydown", (e) => { if (e.key !== "Escape") return; if (state.big) expandMap(false); else closeDrawer(); });
-    DARK.addEventListener("change", () => tiles && tiles.setUrl(TILES(DARK.matches)));
   }
 
   // ------------------------------------------------------------ map
   function initMap() {
-    map = L.map("map", { zoomControl: true, attributionControl: true, scrollWheelZoom: false }).setView([1.3521, 103.8198], 11);
-    tiles = L.tileLayer(TILES(DARK.matches), { attribution: ATTRIB, maxZoom: 19, minZoom: 11, detectRetina: true });
+    map = L.map("map", { zoomControl: true, attributionControl: true, scrollWheelZoom: true, wheelPxPerZoomLevel: 90 }).setView([1.3521, 103.8198], 11);
     const satellite = L.layerGroup([
       L.tileLayer(SAT, { attribution: SAT_ATTRIB, maxZoom: 19, minZoom: 11 }),
       L.tileLayer(SAT_LABELS, { maxZoom: 19, minZoom: 11 }),
     ]).addTo(map);
-    L.control.layers({ Satellite: satellite, Street: tiles }, null, { position: "bottomleft", collapsed: false }).addTo(map);
     map.setMaxBounds([[1.144, 103.535], [1.494, 104.502]]);
     layer = L.layerGroup().addTo(map);
     map.on("click", (e) => {
@@ -264,7 +272,6 @@
     $("expand-btn").setAttribute("aria-pressed", String(on));
     $("expand-btn").setAttribute("aria-label", on ? "Close full-screen map" : "Expand map");
     $("expand-btn").innerHTML = `<i class="ph ph-${on ? "x" : "arrows-out"}" aria-hidden="true"></i>`;
-    if (on) map.scrollWheelZoom.enable(); else map.scrollWheelZoom.disable();
     setTimeout(() => map.invalidateSize(), 60);
   }
   function nearMe() {
