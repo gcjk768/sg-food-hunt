@@ -58,7 +58,7 @@ social:
 ai:                               # Claude via the Claude Code CLI (`claude -p`); falls back to rules if the CLI is missing
   enabled: true
   provider: claude_cli            # the only provider; needs the `claude` binary and ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN
-  model: claude-haiku-4-5-20251001  # was claude-sonnet-5-5 (web-search tasks only; text tasks go to Ollama)
+  model: claude-haiku-5-5  # was claude-sonnet-5-5 (web-search tasks only; text tasks go to Ollama)
   effort: low                     # low | medium | high: extraction and matching are simple tasks
   claude_bin: /shim/claude
   timeout_seconds: 3300
