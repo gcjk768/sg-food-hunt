@@ -15,6 +15,7 @@ services:
     restart: unless-stopped
     env_file: .env # TELEGRAM_BOT_TOKEN (+ optional GOOGLE_PLACES_API_KEY etc.)
     environment:
+      PATH: "/fb:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
       PLAYWRIGHT_WS_URL: ws://playwright:3000/
       TZ: Asia/Singapore
       SGFH_SCHEDULE: daily 08:00
@@ -29,6 +30,7 @@ services:
       SHIM_FALLBACK: unreachable
       SHIM_LOG: /app/logs/ollama-shim.log
     volumes:
+      - /volume1/docker/claude-fallback:/fb:ro   # claude -p fallback wrapper (API key -> subscription); /fb is first on PATH
       - ./config:/app/config
       - /volume1/docker/ollama/shim:/shim:ro # claude -p stand-in that answers from Ollama (settings.yaml claude_bin)
       - ./data:/app/data
