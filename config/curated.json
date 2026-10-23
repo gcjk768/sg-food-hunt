@@ -3186,6 +3186,440 @@
    "id": "v02903"
   }
  ],
+ "ice_cream": [
+  {
+   "id": "v00046"
+  },
+  {
+   "id": "v01240"
+  },
+  {
+   "id": "v01214"
+  },
+  {
+   "id": "v01224"
+  },
+  {
+   "name": "Birds of Paradise Gelato Boutique",
+   "address": "53 Craig Road #01-01, Singapore 089691",
+   "postal_code": "089691",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Gelato"
+   ],
+   "summary": "Botanical gelato made from flowers, herbs, nuts and spices. Named top pick on several 2026 Singapore guides.",
+   "website": null,
+   "phone": null,
+   "dishes": [
+    "Strawberry Basil",
+    "White Chrysanthemum",
+    "Lychee Raspberry",
+    "Thyme waffle cone"
+   ],
+   "hours": null,
+   "booking_url": null,
+   "lat": 1.277689776287836,
+   "lng": 103.8421823267469,
+   "source": {
+    "url": "https://thebestsg.com/best/gelato-shops",
+    "title": "The 12 Best Gelato Shops in Singapore (2026) - TheBest SG"
+   }
+  },
+  {
+   "name": "Apiary",
+   "address": "84 Neil Road, Singapore 088844",
+   "postal_code": "088844",
+   "price_text": "$$",
+   "per_pax": 6.5,
+   "cuisine": [
+    "Ice cream",
+    "Gelato"
+   ],
+   "summary": "Rotating roster of about nineteen flavours with a reputation for pistachio. A single scoop is about S$6-7.",
+   "website": null,
+   "phone": null,
+   "dishes": [
+    "73% Dark Chocolate",
+    "Wildflower Honey with Caramelized Cocoa Nibs",
+    "Pistachio"
+   ],
+   "hours": null,
+   "booking_url": null,
+   "lat": 1.279646277174443,
+   "lng": 103.8421684431586,
+   "source": {
+    "url": "https://singareviews.com/best-ice-cream-singapore/",
+    "title": "Best Ice Cream in Singapore: Top Dessert Spots"
+   }
+  },
+  {
+   "name": "Dopa Dopa Creamery",
+   "address": "29 South Bridge Road #01-01, Singapore 058665",
+   "postal_code": "058665",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Gelato"
+   ],
+   "summary": "Gelato known for house-roasted nuts and pistachio. Also has an outlet at 7 Tanjong Pagar Plaza.",
+   "website": null,
+   "phone": null,
+   "dishes": [
+    "Pistachio",
+    "House-roasted nut gelato"
+   ],
+   "hours": null,
+   "booking_url": null,
+   "lat": 1.287751480173483,
+   "lng": 103.8486661532937,
+   "source": {
+    "url": "https://www.thebestsingapore.com/the-5-best-gelato-shops-in-singapore/",
+    "title": "The 5 Best Gelato Shops in Singapore"
+   }
+  },
+  {
+   "name": "Momolato",
+   "address": "34 Haji Lane, Singapore 189227",
+   "postal_code": "189227",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Gelato"
+   ],
+   "summary": "Halal-certified gelato shop and Gelato World Tour winner. Also sells waffles and croffles.",
+   "website": null,
+   "phone": "<PHONE>",
+   "dishes": [
+    "Sea Salt Sicilian Pistachio",
+    "Hokkaido Hazelnut Chocolate",
+    "Ondeh Ondeh",
+    "Mao Shan Wang Durian",
+    "Oolong Kyoto Hojicha"
+   ],
+   "hours": "Mon-Thu 2pm-11pm, Fri-Sat 11am-1am, Sun 11am-11pm (one source)",
+   "booking_url": null,
+   "lat": 1.300914083831662,
+   "lng": 103.8590714209052,
+   "source": {
+    "url": "https://eatbook.sg/momolato-haji-lane/",
+    "title": "Momolato: Popular Dessert Cafe By An Asian Gelato Champion"
+   }
+  },
+  {
+   "name": "Monarchs & Milkweed",
+   "address": "78 Airport Boulevard #04-218 Jewel Changi Airport, Singapore 819666",
+   "postal_code": "819666",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Gelato"
+   ],
+   "summary": "Gelato shop that reopened at Jewel Changi Airport after closing its North Bridge Road shop.",
+   "website": null,
+   "phone": null,
+   "dishes": [],
+   "hours": null,
+   "booking_url": null,
+   "lat": 1.360341006610217,
+   "lng": 103.9890775502096,
+   "source": {
+    "url": "https://www.thebestsingapore.com/the-5-best-gelato-shops-in-singapore/",
+    "title": "The 5 Best Gelato Shops in Singapore"
+   }
+  },
+  {
+   "name": "Tofu G",
+   "address": "333A Orchard Road #03-30 Mandarin Gallery, Singapore 238867",
+   "postal_code": "238867",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Gelato"
+   ],
+   "summary": "Korean tofu-based gelato in flavours like Chodang Sweet Corn. Also has a Takashimaya outlet.",
+   "website": null,
+   "phone": null,
+   "dishes": [
+    "Chodang Sweet Corn",
+    "Korean tofu gelato"
+   ],
+   "hours": null,
+   "booking_url": null,
+   "lat": 1.302064505560855,
+   "lng": 103.8363409534752,
+   "source": {
+    "url": "https://www.asiaone.com/lifestyle/best-ice-cream-gelato-singapore",
+    "title": "Tofu G, Creamier: Best ice cream and gelato in Singapore - AsiaOne"
+   }
+  },
+  {
+   "name": "Alfero Artisan Gelato",
+   "address": "81 Mac Pherson Lane #01-37, Singapore 360081",
+   "postal_code": "360081",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Gelato"
+   ],
+   "summary": "Artisan gelato shop in the Mac Pherson area.",
+   "website": null,
+   "phone": null,
+   "dishes": [],
+   "hours": null,
+   "booking_url": null,
+   "lat": 1.332169382098752,
+   "lng": 103.8862966767322,
+   "source": {
+    "url": "https://www.thebestsingapore.com/the-5-best-gelato-shops-in-singapore/",
+    "title": "The 5 Best Gelato Shops in Singapore"
+   }
+  },
+  {
+   "name": "Milk & Honey Gelato",
+   "address": "86 Bedok North Street 4 #01-179, Singapore 460086",
+   "postal_code": "460086",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Gelato"
+   ],
+   "summary": "Neighbourhood gelato shop in Bedok North.",
+   "website": null,
+   "phone": null,
+   "dishes": [],
+   "hours": null,
+   "booking_url": null,
+   "lat": 1.332540843657208,
+   "lng": 103.9389893458101,
+   "source": {
+    "url": "https://www.thebestsingapore.com/the-5-best-gelato-shops-in-singapore/",
+    "title": "The 5 Best Gelato Shops in Singapore"
+   }
+  },
+  {
+   "name": "Sunday Folks",
+   "address": "44 Jalan Merah Saga #01-52 Chip Bee Gardens, Singapore 278116",
+   "postal_code": "278116",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Gelato"
+   ],
+   "summary": "Holland Village artisanal ice cream shop serving waffles. Also known for soft serve.",
+   "website": null,
+   "phone": null,
+   "dishes": [
+    "Sea Salt Gula Melaka",
+    "Earl Grey Lavender"
+   ],
+   "hours": null,
+   "booking_url": null,
+   "lat": 1.311921954250856,
+   "lng": 103.796844037126,
+   "source": {
+    "url": "https://www.burpple.com/features/the-best-soft-serve-in-singapore",
+    "title": "The Best Soft Serve In Singapore"
+   }
+  },
+  {
+   "name": "Creamier Handcrafted Ice Cream & Coffee",
+   "address": "131 Toa Payoh Lorong 1 #01-02, Singapore 310131",
+   "postal_code": "310131",
+   "price_text": "$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Gelato"
+   ],
+   "summary": "Handcrafted ice cream and specialty coffee shop at Toa Payoh. Called a neighbourhood favourite at wallet-friendly prices.",
+   "website": "https://creamier.com.sg",
+   "phone": "<PHONE>",
+   "dishes": [
+    "Handcrafted ice cream",
+    "Waffles",
+    "Specialty coffee"
+   ],
+   "hours": "12pm-10pm daily (official site; sources differ)",
+   "booking_url": null,
+   "lat": 1.337984588826065,
+   "lng": 103.8432888456413,
+   "source": {
+    "url": "https://creamier.com.sg/pages/scoop-shops",
+    "title": "Scoop Shops - Creamier"
+   }
+  },
+  {
+   "name": "Burnt Cones",
+   "address": "105 Clementi Street 12 #01-02, Singapore 120105",
+   "postal_code": "120105",
+   "price_text": "$$",
+   "per_pax": 5.0,
+   "cuisine": [
+    "Ice cream",
+    "Gelato"
+   ],
+   "summary": "Clementi gelato cafe with 12-14 rotating flavours and handmade light, medium or dark cones. Scoops start at about $5.",
+   "website": null,
+   "phone": "<PHONE>",
+   "dishes": [
+    "Black Sesame",
+    "Purple Yam",
+    "Kaya Cendol",
+    "Bronte Pistachio",
+    "Ugly Buttermilk Waffles"
+   ],
+   "hours": "9am-12am daily",
+   "booking_url": null,
+   "lat": 1.322711790288128,
+   "lng": 103.7698881036897,
+   "source": {
+    "url": "https://eatbook.sg/burnt-cones/",
+    "title": "Burnt Cones Review: Clementi Cafe Open Till 12am"
+   }
+  },
+  {
+   "name": "Azabu Sabo Hokkaido Ice Cream",
+   "address": "6 Eu Tong Sen Street #01-46 Clarke Quay Central, Singapore 059817",
+   "postal_code": "059817",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Gelato"
+   ],
+   "summary": "Hokkaido ice cream made from farm-fresh milk with over 30 flavours. Also at Takashimaya.",
+   "website": null,
+   "phone": "<PHONE>",
+   "dishes": [
+    "Hokkaido milk ice cream"
+   ],
+   "hours": null,
+   "booking_url": null,
+   "lat": 1.288838562482049,
+   "lng": 103.8465580247433,
+   "source": {
+    "url": "https://www.burpple.com/azabu-sabo-central",
+    "title": "Azabu Sabo Hokkaido Ice Cream (Clarke Quay Central)"
+   }
+  },
+  {
+   "name": "Hundred Acre Creamery",
+   "address": "109 Clementi Street 11 #01-37, Singapore 120109",
+   "postal_code": "120109",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Gelato"
+   ],
+   "summary": "Winnie the Pooh-themed ice cream cafe and original outlet, with handcrafted gelato and waffles. Several other outlets exist.",
+   "website": "https://hundredacre.sg",
+   "phone": null,
+   "dishes": [
+    "Handcrafted gelato",
+    "Waffles"
+   ],
+   "hours": "Tue-Sun 12pm-12am (one source)",
+   "booking_url": null,
+   "lat": 1.321980676555612,
+   "lng": 103.7707761173563,
+   "source": {
+    "url": "https://mapcarta.com/N8742754494",
+    "title": "Hundred Acre Creamery Map - Mapcarta"
+   }
+  },
+  {
+   "name": "Lickers",
+   "address": "124 Hougang Avenue 1 #01-1446, Singapore 530124",
+   "postal_code": "530124",
+   "price_text": "$",
+   "per_pax": 4.7,
+   "cuisine": [
+    "Ice cream",
+    "Gelato"
+   ],
+   "summary": "HDB void deck ice cream shop in Hougang with waffles. Scoops start from about $4.70 per Time Out.",
+   "website": "https://lickers.com.sg",
+   "phone": null,
+   "dishes": [
+    "Honeycomb",
+    "Oolong Lavender",
+    "Gunpowder Apricot",
+    "Yakult Oreo",
+    "Milo Mallow"
+   ],
+   "hours": "Mon 6.30pm-2am, Tue-Thu 1pm-2am, Fri-Sun 12pm-2am",
+   "booking_url": null,
+   "lat": 1.352892615374584,
+   "lng": 103.8866553497159,
+   "source": {
+    "url": "https://lickers.com.sg/pages/contact",
+    "title": "Scoop Shops - Lickers"
+   }
+  },
+  {
+   "name": "Venchi",
+   "address": "2 Orchard Turn #B1-25A ION Orchard, Singapore 238801",
+   "postal_code": "238801",
+   "price_text": "$$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Gelato"
+   ],
+   "summary": "Italian chocolate and gelato cafe; its first Singapore cafe with dine-in seating.",
+   "website": null,
+   "phone": "<PHONE>",
+   "dishes": [
+    "Gelato",
+    "Chocolate"
+   ],
+   "hours": "10am-10pm daily",
+   "booking_url": null,
+   "lat": 1.303979741445055,
+   "lng": 103.832032328465,
+   "source": {
+    "url": "https://www.foodadvisor.com.sg/restaurant/venchi-ion-orchard/",
+    "title": "Venchi (ION Orchard) - FoodAdvisor"
+   }
+  },
+  {
+   "name": "KOOKS Creamery",
+   "address": "Blk 211 Serangoon Avenue 4 #01-02, Singapore 550211",
+   "postal_code": "550211",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "Artisan ice cream shop known for molten lava cookies. Not halal-certified.",
+   "website": null,
+   "phone": "<PHONE>",
+   "dishes": [
+    "Artisan ice cream",
+    "Molten lava cookies",
+    "Cookie Cone"
+   ],
+   "hours": "Tue-Thu, Sun 12pm-10pm; Fri-Sat 12pm-11pm (old listing)",
+   "booking_url": null,
+   "lat": 1.356316888298294,
+   "lng": 103.8731754558605,
+   "source": {
+    "url": "https://danielfooddiary.com/2018/05/29/kookscreamery/",
+    "title": "Kooks Creamery"
+   }
+  }
+ ],
  "hide": [
   "(CLOSED) Error 404",
   "Sabio by the Sea",

@@ -238,3 +238,14 @@ def test_weekly_check_closed_venues_are_hidden(app_config: AppConfig, run_store:
     )
     data = read_json(build_site(app_config, run_store))
     assert "v1" in data["venues"] and "v2" not in data["venues"]
+
+
+def test_ice_cream_list_is_its_own_group(app_config: AppConfig, run_store: RunStore) -> None:
+    v1 = _venue("v1", "Alpha")
+    _write_run(run_store, "20260908T000000Z", [v1], _scores([("v1", "Alpha")]))
+    shop = {"name": "Cone Shop", "lat": 1.2796, "lng": 103.8428, "dishes": ["Salted Caramel"]}
+    write_json(app_config.config_dir / "curated.json", {"ice_cream": [{"id": "v1"}, shop]})
+    data = read_json(build_site(app_config, run_store))
+    assert [r["id"] for r in data["categories"]["ice_cream"]["ranked"]] == ["v1", "y002"]
+    assert data["venues"]["y002"]["why"] == "well-liked ice cream pick"
+    assert any(g["key"] == "ice_cream" and g["icon"] == "ice-cream" for g in data["groups"])

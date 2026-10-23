@@ -79,6 +79,11 @@ GROUPS: list[tuple[str, str, str, list[str]]] = [
     ("new", "New openings", "sparkle", ["new_cafes", "new_zichar", "new_restaurants"]),
     ("izakaya", "Izakaya", "beer-stein", ["izakaya"]),
 ]
+# hand-picked lists in curated.json: (key, label, icon, id prefix for the site-only venues)
+CURATED_LISTS = [
+    ("izakaya", "Izakaya", "beer-stein", "x"),
+    ("ice_cream", "Ice cream", "ice-cream", "y"),
+]
 
 
 def _run_time(run_id: str) -> datetime | None:
@@ -94,8 +99,8 @@ def _curated(config: AppConfig) -> dict[str, Any]:
     return read_json(path) if path.exists() else {}
 
 
-def _curated_row(x: dict[str, Any], vid: str) -> dict[str, Any]:
-    """A site row for a hand-picked venue (``izakaya`` in curated.json); the nearest MRT comes
+def _curated_row(x: dict[str, Any], vid: str, why: str) -> dict[str, Any]:
+    """A site row for a hand-picked venue (``CURATED_LISTS`` in curated.json); the nearest MRT comes
     from its coordinates. It counts as worth going: it was picked for being well liked."""
     lat, lng = x.get("lat"), x.get("lng")
     mrt = nearest_station(lat, lng)[0] if lat and lng else None
@@ -112,7 +117,7 @@ def _curated_row(x: dict[str, Any], vid: str) -> dict[str, Any]:
         "website": x.get("website"), "phone": x.get("phone"), "summary": x.get("summary"),
         "best_for": None, "dishes": x.get("dishes") or [], "aspects": {}, "noise": None,
         "trend": None, "first_seen": None, "new": False, "worth": True,
-        "why": "well-liked izakaya pick", "promo": None,
+        "why": why, "promo": None,
         "sources": [{"source": src.get("title") or "Curated", "title": src.get("title") or "Curated",
                      "url": src["url"], "date": None}] if src.get("url") else [],
     }  # fmt: skip
@@ -306,26 +311,25 @@ def build_site_data(
             config, v, pairs, new, promos.get(v["name"]), popular.get(v["name"])
         )
 
-    # the izakaya list: hand-picked outlets (curated.json) plus any scraped venue named in it
-    izakaya: list[str] = []
-    for i, x in enumerate(curated.get("izakaya") or []):
-        if x.get("id"):  # an id picks a venue the scrapers already know
-            if x["id"] in out_venues:
-                izakaya.append(x["id"])
-            continue
-        vid = f"x{i + 1:03d}"
-        out_venues[vid] = _curated_row(x, vid)
-        izakaya.append(vid)
-    if izakaya:
-        categories["izakaya"] = {
-            "key": "izakaya", "label": "Izakaya", "group": "izakaya", "party_size": 2,
-            "new": False, "digest_only": True,
-            "ranked": [{"id": vid, "rank": r, "score": 0, "components": {}, "adjustments": {}}
-                       for r, vid in enumerate(izakaya, 1)],
-        }  # fmt: skip
-        groups.append(
-            {"key": "izakaya", "label": "Izakaya", "icon": "beer-stein", "categories": ["izakaya"]}
-        )
+    # hand-picked lists (curated.json): outlets with full entries plus any scraped venue named by id
+    for key, label, icon, prefix in CURATED_LISTS:
+        picked: list[str] = []
+        for i, x in enumerate(curated.get(key) or []):
+            if x.get("id"):  # an id picks a venue the scrapers already know
+                if x["id"] in out_venues:
+                    picked.append(x["id"])
+                continue
+            vid = f"{prefix}{i + 1:03d}"
+            out_venues[vid] = _curated_row(x, vid, f"well-liked {label.lower()} pick")
+            picked.append(vid)
+        if picked:
+            categories[key] = {
+                "key": key, "label": label, "group": key, "party_size": 2,
+                "new": False, "digest_only": True,
+                "ranked": [{"id": vid, "rank": r, "score": 0, "components": {}, "adjustments": {}}
+                           for r, vid in enumerate(picked, 1)],
+            }  # fmt: skip
+            groups.append({"key": key, "label": label, "icon": icon, "categories": [key]})
 
     diff_path = run_dir / "diff.json"
     diff = read_json(diff_path) if diff_path.exists() else {}
