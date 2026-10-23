@@ -1423,6 +1423,398 @@
    "Filet Mignon au Poivre",
    "Crème Brûlée"
   ],
+  "Best Employee Fried Chicken": [
+   "Dino Set",
+   "Chicken Pops",
+   "Chicken Breast",
+   "Hash Pops",
+   "Fried Bai Ye Tofu"
+  ],
+  "Jypsy": [
+   "Nest of Fries",
+   "Jypsy Salmon Tacos",
+   "Wagyu Beef Dripping Fried Rice",
+   "Spicy Popcorn Shrimp",
+   "Torched Wagyu Crispy Nigiri"
+  ],
+  "Caffe Fernet": [
+   "Mafaldine Cacio e Pepe",
+   "Housemade Ricotta",
+   "Charred Octopus",
+   "Spanner Crab Spaghetti",
+   "Olive Oil Cake"
+  ],
+  "OverEasy": [
+   "Truffle Burger",
+   "To-Die-For Burger",
+   "Beer Can Chicken",
+   "Mac & Cheese",
+   "Baby Back Ribs"
+  ],
+  "Marguerite": [
+   "Obsiblue Prawn Noodles",
+   "Duck Neck Sausage",
+   "Dry-aged Ora King Salmon",
+   "Gippsland Black Angus Steak"
+  ],
+  "Prego": [
+   "Casarecce alle Costine e Tartufo",
+   "Linguine Astice e Burrata",
+   "Ravioli di Granchio allo Zafferano",
+   "Cappuccino di Funghi",
+   "Margherita Pizza"
+  ],
+  "Griglia Open Fire Italian Kitchen": [
+   "Hokkaido Scallops",
+   "House-made Pappardelle",
+   "Fusilli with Crab and Nduja",
+   "Burratina",
+   "Cappucinomisu"
+  ],
+  "Woke by Wake the Crew": [
+   "Basque Burnt Cheesecake",
+   "Charcoal Sourdough Sandwich",
+   "Golden Chicken Kaarage",
+   "Dirty Latte"
+  ],
+  "Mimmo Bakery": [
+   "Pistachio Bolo Bao",
+   "Egg Tart",
+   "Apple Croissant",
+   "Tigre",
+   "Milk Tiramisu"
+  ],
+  "Madeleine’s Original Portuguese Egg Tarts": [
+   "Original Portuguese Egg Tart",
+   "Gula Melaka Portuguese Egg Tart",
+   "Po Tat a la Mode",
+   "Bolo Bun",
+   "Pan Roasted African Chicken"
+  ],
+  "Tiap Tiap": [
+   "Pandan Chiffon Cake",
+   "Ondeh Ondeh Cake",
+   "OG Chocolate Creamed Cake",
+   "Orange Chiffon Cake",
+   "Banoffee Pie"
+  ],
+  "Crema Cloud": [
+   "Yabukita Matcha Latte",
+   "Spanish Latte",
+   "Cafe Latte",
+   "Roasted Hazelnut Latte"
+  ],
+  "Sip Sip": [
+   "Cast Iron French Toast",
+   "Nori Cold Pasta",
+   "Iberico Pork Jowl Flatbread",
+   "Two-sheet Lasagna",
+   "Roman Iced Coffee"
+  ],
+  "Shu Bakery": [
+   "Uni Scrambled Egg Toast",
+   "Duck Rillette Toast",
+   "Chu + Shu Toast",
+   "Cold Stracciatella Toast",
+   "Tiramisu"
+  ],
+  "Moof": [
+   "Black Sesame Matcha",
+   "Strawberry Royal Milk Pudding",
+   "Hojicha Latte",
+   "Classic Matcha Latte"
+  ],
+  "Mozmoji": [
+   "Cotton Cheesecake",
+   "Matcha Strawberry Cake",
+   "Black Tea Basque",
+   "Salted Cocoa Latte",
+   "Black Sesame Vienna"
+  ],
+  "Touchwood Breakfast Bar": [
+   "Smashed Egg, Bacon & Onion English Muffin",
+   "Cheesy Egg Mushroom Muffin",
+   "Sausage & Cheese Muffin",
+   "Maple Malted Scone",
+   "Tomato Cheese Danish"
+  ],
+  "Puny Platypus Coffee": [
+   "Mont Blanc",
+   "Earl Grey Cloud",
+   "Coco Matcha",
+   "Strawberry Matcha"
+  ],
+  "Park Side": [
+   "Luncheon Bun",
+   "Kaya, Bacon & Eggs",
+   "Hummingbird Pancake",
+   "Tamarind Hot Honey Chicken Burger",
+   "Spiced Fish & Chips"
+  ],
+  "Third Floor Social": [
+   "Brillat Savarin Sticky Malt Loaf",
+   "Braised Beef Cheek",
+   "Churro with Tahini Ice Cream",
+   "Focaccia with Mortadella and Stracciatella",
+   "Calamansi Pie"
+  ],
+  "Dona Manis Heritage Bakehouse": [
+   "Original Banana Pie",
+   "Apple Crumble",
+   "Chocolate Banana Pie",
+   "Heritage Creamy Chicken Pie",
+   "Banana Cake"
+  ],
+  "Smear’d Coffee Bagels": [
+   "Hot Honey Chicken Bagel",
+   "Mentaiko Prawn Bagel",
+   "Butter & Cream Cheese Bagel",
+   "Grilled Cheese Bagel",
+   "Bagel Benny"
+  ],
+  "Bean There Cafe by Degree Celcius": [
+   "Original Shio Pan",
+   "Mentaiko Shio Pan",
+   "Ham & Cheese Shio Pan",
+   "Strawberries and Cream Shio Pan",
+   "Butter Mochi"
+  ],
+  "Living Room": [
+   "Ricotta Sourdough Toast",
+   "Basque Cheesecake",
+   "Coconut Americano",
+   "Einspanner"
+  ],
+  "Fernweh": [
+   "Rendang Beef Benedict",
+   "Roti John French Toast",
+   "Kaya Creme Brulee French Toast",
+   "Har Cheong Gai Don",
+   "Sesame Tang Yuan Fritters"
+  ],
+  "Average Service (new menu!)": [
+   "Thick Slab Bacon",
+   "Mentai Handkerchief Pasta",
+   "Average Maple Toast",
+   "Dirty Nori Capellini with Tiger Prawns",
+   "Grilled Pork Jowl with Truffle Jus"
+  ],
+  "Big Mouth Bakehouse": [
+   "Thai Beef Salad Focaccia Sandwich",
+   "Laksa Mayo Heirloom Tomato Flatbread",
+   "Tempeh Balado Focaccia",
+   "Dulce de Leche Banana Cream Pie",
+   "Matilda Cake"
+  ],
+  "Bloom & Boom": [
+   "Lychee Rose Mille Crepe Cake",
+   "Berry Bavarois",
+   "Gateau Basque",
+   "Olive Oil Garlic Prawns",
+   "Pan-seared Foie Gras"
+  ],
+  "Hues Canele": [
+   "Taro Canele",
+   "Chocolate Almond Canele",
+   "Salted Caramel Canele",
+   "Earl Grey Lavender Canele",
+   "Mr. Fuji Canele"
+  ],
+  "Offsite": [
+   "Fish Otah Melt",
+   "Portobello Melt",
+   "Umami Pork Sandwich",
+   "Handmade Dumplings",
+   "Banoffee Pie"
+  ],
+  "Cloudfields": [
+   "Cacio e Pepe Fries",
+   "Negitoro Kimchi Tuna Melt",
+   "Pork & Potatoes Benny",
+   "Free-range Roasted Chicken",
+   "Short Rib Rendang Pasta"
+  ],
+  "Studio Frond": [
+   "Miso Butterscotch Matcha Latte",
+   "White Corn Matcha",
+   "Hojicha Miso Butterscotch",
+   "Usucha"
+  ],
+  "Oatsome": [
+   "Greek Yoghurt Bowl",
+   "Apple Cinnamon Parfait",
+   "Black Sesame Injeolmi Bbang",
+   "Pistachio Cinnamon Bun",
+   "Cookies and Cream Overnight Oats"
+  ],
+  "Marlow’s Deli": [
+   "Salt Beef Sanga",
+   "Cluckin' Good",
+   "Ocean Melt",
+   "Honey, I'm Ham",
+   "Strawberry Matcha Foam Latte"
+  ],
+  "Pomegranate": [
+   "Full English Breakfast",
+   "Eggs Royale",
+   "Classic Beef Burger",
+   "Afternoon Tea Set",
+   "Chicken Katsu Sandwich"
+  ],
+  "Maxi Coffee Bar": [
+   "Iced Cereal Milk Latte",
+   "Coconut Cold Brew",
+   "Cashew Butter Toast",
+   "Kaya Butter Toast",
+   "B.E.C. Muffin"
+  ],
+  "Joji’s Diner": [
+   "Chicken & Waffles",
+   "Smash Burger",
+   "All-Star Platter",
+   "Chili Dog"
+  ],
+  "Tolido’s Espresso Nook": [
+   "Rosti with Smoked Bratwurst",
+   "Pandan Pancakes",
+   "Prawn Laksa Pasta",
+   "Stout Glazed Bacon French Toast",
+   "Shakshouka"
+  ],
+  "Symmetry": [
+   "Crab on Toast",
+   "Big Breakfast",
+   "Lamb Shakshouka",
+   "Waffles",
+   "Truffle Fries"
+  ],
+  "Common Man Coffee Roasters": [
+   "Common Man Full Breakfast",
+   "King Prawn Mac & Cheese",
+   "Breakfast Pancakes",
+   "Grilled Barramundi",
+   "Kaya Toast Latte"
+  ],
+  "Moonchild": [
+   "Pork Dan Dan Scallion Noodles",
+   "Scallop Rose Mafaldine",
+   "Potato Stack with Smoked Salmon",
+   "Butterscotch Rum Bananas Toast",
+   "Cereal Prawn Pasta"
+  ],
+  "Chez Suzette": [
+   "Crepes Suzette",
+   "Smoked Salmon Eggs Benedict",
+   "Croque Monsieur",
+   "Escargots Bourguignon",
+   "French Onion Soup"
+  ],
+  "Punch": [
+   "Earl Grey Pancakes",
+   "Poached Eggs with Smashed Avocado on Sourdough",
+   "Grilled Cheese Toast with Tomato Soup"
+  ],
+  "Baia": [
+   "Hamachi Tartare",
+   "Duck Samosas",
+   "Wagyu Beef Bavette",
+   "Truffle Pizza",
+   "Tiramisu"
+  ],
+  "Shang Palace": [
+   "Baked Live Prawns with Garlic and Sarawak White Peppercorn",
+   "Deep-fried Stuffed Mud Crab Meat in Shell",
+   "Barbecued Iberico Pork Loin with Honey Sauce",
+   "Applewood Smoked Bean Curd Roll"
+  ],
+  "Restaurant Born": [
+   "Fried Bao with Oyster",
+   "Monkfish with Chicken Fat",
+   "Pigeon, Grains and Corn",
+   "Sweet Potato, Oolong and Sea Salt"
+  ],
+  "Gary’s": [
+   "Gary's Garden Salad",
+   "Red Prawn Tartare",
+   "Beef Cheek Ragu Pappardelle",
+   "Stuffed Seabass",
+   "Tiramisu"
+  ],
+  "Sol & Luna": [
+   "White Gazpacho",
+   "Braised Lamb Shoulder",
+   "Grilled Tomino Cheese",
+   "Truffle Risotto",
+   "Fried Soft-Shell Prawn"
+  ],
+  "Binary": [
+   "Kubaneh Bread",
+   "Octopus",
+   "Chicken Wings",
+   "Tiger Prawns",
+   "Wagyu Flank Steak"
+  ],
+  "Tomacado": [
+   "Honey Roasted Pumpkin Salad",
+   "Cured Salmon",
+   "Wild Mushroom Soup",
+   "Chicken with Black Truffle",
+   "Wagyu Steak"
+  ],
+  "Ichigo Ichie": [
+   "Chilled Somen with Kuruma Ebi and Uni",
+   "Beef Donabe Rice",
+   "Abalone in Liver Sauce"
+  ],
+  "RISE Restaurant": [
+   "Singapore Chilli Crab",
+   "Ayam Buah Keluak",
+   "Wagyu Beef Cheek Rendang",
+   "Teh Tarik Ice Cream",
+   "Chendol"
+  ],
+  "Beach Road Kitchen": [
+   "Singapore Chilli Crab",
+   "Seafood Laksa",
+   "Signature Chicken Rice",
+   "Tomahawk Steak",
+   "Truffle Mushroom Pizza"
+  ],
+  "Bebek Goreng Pak Ndut": [
+   "Bebek Goreng Original",
+   "Sop Buntut",
+   "Ayam Penyet",
+   "Bebek Bakar",
+   "Kangkong Belacan"
+  ],
+  "Tipo Pasta Bar": [
+   "Truffle Tramezzini",
+   "Royal Ragu",
+   "Classy Carbonara",
+   "Black Prawn Squid Ink Pasta",
+   "Absolute Alfredo"
+  ],
+  "All Things Delicious": [
+   "Shakshouka",
+   "Gula Melaka Scones",
+   "Wholesome Breakfast",
+   "Beef Brisket on Sourdough",
+   "Sticky Toffee Pudding"
+  ],
+  "Anchorvale Village Hawker Centre": [
+   "Chee Cheong Fun",
+   "Fried Chicken Wings",
+   "Hokkien Mee",
+   "Thunder Tea Rice",
+   "Min Jiang Kueh"
+  ],
+  "Changi Village Hawker Centre": [
+   "Nasi Lemak",
+   "Mee Rebus",
+   "Ipoh Hor Fun",
+   "Lor Mee",
+   "Ayam Penyet"
+  ],
   "Supernova": [
    "Fried Chicken French Toast",
    "Steak Hash",
