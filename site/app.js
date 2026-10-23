@@ -95,12 +95,10 @@
   // ------------------------------------------------------------ hero
   function renderLede() {
     const n = Object.keys(D.venues).length;
-    const src = D.sources.length ? listJoin(D.sources) : "the food blogs";
     const when = D.run_finished_at ? fmtDate(D.run_finished_at) : D.run_id;
-    $("lede").textContent = `${n} places from ${src}, re-ranked every morning. Last run ${when}.`;
+    $("lede").textContent = `${n} places, re-ranked every morning. Last run ${when}.`;
     $("promos-link").dataset.count = String(D.promos.count || 0);
     $("foot").innerHTML =
-      `<span>Sources: ${esc(D.sources.join(", "))}</span>` +
       `<span>Basemap ${ATTRIB}, ${SAT_ATTRIB}</span>` +
       `<span>Blog and review data, not a booking. Check hours before you go.</span>` +
       `<span>Run <code>${esc(D.run_id)}</code></span>`;
@@ -479,5 +477,4 @@
     const d = new Date(iso);
     return isNaN(d) ? iso : d.toLocaleString("en-SG", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Singapore" });
   }
-  function listJoin(a) { return a.length < 2 ? a.join("") : `${a.slice(0, -1).join(", ")} and ${a[a.length - 1]}`; }
 })();
