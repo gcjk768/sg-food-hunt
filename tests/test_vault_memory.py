@@ -72,7 +72,7 @@ def test_history_is_append_only_and_tracks_rank_moves(app_config: AppConfig, vau
     lines = history_lines(note)
     assert len(lines) == 4
     assert "🆕 **first seen** · run r1" in lines[0]
-    assert "🆕 **entered top 15** · #5 · Best zi char" in lines[1]
+    assert "🆕 **entered top 25** · #5 · Best zi char" in lines[1]
     assert "⬆️ **moved up** · #5 → #2 · Best zi char" in lines[2]
     assert lines[3].endswith("**card sent** · #2 · Zi")
     assert note is not None and "my own words" in note.body  # ## My notes survives

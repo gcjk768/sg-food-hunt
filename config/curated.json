@@ -2280,6 +2280,272 @@
    "Chicken Meatball Marinara Sandwich",
    "Spam Fries"
   ],
+  "The Lokal": [
+   "Banana Bread",
+   "Sticky Date Pudding",
+   "Lobster Roll",
+   "Fat Chips with Truffle Oil",
+   "Cape Grim Sirloin Steak Tagliata"
+  ],
+  "Trapizza": [
+   "Pizza Siciliana",
+   "Pizza Aloha",
+   "Pizza di Mare",
+   "Pinsa Napoli",
+   "Trapizza Linguine"
+  ],
+  "AN Omakase Singapore: S$61 off AN Omakase’s S$238 menu": [
+   "Amaebi with Torched Foie Gras",
+   "Otoro with Caviar",
+   "Uni Handroll",
+   "Yuzu-seared Scallop"
+  ],
+  "Hock Hai (Hong Lim) Curry Chicken Noodle (#03-14)": [
+   "Curry Chicken Bee Hoon Mee",
+   "Satay Bee Hoon"
+  ],
+  "Makan Melaka": [
+   "Cendol Melaka",
+   "Claypot Asam Pedas Melaka",
+   "Mee Soto Melaka",
+   "Nasi Lemak",
+   "Mee Rebus"
+  ],
+  "Estuary": [
+   "Signature Sarawak Claypot Rice",
+   "Charcoal-grilled Aged Fish",
+   "Haddock Fish and Chips",
+   "Fresh Oysters",
+   "Sakura Pork Chop"
+  ],
+  "Slurp": [
+   "Boat Noodles",
+   "Pad Thai",
+   "Pad Mama Prawn Tobiko Lava",
+   "Prawn Cakes",
+   "Moo Ping Pork Skewers"
+  ],
+  "Sushi Masa by Ki-setsu": [
+   "Flamed Otoro with Leek",
+   "Anago Sushi",
+   "Negitoro Monaka",
+   "Grilled Ankimo"
+  ],
+  "Ginza Sushi-Ichi": [
+   "Mushi Awabi (Steamed Abalone)",
+   "Kegani Hairy Crab",
+   "Otoro Nigiri",
+   "Uni and Ikura Rice Bowl"
+  ],
+  "Nikuya Tanaka": [
+   "Kobe Wagyu Steak",
+   "Beef Tataki",
+   "Ice Somen",
+   "Kobe Beef Tenderloin Tempura"
+  ],
+  "Sushi Masaaki": [
+   "Uni Cake",
+   "Uni and Caviar Sushi",
+   "Kawahagi Nigiri with Liver",
+   "Hokkaido Hairy Crab"
+  ],
+  "Hamamoto": [
+   "Matsuba-gani Snow Crab",
+   "Ise Ebi Sashimi with Uni and Caviar",
+   "Nodoguro Nigiri",
+   "Sendai Wagyu with Uni and Truffle"
+  ],
+  "Sushi Ayumu by Masa Ishibashi": [
+   "Ayumu Roll",
+   "Nodoguro",
+   "Ankimo Monaka",
+   "Ikura Uni Don"
+  ],
+  "Sushi Ashino": [
+   "Aged Otoro",
+   "Aged Botan Shrimp",
+   "Chargrilled Nodoguro",
+   "Uni"
+  ],
+  "Sushi Kenji": [
+   "Chawanmushi",
+   "Uni and Ikura Rice Bowl",
+   "Chutoro Sashimi",
+   "Anago Nigiri"
+  ],
+  "Takahashi Singapore": [
+   "Karesansui Zen Garden Platter",
+   "Crab Croquette",
+   "Unagi and Anago Competition",
+   "Abalone Katsu with Uni",
+   "Negitoro Handroll"
+  ],
+  "Sushi Kawasemi": [
+   "Aged Akami Zuke",
+   "Otoro Aburi",
+   "Hamaguri Osuimono",
+   "Charcoal-grilled Anago",
+   "Tamagoyaki"
+  ],
+  "Hao Kee Seafood Deluxe": [
+   "Chao Tah Bee Hoon",
+   "Chye Poh Hor Fun",
+   "Kailan with Pork Floss",
+   "Mee Sua Kueh",
+   "Garlic Chicken"
+  ],
+  "Chui Xiang Kitchen": [
+   "Live Lobster Porridge",
+   "Marmite Pork Ribs",
+   "Signature Beancurd with Golden Mushroom",
+   "Teochew Cabbage Chicken",
+   "Pepper Crab"
+  ],
+  "Hong Kong Street Zhen Ji": [
+   "San Lau Hor Fun",
+   "XO Fish Head Bee Hoon",
+   "Prawn Paste Chicken",
+   "Sweet and Sour Pork"
+  ],
+  "Hualong Fishhead Steamboat": [
+   "Charcoal Fishhead Steamboat",
+   "Wok-fried White Bee Hoon",
+   "Salted Egg Chicken",
+   "Crispy Salted Egg Calamari",
+   "Pan Fried King Prawns"
+  ],
+  "Siang Hee Seafood": [
+   "Pumpkin Prawns",
+   "Deep-fried Pork Knuckle",
+   "Coffee Pork Ribs",
+   "Prawn Paste Chicken",
+   "Coffee Crab"
+  ],
+  "Ban Leong Wah Hoe": [
+   "Chilli Crab",
+   "Black Pepper Crab",
+   "Har Cheong Gai",
+   "Moonlight Hor Fun",
+   "Hei Zhor"
+  ],
+  "Kam Jia Zhuang Seafood": [
+   "Deep-Fried Prawn Ball with Pumpkin Butter Sauce",
+   "Dong Po Pork Belly",
+   "Black Currant Sauce Pork Ribs",
+   "Claypot Sea Cucumber with Fish Maw"
+  ],
+  "Yeo Keng Nam Chicken Rice": [
+   "Hainanese Chicken Rice",
+   "Salted Egg Pork Ribs",
+   "Claypot Brinjal",
+   "Pig Stomach Soup"
+  ],
+  "136 Hong Kong Street Fish Head Steamboat": [
+   "Claypot Braised Mee Tai Mak",
+   "Fish Head Steamboat",
+   "Curry Hor Fun with Chicken",
+   "Prawn Paste Chicken",
+   "Salted Egg Chicken"
+  ],
+  "Yang Ming Seafood": [
+   "Andrew Lobster Chee Cheong Fun",
+   "Pig's Stomach Chicken Soup",
+   "Salt Baked Crab",
+   "Soy Bean and Egg Steamed Fish",
+   "Chao Tah Pig Trotter Chee Cheong Fun"
+  ],
+  "Hua Yu Wee": [
+   "Chilli Crab",
+   "Black Pepper Crab",
+   "Feng Sha Chicken",
+   "La La Hor Fun",
+   "Coffee Ribs"
+  ],
+  "Jiak Modern Tsechar": [
+   "Signature Curry Fish Head",
+   "Mala Fish Head",
+   "Prawn Paste Chicken",
+   "Oats Sotong",
+   "Slipper Lobster Black Bee Hoon"
+  ],
+  "Choice Cuts Pizza & Records": [
+   "Classic Cheese Pizza",
+   "Pepperoni Pizza",
+   "Big Poppa Pizza",
+   "MF Shroom Pizza",
+   "Bronx Bomber Pizza"
+  ],
+  "Appetite": [
+   "Tortilla de Camarones",
+   "Hokkaido Corn Custard with Uni",
+   "Foie Gras and Chicken Liver Parfait on Toast",
+   "Polenta with Braised Beef Cheeks"
+  ],
+  "Muro Coffee Chinatown": [
+   "Mad Cheese Focaccia",
+   "Pastrami Affair Focaccia",
+   "The Full Foc",
+   "Chicken Pesto Focaccia",
+   "Ponzu Salmon Focaccia"
+  ],
+  "DLLM (Dinner Lok Lok Menu)": [
+   "Enoki bacon skewer",
+   "Broccoli skewer",
+   "Taukey (crispy beancurd skin)",
+   "Fried mantou with condensed milk",
+   "Cheese tofu"
+  ],
+  "VeganBurg": [
+   "Chilli Krab burger",
+   "Creamy Shrooms burger",
+   "Hainanese Chicken burger",
+   "Seaweed fries"
+  ],
+  "Le Jardin": [
+   "Croissant Waffle",
+   "Potato Rosti",
+   "Forest Mushroom Tagliatelle",
+   "Black Angus Ribeye",
+   "Burnt Basque Cheesecake"
+  ],
+  "The Naked Finn": [
+   "Lobster roll",
+   "Hae mee tng (prawn noodles)",
+   "Fish and chips",
+   "Deep-fried soon hock"
+  ],
+  "Chat Masala": [
+   "Butter chicken",
+   "Mysore mutton",
+   "Mama Mia mussels",
+   "Kerala meen curry",
+   "Chicken biryani"
+  ],
+  "Ah Orh Seafood Restaurant": [
+   "Oyster omelette",
+   "Braised duck",
+   "Teochew steamed pomfret",
+   "Orh nee",
+   "Fish head steamboat"
+  ],
+  "Pietro Ristorante Italiano": [
+   "Tiramisu al Pistacchio",
+   "Pizza Quattro Formaggi",
+   "Linguine al Cartoccio",
+   "Spaghetti alla Carbonara",
+   "Calamari Fritti"
+  ],
+  "Red House Seafood": [
+   "Red House chilli crab",
+   "Lobster in creamy custard sauce",
+   "Black pepper crab",
+   "Braised fish meat noodles",
+   "Crab meat pao fan"
+  ],
+  "Briyani by Hamidah Bi (#01-14)": [
+   "Mutton briyani",
+   "Chicken briyani"
+  ],
   "Garibaldi Italian Restaurant & Bar": [
    "Ossobuco",
    "Costoletta alla Milanese",
@@ -2958,6 +3224,21 @@
   "Two Bakers",
   "Starter Lab",
   "Luxe Singapore",
-  "Eden Restaurant"
+  "Eden Restaurant",
+  "Tingkat PeraMakan",
+  "Pacamara",
+  "Paddy Hills",
+  "The Catch Seafood Restaurant & Bar",
+  "Buckaroo BBQ & Grill Restaurant",
+  "Wild Oats",
+  "Riders Cafe",
+  "Nosh",
+  "Seletar Hills Restaurant",
+  "Da Paolo BistroBar",
+  "One Punggol",
+  "Swee Lee Clarke Quay",
+  "Cygnet Bar",
+  "Kampung Kitchen",
+  "Details at a glance"
  ]
 }

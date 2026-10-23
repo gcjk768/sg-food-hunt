@@ -225,3 +225,16 @@ def test_curated_hide_keeps_closed_venues_off_every_list(
     data = read_json(build_site(app_config, run_store))
     assert "v1" in data["venues"] and "v2" not in data["venues"]
     assert all(r["id"] != "v2" for c in data["categories"].values() for r in c["ranked"])
+
+
+def test_weekly_check_closed_venues_are_hidden(app_config: AppConfig, run_store: RunStore) -> None:
+    v1, v2 = _venue("v1", "Alpha"), _venue("v2", "Gone Cafe")
+    _write_run(
+        run_store, "20260908T000000Z", [v1, v2], _scores([("v1", "Alpha"), ("v2", "Gone Cafe")])
+    )
+    data_dir = app_config.resolve(app_config.settings.paths.data_dir)
+    write_json(
+        data_dir / "closed.json", {"closed": {"Gone Cafe": {"note": "x", "url": "https://x"}}}
+    )
+    data = read_json(build_site(app_config, run_store))
+    assert "v1" in data["venues"] and "v2" not in data["venues"]

@@ -235,7 +235,10 @@ def build_site_data(
     bootstrap = all_runs[0].run_id if all_runs else None  # first run saw everything "new"
     curated = _curated(config)
     popular: dict[str, list[str]] = curated.get("dishes") or {}
-    hide = set(curated.get("hide") or [])  # closed, moved or not a place to eat: kept off every list
+    closed_path = data_dir / "closed.json"  # found by the weekly check (sgfoodhunt/recheck.py)
+    found_closed = read_json(closed_path).get("closed") or {} if closed_path.exists() else {}
+    # closed, moved or not a place to eat: kept off every list
+    hide = set(curated.get("hide") or []) | set(found_closed)
 
     categories: dict[str, Any] = {}
     tops: dict[str, list[tuple[int, str]]] = {}

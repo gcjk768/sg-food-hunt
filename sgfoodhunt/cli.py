@@ -228,6 +228,7 @@ def run(
         _notify(config, ranked.diff)
     _occasion(config, store)
     _promos(config, store)
+    _recheck(config, store)
     _site(config, store)
     console.print(
         f"\nrun note: {vault.note_path('Runs', record.run_id)}\n"
@@ -302,6 +303,21 @@ def _promos(config: AppConfig, store: RunStore, force: bool = False) -> str:
         return "failed"
     if out != "not due yet":
         log.info("promo message: %s", out)
+    return out
+
+
+def _recheck(config: AppConfig, store: RunStore, force: bool = False) -> str:
+    """The weekly still-open check for the places on your lists. Never fails a run."""
+    from sgfoodhunt.recheck import run_recheck
+
+    try:
+        _, cache, _ = _paths(config)
+        out = run_recheck(config, store, build_ai_client(config.settings.ai, cache), force=force)
+    except Exception as exc:
+        log.warning("recheck failed: %s", exc)
+        return "failed"
+    if out != "not due yet":
+        log.info("recheck: %s", out)
     return out
 
 
@@ -622,6 +638,19 @@ def promos(
     config = _load(config_dir)
     store, _, _ = _paths(config)
     console.print(f"promos: {_promos(config, store, force=force)}")
+
+
+@app.command()
+def recheck(
+    config_dir: ConfigOpt = Path("config"),
+    force: Annotated[
+        bool, typer.Option("--force", help="Check now, ignoring the 7 day gap")
+    ] = False,
+) -> None:
+    """Search whether the places on your lists have closed; the website drops the ones that have."""
+    config = _load(config_dir)
+    store, _, _ = _paths(config)
+    console.print(f"recheck: {_recheck(config, store, force=force)}")
 
 
 @app.command("notify-test")

@@ -436,7 +436,14 @@
       `<h3>Opening hours</h3>${hoursHtml(v.hours)}` +
       (entry && Object.keys(entry.components).length ? `<h3>Why it ranks #${entry.rank} on ${esc(shortLabel(scored.cat))}</h3>${scoreHtml(entry)}` : "") +
       (v.sources.length ? `<h3>Where it was recommended</h3><ul class="sources">${v.sources.map((s) => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a><small>${esc(s.source)}${s.date ? ` ${s.date.slice(0, 7)}` : ""}</small></li>`).join("")}</ul>` : "") +
+      `<p class="report"><small>Checked ${esc((D.generated_at || "").slice(0, 10))}. Closed, moved or wrong? <a href="${esc(reportUrl(v))}" target="_blank" rel="noopener">Report it</a></small></p>` +
       `</div>`;
+  }
+
+  /* A report is a prefilled GitHub issue on the app's repo: no server needed, and it reaches the owner. */
+  function reportUrl(v) {
+    const body = `Venue: ${v.name}\nId: ${v.id}\nAddress: ${v.address || ""}\n\nWhat is wrong (closed, moved, wrong dish or price)?\n`;
+    return "https://github.com/gcjk768/sg-food-hunt/issues/new?labels=data&title=" + encodeURIComponent("Report: " + v.name) + "&body=" + encodeURIComponent(body);
   }
 
   function hoursHtml(h) {

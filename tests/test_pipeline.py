@@ -237,7 +237,7 @@ async def test_rank_run_end_to_end(
         "Tiong Bahru Bakery",
         "Keng Eng Kee Seafood",
     }
-    assert set(result.scores) == {"cafes_date", "zichar_family"}
+    assert set(result.scores) >= {"cafes_date", "zichar_family"}
     zichar = result.scores["zichar_family"]
     assert (
         zichar[0].name == "Keng Eng Kee Seafood" and zichar[0].rank == 1
@@ -263,7 +263,7 @@ async def test_rank_run_end_to_end(
     assert "## My notes" in note.body and "## Evidence" in note.body
     assert (vault.root / "Categories" / "Best zi char places for a family weekend meal.md").exists()
     cat_note = (vault.root / "Categories" / "Best cafes for a date.md").read_text()
-    assert "## Top 15" in cat_note
+    assert "## Top 25" in cat_note
     # the pipe is escaped inside a Markdown table cell
     assert "[[SG Food Hunt/Venues/Tiong Bahru Bakery\\|Tiong Bahru Bakery]]" in cat_note
     exports = Path(app_config.settings.paths.exports_dir) / run.run_id

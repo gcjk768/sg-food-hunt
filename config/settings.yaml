@@ -77,6 +77,6 @@ exports:
   json: true
 
 notifications:
-  telegram: true
+  telegram: false
   email: false
   rating_change_threshold: 0.2

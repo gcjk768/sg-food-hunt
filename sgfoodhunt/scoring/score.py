@@ -189,10 +189,27 @@ def michelin_level(award: str | None) -> float | None:
 
 
 # --- filters ----------------------------------------------------------------------------------
+# Listicle scrapes sometimes return a closed place, a mall or a bare area name as a "restaurant".
+NOT_A_PLACE_RE = re.compile(
+    r"\((?:temporarily |permanently )?closed\)|\bpermanently closed\b"
+    r"|^\W*\d*\W*$|^(?:north|south|east|west|central) singapore$"
+    r"|\b(?:mall|plaza|jewellers?|museum)\b|\bshopping (?:centre|center)\b",
+    re.IGNORECASE,
+)
+# a hotel or resort scraped as a venue carries its restaurants' "$" label, so keep it out of the cheap tiers
+HOTEL_RE = re.compile(
+    r"\b(?:hotel|resort|mandarin oriental|ritz-carlton|fullerton|raffles|st\.? regis|shangri-la|"
+    r"four seasons|conrad|swissotel|pan pacific|intercontinental|capella)\b",
+    re.IGNORECASE,
+)
+
+
 def hard_filter_reason(
     venue: Venue, category: Category, s: ScoringSettings, today: date
 ) -> str | None:
     hf = category.hard_filters
+    if NOT_A_PLACE_RE.search(venue.name):
+        return "not a place to eat"
     if hf.exclude_closed and venue.business_status == "CLOSED_PERMANENTLY":
         return "closed permanently"
     if hf.open_weekends and venue.open_weekends is False:
@@ -214,6 +231,8 @@ def hard_filter_reason(
         if kind not in hf.michelin:
             return "no Michelin star" if "star" in hf.michelin else "not Bib Gourmand"
     if hf.price_levels:
+        if max(hf.price_levels) <= 2 and HOTEL_RE.search(venue.name):
+            return "hotel, not a cheap or affordable place"
         if venue.price_level is None:
             if category.key not in venue.category_keys:
                 return "no price level"

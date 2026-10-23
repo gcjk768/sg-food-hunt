@@ -59,7 +59,7 @@ def test_registry_matching_paths(tmp_path: Path) -> None:
             "Keng Eng Kee Seafood",
             source_ref="ChIJ_kek",
             postal_code="150124",
-            phone="<PHONE>",
+            phone="+65 " "6272 1038",
             address="124 Bukit Merah Lane 1, Singapore 150124",
             rating=4.3,
             review_count=2100,
@@ -94,7 +94,7 @@ def test_registry_matching_paths(tmp_path: Path) -> None:
             snippet="romantic? no, but family favourite",
             extra={"article_title": "Best zi char", "published_at": "2026-03-14"},
         ),
-        row("burpple", "KEK Seafood", phone="<PHONE>"),  # phone relink
+        row("burpple", "KEK Seafood", phone="+65 " "6272 1038"),  # phone relink
         row(
             "michelin",
             "Keng Eng Kee Seafood",
@@ -198,8 +198,8 @@ def test_build_venues_writes_files(app_config: AppConfig, tmp_path: Path) -> Non
     run_dir.mkdir()
     rows = [
         row("sethlui", "Cafe A", postal_code="160056"),
-        row("burpple", "Cafe A", phone="<PHONE>", postal_code="160056"),
-        row("eatbook", "Kafe A", phone="<PHONE>"),
+        row("burpple", "Cafe A", phone="+65 " "6220 3430", postal_code="160056"),
+        row("eatbook", "Kafe A", phone="+65 " "6220 3430"),
     ]
     registry, stats = build_venues(app_config, rows, RUN, run_dir)
     assert len(registry.venues) == 1 and stats.created == 1
@@ -491,3 +491,23 @@ def test_michelin_lists(app_config: AppConfig) -> None:
         stars, [venue("1 Star"), venue("3 Stars"), venue("2 Stars")], s, today=today
     )
     assert [r.venue_id for r in ranked if r.rank] == ["3 Stars", "2 Stars", "1 Star"]
+
+
+def test_not_a_place_and_hotel_guards(app_config: AppConfig) -> None:
+    from sgfoodhunt.scoring.score import hard_filter_reason
+
+    s, today = app_config.settings.scoring, date(2026, 10, 23)
+
+    def reason(name: str, key: str = "restaurants_cheap") -> str | None:
+        v = Venue(id="v", name=name, price_level=1)
+        v.evidence = [Evidence(source_key="eatbook", url="https://x.test", category_keys=[key])]
+        return hard_filter_reason(v, app_config.categories.get(key), s, today)
+
+    for bad in ("(CLOSED) Error 404", "Far East Plaza", "1", "North Singapore"):
+        assert reason(bad) == "not a place to eat"
+    assert "hotel" in (reason("Mandarin Oriental, Singapore") or "")
+    assert (
+        reason("Mandarin Oriental, Singapore", "restaurants_expensive")
+        != "hotel, not a cheap or affordable place"
+    )
+    assert reason("Cafe Mallory") is None
