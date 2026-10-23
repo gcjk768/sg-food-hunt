@@ -3618,6 +3618,1451 @@
     "url": "https://danielfooddiary.com/2018/05/29/kookscreamery/",
     "title": "Kooks Creamery"
    }
+  },
+  {
+   "name": "Udders",
+   "address": "246D Upper Thomson Road, Singapore 574370",
+   "postal_code": "574370",
+   "price_text": "$$",
+   "per_pax": 4.5,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "Homegrown ice cream maker known for alcohol-infused and local-inspired flavours. Its Upper Thomson outlet opens late.",
+   "website": "https://udders.com.sg/",
+   "phone": "<PHONE>",
+   "dishes": [
+    "Rum Rum Raisin",
+    "Bailey's & Bourbon",
+    "Emperor Mao (Mao Shan Wang durian)",
+    "Cereal Killer",
+    "Tira-Miss-u"
+   ],
+   "hours": "Sun-Thu 11am-11pm; Fri-Sat 11am-1am",
+   "booking_url": null,
+   "lat": 1.353623718631301,
+   "lng": 103.834473293178,
+   "source": {
+    "url": "https://www.misslobang.com/article/best-ice-cream-gelato-singapore-2026",
+    "title": "7 Best Artisan Ice Cream & Gelato Shops in Singapore (2026)"
+   }
+  },
+  {
+   "name": "Kindred Folk",
+   "address": "9 King Albert Park, #01-67, Singapore 598332",
+   "postal_code": "598332",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "Handmade ice cream cafe at King Albert Park with quirky drink-inspired flavours. Seating is on the second floor.",
+   "website": "https://kindredfolk.sg/",
+   "phone": "<PHONE>",
+   "dishes": [
+    "Cereal Milk",
+    "Stylo Milo",
+    "Wasabi",
+    "Deep-fried mantou ice cream"
+   ],
+   "hours": "Tue-Sun from 12pm; closed Mon (per FoodAdvisor)",
+   "booking_url": null,
+   "lat": 1.336842175434566,
+   "lng": 103.7793138099725,
+   "source": {
+    "url": "https://kindredfolk.sg/",
+    "title": "Homepage - Kindred Folk Handmade Ice Cream"
+   }
+  },
+  {
+   "name": "WellSmoocht (Smoocht)",
+   "address": "8 Sin Ming Road, #01-03, Sin Ming Centre, Singapore 575628",
+   "postal_code": "575628",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Vegan",
+    "Dessert"
+   ],
+   "summary": "Sin Ming outlet of Smoocht, making gelato-style R'ice cream from organic brown rice milk. Now branded WellSmoocht in a tie-up with Well Dressed Salad Bar.",
+   "website": "https://well.smoocht.com/",
+   "phone": "<PHONE>",
+   "dishes": [
+    "Rose pistachio doughnut-gelato",
+    "Rice milk ice cream",
+    "Thai Tea",
+    "The Perfect Matcha"
+   ],
+   "hours": "Daily 12pm-9:30pm (official site)",
+   "booking_url": null,
+   "lat": 1.353718102303169,
+   "lng": 103.8361172881759,
+   "source": {
+    "url": "https://eatbook.sg/wellsmoocht-vegan-marymount/",
+    "title": "Wellsmoocht Review - Eatbook.sg"
+   }
+  },
+  {
+   "name": "Kind Kones",
+   "address": "583 Orchard Road, #B1-17, Forum The Shopping Mall, Singapore 238884",
+   "postal_code": "238884",
+   "price_text": "$$",
+   "per_pax": 8.8,
+   "cuisine": [
+    "Ice cream",
+    "Vegan",
+    "Dessert"
+   ],
+   "summary": "Plant-based ice cream shop with no animal products. The Paragon and Great World outlets have closed.",
+   "website": "https://kindkones.com/",
+   "phone": "<PHONE>",
+   "dishes": [
+    "Almond Brittle Fudge",
+    "Pandan Gula Melaka",
+    "Black Forest",
+    "Flourless Sweet Potato Brownie"
+   ],
+   "hours": "Daily 11am-9pm",
+   "booking_url": null,
+   "lat": 1.306097521645643,
+   "lng": 103.8286785560409,
+   "source": {
+    "url": "https://www.misslobang.com/article/best-ice-cream-gelato-singapore-2026",
+    "title": "7 Best Artisan Ice Cream & Gelato Shops in Singapore (2026)"
+   }
+  },
+  {
+   "name": "Gelato Labo",
+   "address": "108 Faber Drive, Faber Hills, Singapore 129418",
+   "postal_code": "129418",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Gelato",
+    "Dessert"
+   ],
+   "summary": "Artisan gelato maker with sorbets and unusual flavours, sharing a space with Glass Roasters at Faber Hills. Other outlets include Joo Chiat.",
+   "website": "https://www.gelatolabo.com/",
+   "phone": "<PHONE>",
+   "dishes": [
+    "New Zealand Kiwi Sorbet",
+    "Piedmont Hazelnut",
+    "Bronte Pistachio with Himalayan Pink Salt",
+    "Hokkaido Milk and Acacia Honey"
+   ],
+   "hours": null,
+   "booking_url": null,
+   "lat": 1.320480402786236,
+   "lng": 103.7565135299978,
+   "source": {
+    "url": "https://thebestsg.com/best/ice-cream",
+    "title": "The 10 Best Ice Cream Parlours in Singapore (2026) - TheBest SG"
+   }
+  },
+  {
+   "name": "The Daily Scoop",
+   "address": "41 Sunset Way, #01-04, Clementi Arcade, Singapore 597071",
+   "postal_code": "597071",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "Ice cream cafe established in 2004 with over 45 rotating flavours. Sunset Way outlet is open per current listings.",
+   "website": "https://thedailyscoop.com.sg/",
+   "phone": "<PHONE>",
+   "dishes": [
+    "Pandan Blue Pea Mochi",
+    "Chendol",
+    "Mao Shan Wang durian",
+    "Lychee Martini",
+    "Strawberry Shortcake"
+   ],
+   "hours": "Mon-Thu 11am-9pm; Fri-Sat 11am-10pm; Sun 2pm-9pm",
+   "booking_url": null,
+   "lat": 1.323552869184357,
+   "lng": 103.7675154865464,
+   "source": {
+    "url": "https://www.burpple.com/the-daily-scoop-3",
+    "title": "The Daily Scoop (Sunset Way) - Burpple"
+   }
+  },
+  {
+   "name": "Salted Caramel Artisan Ice Cream",
+   "address": "246F Upper Thomson Road, Singapore 574370",
+   "postal_code": "574370",
+   "price_text": "$$",
+   "per_pax": 4.5,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "Artisan ice cream shop at Upper Thomson serving scoops, waffles and croissants. Scoops start at $4.50 and takeaway pints are $15.90.",
+   "website": "https://saltedcaramel.sg/",
+   "phone": "<PHONE>",
+   "dishes": [
+    "Horlicks Tim Tam",
+    "Milo Crunch",
+    "Rum and Raisin",
+    "Stout and Chocolate"
+   ],
+   "hours": "Daily 12pm-11pm (official site)",
+   "booking_url": null,
+   "lat": 1.353623718631301,
+   "lng": 103.834473293178,
+   "source": {
+    "url": "https://saltedcaramel.sg/contact-us",
+    "title": "Contact Us - Salted Caramel"
+   }
+  },
+  {
+   "name": "Holy Cow Creamery",
+   "address": "292 Yishun Street 22, #01-291, Singapore 760292",
+   "postal_code": "760292",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "Neighbourhood creamery in Yishun serving ice cream, waffles, coffee and milkshakes. Listings show it still operating in 2026.",
+   "website": "https://www.facebook.com/holycowcreamery.yishun/",
+   "phone": null,
+   "dishes": [
+    "Mao Shan Wang",
+    "Earl Grey Lavender",
+    "Salted Gula Melaka",
+    "Muah Chee"
+   ],
+   "hours": "11:30am-10pm (Fri-Sat to 11pm); sources conflict on Monday",
+   "booking_url": null,
+   "lat": 1.43672478418959,
+   "lng": 103.8369663902814,
+   "source": {
+    "url": "https://www.burpple.com/holy-cow-creamery",
+    "title": "Holy Cow Creamery (Yishun) - Burpple"
+   }
+  },
+  {
+   "name": "Yeah Gelato",
+   "address": "68 Orchard Road, #01-K1, Plaza Singapura, Singapore 238839",
+   "postal_code": "238839",
+   "price_text": "$$",
+   "per_pax": 7.8,
+   "cuisine": [
+    "Gelato",
+    "Dessert"
+   ],
+   "summary": "Chinese gelato chain that opened its first Singapore outlet at Plaza Singapura in July 2025. Gelato is served from Italian-style pozzetti tubs.",
+   "website": "https://eatbook.sg/yeah-gelato-singapore/",
+   "phone": null,
+   "dishes": [
+    "Pistachio",
+    "Dark Chocolate",
+    "Hawthorn",
+    "Durian"
+   ],
+   "hours": "Daily 11am-10pm",
+   "booking_url": null,
+   "lat": 1.300747709639166,
+   "lng": 103.8450475734307,
+   "source": {
+    "url": "https://eatbook.sg/yeah-gelato-singapore/",
+    "title": "Yeah Gelato: Viral Chinese Chain Opens At Plaza Singapura"
+   }
+  },
+  {
+   "name": "Denzy Gelato",
+   "address": "Blk 506 Bishan Street 11, #01-404, Singapore 570506",
+   "postal_code": "570506",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Gelato",
+    "Dessert"
+   ],
+   "summary": "Artisanal gelato shop from The Denzy Collective, sold in over a hundred retail establishments in Singapore. Bishan is the original outlet; current status is unconfirmed.",
+   "website": "https://denzygelato.com/",
+   "phone": null,
+   "dishes": [
+    "Pear Ginger Ginger Flower",
+    "Mango & Yuzu",
+    "Yoghurt Speculoos",
+    "Roasted Bronte Pistachio"
+   ],
+   "hours": null,
+   "booking_url": null,
+   "lat": 1.349171987880373,
+   "lng": 103.8491654539315,
+   "source": {
+    "url": "https://www.sassymamasg.com/the-best-ice-cream-and-frozen-yogurt-places-in-singapore-yummo/",
+    "title": "30 Best Gelato & Ice Cream Shops In Singapore For A Cool, Creamy Treat"
+   }
+  },
+  {
+   "name": "Fatcat Ice Cream & Coffee Boutique",
+   "address": "15 Simon Road, #01-00, Singapore 545900",
+   "postal_code": "545900",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "Takeaway-only Kovan outlet of the Fatcat ice cream brand. The original Bedok outlet is permanently closed.",
+   "website": "https://fatcat.sg/",
+   "phone": null,
+   "dishes": [
+    "Beer Batter",
+    "Sea Salt Matcha",
+    "Banana Caramel",
+    "Watermelon Soju"
+   ],
+   "hours": "Mon, Wed, Thu, Sun 1pm-10pm; Fri-Sat 1pm-11pm; closed Tue",
+   "booking_url": null,
+   "lat": 1.361897567802918,
+   "lng": 103.8858372730418,
+   "source": {
+    "url": "https://www.burpple.com/fatcat-ice-cream-coffee-boutique",
+    "title": "FATCAT Ice Cream & Coffee (Kovan) - Burpple"
+   }
+  },
+  {
+   "name": "Freshio Gelato",
+   "address": "91 Bencoolen Street, #01-60, Sunshine Plaza, Singapore 189652",
+   "postal_code": "189652",
+   "price_text": "$",
+   "per_pax": 6.5,
+   "cuisine": [
+    "Gelato",
+    "Dessert"
+   ],
+   "summary": "Gelato cafe in Sunshine Plaza, opened by a couple in their 70s. Its Sicilian pistachio ranked 5th in Eatbook's pistachio gelato list.",
+   "website": null,
+   "phone": "<PHONE>",
+   "dishes": [
+    "Sicilian Pistachio"
+   ],
+   "hours": "12pm-10pm; closed Wednesday per Sunshine Plaza site (sources conflict)",
+   "booking_url": null,
+   "lat": 1.300347620815493,
+   "lng": 103.851046168708,
+   "source": {
+    "url": "https://eatbook.sg/best-pistachio-gelato-singapore/",
+    "title": "10 Best Pistachio Gelato In Singapore - Eatbook"
+   }
+  },
+  {
+   "name": "GelatiAmo OneNorth",
+   "address": "1 Fusionopolis Way, #B1-11, Connexis, Singapore 138632",
+   "postal_code": "138632",
+   "price_text": "$$",
+   "per_pax": 4.2,
+   "cuisine": [
+    "Gelato",
+    "Dessert"
+   ],
+   "summary": "Gelato cafe run by Italian chef Loris Massimini, sister to Ristorante Pietrasanta, opened 2022. Gelato is made daily and stored pozzetti-style.",
+   "website": "https://gelatiamosg.com/",
+   "phone": "<PHONE>",
+   "dishes": [
+    "Burrata Balsamico",
+    "Pistachio",
+    "Ferrero Rocher",
+    "Almond & Turmeric (vegan)"
+   ],
+   "hours": "Mon-Sat 11am-9pm; Sun 11:30am-7pm (OpenRice)",
+   "booking_url": null,
+   "lat": 1.299150164522656,
+   "lng": 103.7875812487673,
+   "source": {
+    "url": "https://eatbook.sg/gelatiamo-one-north/",
+    "title": "GelatiAmo: New Gelato Cafe In One-North - Eatbook"
+   }
+  },
+  {
+   "name": "Mondo",
+   "address": "92A Amoy Street, Singapore 069911",
+   "postal_code": "069911",
+   "price_text": "$$$",
+   "per_pax": 7.0,
+   "cuisine": [
+    "Gelato",
+    "Dessert"
+   ],
+   "summary": "Gelato and coffee bar in Telok Ayer opened around August 2025, serving small-batch gelato in unusual flavours plus gelato cocktail floats.",
+   "website": "https://www.instagram.com/mondo.gram/",
+   "phone": null,
+   "dishes": [
+    "Blue Cheese & Candied Pear",
+    "Pineapple Makgeolli",
+    "Brandy & Raisin",
+    "Sicilian Pistachio"
+   ],
+   "hours": "Mon-Thu 11am-10pm; Fri-Sat 11am-12am; closed Sun",
+   "booking_url": null,
+   "lat": 1.281278279349917,
+   "lng": 103.8470319160376,
+   "source": {
+    "url": "https://hungrygowhere.com/food-news/mondo-gelato-bar-singapore/",
+    "title": "Mondo: Amoy's new gelato bar - HungryGoWhere"
+   }
+  },
+  {
+   "name": "The Dark Gallery (Millenia Walk)",
+   "address": "9 Raffles Boulevard, #01-K5, Millenia Walk, Singapore 039596",
+   "postal_code": "039596",
+   "price_text": "$$$",
+   "per_pax": 12.0,
+   "cuisine": [
+    "Dessert",
+    "Chocolate",
+    "Ice cream"
+   ],
+   "summary": "Dark chocolate dessert cafe that also sells dark chocolate ice cream. The Funan outlet has closed; Millenia Walk is open.",
+   "website": "https://thedarkgallery.com/",
+   "phone": "<PHONE>",
+   "dishes": [
+    "Single Origin Dark Chocolate Ice Cream Platter",
+    "Salted Peanut Butter",
+    "Sea Salt Butterscotch"
+   ],
+   "hours": "Daily 11am-9:30pm (sources vary)",
+   "booking_url": null,
+   "lat": 1.292605444624933,
+   "lng": 103.8597249444427,
+   "source": {
+    "url": "https://eatbook.sg/dark-gallery/",
+    "title": "The Dark Gallery Review - Eatbook.sg"
+   }
+  },
+  {
+   "name": "5 The Moments (Churn Creamery)",
+   "address": "73 Tanjong Pagar Road, Singapore 088494",
+   "postal_code": "088494",
+   "price_text": "$$",
+   "per_pax": 5.0,
+   "cuisine": [
+    "Gelato",
+    "Dessert"
+   ],
+   "summary": "Handcrafted gelato cafe opened in 2014 whose gelato is churned by sister brand Churn Creamery. Also serves craft beer, cakes and savoury bites.",
+   "website": "https://www.5themoments.com.sg/",
+   "phone": "<PHONE>",
+   "dishes": [
+    "Hojicha",
+    "Blueberry Cheesecake",
+    "Earl Grey",
+    "Coconut Sorbet"
+   ],
+   "hours": "Mon-Thu 12pm-11pm; Fri-Sun 12pm-11:30pm",
+   "booking_url": null,
+   "lat": 1.278020290466562,
+   "lng": 103.8438720568061,
+   "source": {
+    "url": "https://www.burpple.com/5-the-moments",
+    "title": "5 The Moments - Burpple"
+   }
+  },
+  {
+   "name": "Hey Sugar",
+   "address": "Blk 818 Choa Chu Kang Avenue 1, #01-06, Singapore 680818",
+   "postal_code": "680818",
+   "price_text": "$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "Halal-certified neighbourhood ice cream and waffle cafe opposite Keat Hong LRT. A set of waffle, scoop and drink is around $11.90.",
+   "website": "https://www.instagram.com/heysugarsg/",
+   "phone": null,
+   "dishes": [
+    "Chocolate Rocky Road",
+    "Sea Salt Crumble",
+    "Cookie Monster",
+    "Mango Passionfruit"
+   ],
+   "hours": "Mon-Thu 12:30pm-10:30pm; Fri-Sat to 11:30pm (Yelp)",
+   "booking_url": null,
+   "lat": 1.378026161772648,
+   "lng": 103.7488267709187,
+   "source": {
+    "url": "https://www.burpple.com/hey-sugar",
+    "title": "Hey Sugar - Burpple"
+   }
+  },
+  {
+   "name": "Bing Bing Ice Cream Gallery",
+   "address": "491 River Valley Road, #01-20, Valley Point, Singapore 248371",
+   "postal_code": "248371",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "Small company making artisan handcrafted ice cream, frozen yoghurt and sorbet. River Valley is the only outlet shown as clearly open; others appear closed.",
+   "website": "https://icecreamgallery.com/",
+   "phone": "<PHONE>",
+   "dishes": [
+    "Ice cream",
+    "Frozen yoghurt",
+    "Sorbet"
+   ],
+   "hours": "11:30am-9:30pm",
+   "booking_url": null,
+   "lat": 1.293036009328751,
+   "lng": 103.8270690670577,
+   "source": {
+    "url": "https://www.yelp.com/biz/bing-bing-ice-cream-gallery-singapore-5",
+    "title": "BING BING ICE CREAM GALLERY - Yelp"
+   }
+  },
+  {
+   "name": "Three's A Crowd",
+   "address": "802 Tampines Avenue 4, #01-11, Singapore 520802",
+   "postal_code": "520802",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Gelato",
+    "Dessert"
+   ],
+   "summary": "Halal-certified gelato and dessert cafe in Tampines, known for Horlicks waffles. Hours are from a 2021 article.",
+   "website": "https://www.facebook.com/threesacrowdcafe/",
+   "phone": "<PHONE>",
+   "dishes": [
+    "Horlicks waffle",
+    "Gelato"
+   ],
+   "hours": "Sun-Thu 11am-10:30pm; Fri 11am-11pm; Sat 11am-12am",
+   "booking_url": null,
+   "lat": 1.346084423982096,
+   "lng": 103.9380340231318,
+   "source": {
+    "url": "https://eatbook.sg/threes-a-crowd-cafe-singapore/",
+    "title": "Three's A Crowd Cafe Review - Eatbook.sg"
+   }
+  },
+  {
+   "name": "Van Leeuwen Ice Cream",
+   "address": "181 Orchard Road, #01-19/20, Orchard Central, Singapore 238896",
+   "postal_code": "238896",
+   "price_text": "$$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "French-style ice cream from the US craft brand, with its first overseas store at Orchard Central. Hours are from the 2023 opening period.",
+   "website": "https://vanleeuwenicecream.sg/",
+   "phone": null,
+   "dishes": [
+    "Chocolate Caramel Cheesecake",
+    "PB Brownie Honeycomb",
+    "Praline Butter Cake"
+   ],
+   "hours": "Sun-Wed 12pm-11pm; Thu-Sat 12pm-12am",
+   "booking_url": null,
+   "lat": 1.300838908392453,
+   "lng": 103.8394347338989,
+   "source": {
+    "url": "https://www.sassymamasg.com/the-best-ice-cream-and-frozen-yogurt-places-in-singapore-yummo/",
+    "title": "30 Best Gelato & Ice Cream Shops In Singapore For A Cool, Creamy Treat"
+   }
+  },
+  {
+   "name": "Betsubara Creamery & Cafe",
+   "address": "625B Tampines Street 61, #01-01, Singapore 522625",
+   "postal_code": "522625",
+   "price_text": "$",
+   "per_pax": 5,
+   "cuisine": [
+    "Ice cream",
+    "Dessert",
+    "Japanese"
+   ],
+   "summary": "Japanese-inspired ice cream cafe in Tampines North serving Hokkaido milk soft serve and Hokkaido butter waffles. Sea Salt Hokkaido Milk soft serve is around $4.80.",
+   "website": "https://betsubara.sg",
+   "phone": "<PHONE>",
+   "dishes": [
+    "Sea Salt Hokkaido Milk soft serve",
+    "Lavender Hokkaido Milk",
+    "Nama Chocolate",
+    "Kyoho Grape",
+    "Hokkaido butter waffle"
+   ],
+   "hours": "Daily 12pm-10pm (sources vary; weekends possibly to 11pm)",
+   "booking_url": null,
+   "lat": 1.362482809642557,
+   "lng": 103.9406809640135,
+   "source": {
+    "url": "https://eatbook.sg/betsubara-creamery-and-cafe/",
+    "title": "Betsubara Creamery & Cafe: New Ice Cream Cafe In Tampines North"
+   }
+  },
+  {
+   "name": "Matchaya (The Cathay)",
+   "address": "2 Handy Road, #01-08 The Cathay, Singapore 229233",
+   "postal_code": "229233",
+   "price_text": "$$",
+   "per_pax": 8,
+   "cuisine": [
+    "Ice cream",
+    "Dessert",
+    "Japanese"
+   ],
+   "summary": "Matcha cafe known for houjicha and matcha soft serve, with a mystery-flavour soft serve rotation. The Cathay outlet is its flagship cafe.",
+   "website": "https://matchaya.sg",
+   "phone": null,
+   "dishes": [
+    "Hojicha soft serve",
+    "Uji matcha soft serve",
+    "Matcha parfait",
+    "Mystery flavour soft serve"
+   ],
+   "hours": "Mon-Thu 1pm-10pm; Fri 1pm-11pm (Yelp, July 2026)",
+   "booking_url": null,
+   "lat": 1.2992060914543,
+   "lng": 103.8478268172409,
+   "source": {
+    "url": "https://www.burpple.com/matchaya-2",
+    "title": "Matchaya (The Cathay)"
+   }
+  },
+  {
+   "name": "Honeybee (Haji Lane)",
+   "address": "67 Haji Lane, Singapore 189260",
+   "postal_code": "189260",
+   "price_text": "$$",
+   "per_pax": 8.5,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "JB dessert chain serving soft serve topped with real honeycomb. The Golden Honeybee costs S$8.50 and comes with honey pearls and cornflakes.",
+   "website": null,
+   "phone": "<PHONE>",
+   "dishes": [
+    "Golden Honeybee",
+    "Honeycomb soft serve"
+   ],
+   "hours": "Mon-Thu 11:30am-9:30pm; Fri-Sat 11:30am-10pm; Sun 11:30am-9:30pm",
+   "booking_url": null,
+   "lat": 1.30133565118528,
+   "lng": 103.8585346144835,
+   "source": {
+    "url": "https://mothership.sg/2023/02/honeybee-singapore-ice-cream/",
+    "title": "JB dessert chain now at City Hall & Haji Lane sells real honeycombs on ice cream from S$8.50"
+   }
+  },
+  {
+   "name": "Cafe Usagi Tokyo",
+   "address": "8 Temasek Boulevard, Suntec City Tower 3, #02-615A, Singapore 038983",
+   "postal_code": "038983",
+   "price_text": "$$",
+   "per_pax": 7,
+   "cuisine": [
+    "Ice cream",
+    "Dessert",
+    "Japanese"
+   ],
+   "summary": "Japanese cafe famous for handmade mochi ice cream and daifuku, plus mochi waffles and matcha. Mochi ice cream is priced from about $6-7.",
+   "website": null,
+   "phone": null,
+   "dishes": [
+    "Ceremonial Matcha mochi ice cream",
+    "Gokujo Hojicha mochi ice cream",
+    "Genmaicha mochi ice cream",
+    "Mochi waffle",
+    "Parfait"
+   ],
+   "hours": "Daily 10:30am-10pm",
+   "booking_url": null,
+   "lat": 1.295931894771942,
+   "lng": 103.8590144067362,
+   "source": {
+    "url": "https://middleclass.sg/treats/cafe-usagi-tokyo-suntec-city/",
+    "title": "Cafe Usagi TOKYO: Japanese Cafe Serving Freshly Made Daifuku Mochi And Mochi Waffles In Suntec City"
+   }
+  },
+  {
+   "name": "Tokyo Milk Cheese Factory (Jewel Changi)",
+   "address": "78 Airport Boulevard, #B2-265, Jewel Changi Airport, Singapore 819666",
+   "postal_code": "819666",
+   "price_text": "$",
+   "per_pax": 5,
+   "cuisine": [
+    "Ice cream",
+    "Dessert",
+    "Japanese"
+   ],
+   "summary": "Flagship of the Japanese brand serving Hokkaido Jersey milk and Gouda and cream cheese soft serve. The Cow Cow Twist swirl starts from $4.80.",
+   "website": "https://order.tokyomilkcheesesg.com",
+   "phone": "<PHONE>",
+   "dishes": [
+    "Cow Cow Twist soft serve",
+    "Hokkaido Jersey Milk soft serve",
+    "Gouda & Cream Cheese soft serve",
+    "Milk pie"
+   ],
+   "hours": "Daily 10:00-21:45",
+   "booking_url": null,
+   "lat": 1.360341006610217,
+   "lng": 103.9890775502096,
+   "source": {
+    "url": "https://www.nani.sg/food-drink/places-to-get-japanese-ice-cream",
+    "title": "12 Places To Get Japanese Ice Cream To Quell The Heat"
+   }
+  },
+  {
+   "name": "Muted",
+   "address": "221 Lavender Street, Singapore 338774",
+   "postal_code": "338774",
+   "price_text": "$",
+   "per_pax": 6,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "Ice cream shop with Japanese-leaning flavours such as roasted hojicha and Earl Grey sakura. Scoops are $5-6 and buttermilk waffles $6.",
+   "website": "https://instagram.com/muted.sg",
+   "phone": "<PHONE>",
+   "dishes": [
+    "Roasted Hojicha",
+    "Earl Grey Sakura",
+    "Soy Gula Melaka",
+    "Uji Matcha",
+    "Buttermilk waffle"
+   ],
+   "hours": "Daily 12pm-12am",
+   "booking_url": null,
+   "lat": 1.314666009981614,
+   "lng": 103.8595595969724,
+   "source": {
+    "url": "https://eatbook.sg/best-waffles-ice-cream/",
+    "title": "30 Ice Cream and Waffles Cafes In Singapore"
+   }
+  },
+  {
+   "name": "Cold Break",
+   "address": "202 Jalan Besar, Singapore 208888",
+   "postal_code": "208888",
+   "price_text": "$",
+   "per_pax": 8,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "Ice cream cafe on Jalan Besar with waffle pairings. Scoops $4.90, nian gao waffles $7.50.",
+   "website": "https://instagram.com/coldbreak_sg",
+   "phone": null,
+   "dishes": [
+    "Oolong Hojicha",
+    "White Chrysanthemum and Goji Berries",
+    "Korean Strawberry Cheesecake",
+    "Nian Gao Waffles",
+    "Orh Nee Waffles"
+   ],
+   "hours": "Sun 1pm-11pm; Mon-Thu 2pm-11pm; Fri 2pm-1am; Sat 1pm-1am",
+   "booking_url": null,
+   "lat": 1.308441690645799,
+   "lng": 103.8574979921912,
+   "source": {
+    "url": "https://eatbook.sg/best-waffles-ice-cream/",
+    "title": "30 Ice Cream and Waffles Cafes In Singapore"
+   }
+  },
+  {
+   "name": "Parvifolia",
+   "address": "510 Bedok North Street 3, #01-75, Singapore 460510",
+   "postal_code": "460510",
+   "price_text": "$",
+   "per_pax": 6.2,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "Bedok ice cream shop with mochi-themed flavours. Pistachio Rose Mochi and Chrysanthemum Honeysuckle are $6.20 each.",
+   "website": "https://instagram.com/parvifolia.sg",
+   "phone": null,
+   "dishes": [
+    "Chrysanthemum Honeysuckle",
+    "Pistachio Rose Mochi",
+    "Scoop with waffle"
+   ],
+   "hours": "Sun-Tue, Thu 12pm-12am; Fri-Sat 12pm-1am; closed Wed",
+   "booking_url": null,
+   "lat": 1.332123132919169,
+   "lng": 103.93105149637,
+   "source": {
+    "url": "https://eatbook.sg/best-waffles-ice-cream/",
+    "title": "30 Ice Cream and Waffles Cafes In Singapore"
+   }
+  },
+  {
+   "name": "MADLYGOOD",
+   "address": "3155 Commonwealth Avenue West, #05-22, The Clementi Mall, Singapore 129588",
+   "postal_code": "129588",
+   "price_text": "$$",
+   "per_pax": 14,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "Ice cream and waffle cafe in The Clementi Mall serving mochi waffles. Pistachio Cream Mochi and Cream Cheese Buttermilk are $14 each.",
+   "website": "https://instagram.com/madlygood_official",
+   "phone": null,
+   "dishes": [
+    "Pistachio Cream Mochi",
+    "Cream Cheese Buttermilk",
+    "Honey Bunny gelato"
+   ],
+   "hours": "Daily 11:30am-10pm",
+   "booking_url": null,
+   "lat": 1.314896196393653,
+   "lng": 103.764423054189,
+   "source": {
+    "url": "https://eatbook.sg/best-waffles-ice-cream/",
+    "title": "30 Ice Cream and Waffles Cafes In Singapore"
+   }
+  },
+  {
+   "name": "Emma Softserve Ice Cream",
+   "address": "100 Tras Street, 100AM #02-10, Singapore 079027",
+   "postal_code": "079027",
+   "price_text": "$",
+   "per_pax": 3.9,
+   "cuisine": [
+    "Ice cream",
+    "Dessert",
+    "Japanese"
+   ],
+   "summary": "Soft serve shop at 100AM serving Japanese-style matcha and hojicha soft serve. Soft serve starts from $3.90.",
+   "website": null,
+   "phone": null,
+   "dishes": [
+    "Matcha soft serve",
+    "Hojicha soft serve"
+   ],
+   "hours": "Sun-Thu 11am-9pm; Fri-Sat 11am-9:30pm",
+   "booking_url": null,
+   "lat": 1.274934747509414,
+   "lng": 103.8435524129149,
+   "source": {
+    "url": "https://www.nani.sg/food-drink/places-to-get-japanese-ice-cream",
+    "title": "12 Places To Get Japanese Ice Cream To Quell The Heat"
+   }
+  },
+  {
+   "name": "Hokkaido Fresh Serve (formerly Le Varo)",
+   "address": "8 Raffles Avenue, #01-K3 Esplanade Mall, Singapore 039802",
+   "postal_code": "039802",
+   "price_text": "$$",
+   "per_pax": 7,
+   "cuisine": [
+    "Ice cream",
+    "Dessert",
+    "Japanese"
+   ],
+   "summary": "Hokkaido-style ice cream kiosk at Esplanade Mall. Honey Yuzu Sorbet starts from $7.",
+   "website": "https://levarosg.wixsite.com/levaro-hokkaidoicecr",
+   "phone": null,
+   "dishes": [
+    "Rich Milk",
+    "Cantaloupe Melon",
+    "Honey Yuzu Sorbet"
+   ],
+   "hours": "Daily 10am-10:30pm",
+   "booking_url": null,
+   "lat": 1.28964784521264,
+   "lng": 103.8562672509768,
+   "source": {
+    "url": "https://www.nani.sg/food-drink/places-to-get-japanese-ice-cream",
+    "title": "12 Places To Get Japanese Ice Cream To Quell The Heat"
+   }
+  },
+  {
+   "name": "AM:PM Cafe",
+   "address": "529 Ang Mo Kio Avenue 10, #01-2365, Singapore 560529",
+   "postal_code": "560529",
+   "price_text": "$$",
+   "per_pax": 10,
+   "cuisine": [
+    "Ice cream",
+    "Dessert",
+    "Cafe"
+   ],
+   "summary": "Ang Mo Kio cafe ranked first in a 2026 soft serve list for its Affogato Soft Serve. Also serves freshly baked egglet waffles from $10 with ice cream from $4.50 a flavour.",
+   "website": "https://ampm-cafe.com",
+   "phone": null,
+   "dishes": [
+    "Affogato Soft Serve",
+    "Chendol Coconut Soft Serve with Gula Melaka",
+    "Freshly baked egglets",
+    "Pandan egglet"
+   ],
+   "hours": "Sun-Thu 11:45am-10:30pm; Fri-Sat 11:45am-11pm",
+   "booking_url": null,
+   "lat": 1.37234358233884,
+   "lng": 103.8554554280723,
+   "source": {
+    "url": "https://singaporeverified.com/food/soft-serve-ice-cream-in-singapore/",
+    "title": "11 Best Soft Serve Ice Cream In Singapore"
+   }
+  },
+  {
+   "name": "Sweet Scoop",
+   "address": "Block 311 Hougang Avenue 5, #01-177, Singapore 530311",
+   "postal_code": "530311",
+   "price_text": "$",
+   "per_pax": 4.2,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "Hougang ice cream and waffle shop with scoops at $4.20 and pandan or red velvet waffles. Also sells brownie and lava cake topped with vanilla gelato at $9.90.",
+   "website": "https://instagram.com/sweetscoop_sg",
+   "phone": null,
+   "dishes": [
+    "Brownie x Vanilla Gelato",
+    "Lava Cake x Vanilla Gelato",
+    "Pandan waffle",
+    "Red velvet waffle"
+   ],
+   "hours": "Mon, Wed-Thu 1:30pm-11pm; Fri-Sat 1:30pm-12am; Sun 1:30pm-11:30pm; closed Tue",
+   "booking_url": null,
+   "lat": 1.365667330647917,
+   "lng": 103.894853675162,
+   "source": {
+    "url": "https://eatbook.sg/best-waffles-ice-cream/",
+    "title": "30 Ice Cream and Waffles Cafes In Singapore"
+   }
+  },
+  {
+   "name": "Udders (Beach Road)",
+   "address": "345 Beach Road, Singapore 199568",
+   "postal_code": "199568",
+   "price_text": "$",
+   "per_pax": 7.3,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "Local ice cream chain with a Beach Road outlet next to Ya Kun, known for mochi waffles with scoops. A reviewer paid $7.30 for a mochi waffle.",
+   "website": "https://udders.com.sg",
+   "phone": "<PHONE>",
+   "dishes": [
+    "Mochi waffle",
+    "Milo",
+    "Tira-miss-u",
+    "Kueh Salat",
+    "Kit Kat Bites"
+   ],
+   "hours": "Daily 2pm-10pm",
+   "booking_url": null,
+   "lat": 1.301562602214586,
+   "lng": 103.8616020443008,
+   "source": {
+    "url": "https://udders.com.sg/location/beach-rd/",
+    "title": "Beach Rd - Udders"
+   }
+  },
+  {
+   "name": "Tsujiri (Clarke Quay Central)",
+   "address": "6 Eu Tong Sen Street, #01-74 Clarke Quay Central, Singapore 059817",
+   "postal_code": "059817",
+   "price_text": "$",
+   "per_pax": 5,
+   "cuisine": [
+    "Ice cream",
+    "Dessert",
+    "Japanese"
+   ],
+   "summary": "Kyoto-origin matcha specialist (est. 1860) serving matcha, vanilla and hojicha soft serve. Soft serve is about $5.",
+   "website": "https://tsujiri.sg",
+   "phone": "<PHONE>",
+   "dishes": [
+    "Matcha soft serve",
+    "Hojicha soft serve",
+    "Vanilla soft serve"
+   ],
+   "hours": "Sun-Thu 11am-10pm; Fri-Sat 11am-11pm",
+   "booking_url": null,
+   "lat": 1.288838562482049,
+   "lng": 103.8465580247433,
+   "source": {
+    "url": "https://www.burpple.com/tsujiri-5",
+    "title": "Tsujiri (Clarke Quay Central)"
+   }
+  },
+  {
+   "name": "108 Matcha Saro (Suntec City)",
+   "address": "5 Temasek Boulevard, #B1-K5 Suntec City, Singapore 038985",
+   "postal_code": "038985",
+   "price_text": "$",
+   "per_pax": 4.9,
+   "cuisine": [
+    "Ice cream",
+    "Dessert",
+    "Japanese"
+   ],
+   "summary": "Hokkaido matcha dessert brand and its original Singapore outlet at Suntec City. Hokkaido soft serve cones are $4.90.",
+   "website": "https://manna360.com.sg/our-brands/108-matcha-saro",
+   "phone": null,
+   "dishes": [
+    "Matcha Hokkaido soft serve",
+    "Matcha soft serve parfait deluxe",
+    "Mont Blanc parfait"
+   ],
+   "hours": "Mon-Thu, Sun 11am-9pm; Fri-Sat 11am-9:30pm",
+   "booking_url": null,
+   "lat": 1.294503466205687,
+   "lng": 103.8579852739892,
+   "source": {
+    "url": "https://www.timeout.com/singapore/restaurants/108-matcha-saro",
+    "title": "108 Matcha Saro"
+   }
+  },
+  {
+   "name": "Moin Moin Gelato",
+   "address": "930 Yishun Central 1, #01-125, Singapore 760930",
+   "postal_code": "760930",
+   "price_text": "$",
+   "per_pax": 4.7,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "Yishun ice cream shop with rotating flavours and waffles. Scoops from $4.70, waffle $6.50.",
+   "website": "https://facebook.com/MoinMoinGelato",
+   "phone": null,
+   "dishes": [
+    "Black Sesame",
+    "Yakult Vanilla",
+    "Waffle"
+   ],
+   "hours": "Tue-Thu 2pm-10pm; Fri 2pm-12am; Sat-Sun 12pm-12am; closed Mon",
+   "booking_url": null,
+   "lat": 1.426915481472256,
+   "lng": 103.8373512063192,
+   "source": {
+    "url": "https://eatbook.sg/best-waffles-ice-cream/",
+    "title": "30 Ice Cream and Waffles Cafes In Singapore"
+   }
+  },
+  {
+   "name": "Bing Chilling",
+   "address": "122 Bedok North Street 2, #01-112, Singapore 460122",
+   "postal_code": "460122",
+   "price_text": "$",
+   "per_pax": 4.5,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "Late-night Bedok ice cream shop with classic flavours from $4.50.",
+   "website": "https://instagram.com/bingchilling.sg",
+   "phone": null,
+   "dishes": [
+    "Classic ice cream flavours"
+   ],
+   "hours": "Mon-Fri 7pm-2am; Sat-Sun 2pm-2am",
+   "booking_url": null,
+   "lat": 1.328617198198938,
+   "lng": 103.9377871493869,
+   "source": {
+    "url": "https://eatbook.sg/best-waffles-ice-cream/",
+    "title": "30 Ice Cream and Waffles Cafes In Singapore"
+   }
+  },
+  {
+   "name": "Udders Ice Cream",
+   "address": "155 Thomson Road, Singapore 307608",
+   "postal_code": "307608",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "Homegrown ice cream chain with several outlets across Singapore, including Tampines Mall and Upper Thomson. The Novena outlet on Thomson Road is listed with a Tripadvisor and Yelp page.",
+   "website": "https://udders.com.sg/",
+   "phone": "<PHONE>",
+   "dishes": [
+    "Ice cream",
+    "Ice cream cakes"
+   ],
+   "hours": null,
+   "booking_url": null,
+   "lat": 1.318084383213021,
+   "lng": 103.8437866970982,
+   "source": {
+    "url": "https://www.yelp.com/biz/udders-ice-cream-singapore",
+    "title": "Udders Ice Cream - Yelp"
+   }
+  },
+  {
+   "name": "Haagen-Dazs Waterway Point",
+   "address": "83 Punggol Central, #01-72/73, Waterway Point, Singapore 828761",
+   "postal_code": "828761",
+   "price_text": "$$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "Premium ice cream shop on Level 1 West Wing of Waterway Point in Punggol, near Punggol MRT. Address and phone match across Burpple, FoodAdvisor and SingMalls.",
+   "website": "https://www.haagendazs.com.sg/shop/singapore/waterway-point",
+   "phone": "<PHONE>",
+   "dishes": [
+    "Ice cream"
+   ],
+   "hours": "11:00am-10:00pm daily",
+   "booking_url": null,
+   "lat": 1.406484621320066,
+   "lng": 103.9021056807848,
+   "source": {
+    "url": "https://www.burpple.com/haagen-dazs-waterway-point",
+    "title": "Haagen-Dazs (Waterway Point) - Burpple"
+   }
+  },
+  {
+   "name": "Marble Slab Creamery Causeway Point",
+   "address": "1 Woodlands Square, Causeway Point #B1-22, Singapore 738099",
+   "postal_code": "738099",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "Ice cream parlour in the basement of Causeway Point, Woodlands, next to The Chicken Rice Shop. Not marked closed in the sources found, though the Yelp page is dated July 2025.",
+   "website": null,
+   "phone": "<PHONE>",
+   "dishes": [
+    "Ice cream"
+   ],
+   "hours": null,
+   "booking_url": null,
+   "lat": 1.436070065080311,
+   "lng": 103.7859815242531,
+   "source": {
+    "url": "https://www.yelp.com/biz/marble-slab-creamery-singapore-6",
+    "title": "Marble Slab Creamery - Yelp"
+   }
+  },
+  {
+   "name": "Ben & Jerry's VivoCity",
+   "address": "1 HarbourFront Walk, #02-K1, VivoCity, Singapore 098585",
+   "postal_code": "098585",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "Scoop shop of the American ice cream brand on Level 2 of VivoCity. Official Ben & Jerry's Singapore site lists this unit.",
+   "website": "https://www.benjerry.com.sg/vivocity",
+   "phone": "<PHONE>",
+   "dishes": [
+    "Ice cream"
+   ],
+   "hours": "11am-10pm daily",
+   "booking_url": null,
+   "lat": 1.264293167839738,
+   "lng": 103.8223046936493,
+   "source": {
+    "url": "https://www.benjerry.com.sg/vivocity",
+    "title": "Ben & Jerry's Singapore"
+   }
+  },
+  {
+   "name": "Baskin-Robbins Punggol Oasis Terraces",
+   "address": "681 Punggol Drive, #01-05 Oasis Terraces, Singapore 820681",
+   "postal_code": "820681",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "Outlet of the American ice cream chain at Oasis Terraces in Punggol. Listed on Tripadvisor and a Singapore outlet directory; current status not confirmed.",
+   "website": null,
+   "phone": null,
+   "dishes": [
+    "Ice cream"
+   ],
+   "hours": null,
+   "booking_url": null,
+   "lat": 1.402780157256932,
+   "lng": 103.9132151013428,
+   "source": {
+    "url": "https://www.tripadvisor.com/Restaurant_Review-g294265-d21399738-Reviews-Baskin_Robbins-Singapore.html",
+    "title": "Baskin Robbins Punggol - Tripadvisor"
+   }
+  },
+  {
+   "name": "hay, gelato. (Katong)",
+   "address": "121 East Coast Road, Singapore 428807",
+   "postal_code": "428807",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Gelato",
+    "Dessert"
+   ],
+   "summary": "Artisanal gelato shop on East Coast Road in Katong, across from i12. A second outlet is at Bedok North Avenue 3.",
+   "website": null,
+   "phone": "<PHONE>",
+   "dishes": [
+    "Gelato"
+   ],
+   "hours": null,
+   "booking_url": null,
+   "lat": 1.305977598736903,
+   "lng": 103.9046420631718,
+   "source": {
+    "url": "https://www.tripadvisor.com/Restaurant_Review-g294265-d27157231-Reviews-Hay_gelato_Katong-Singapore.html",
+    "title": "HAY, GELATO @ KATONG - Tripadvisor"
+   }
+  },
+  {
+   "name": "Swensen's Plaza Singapura",
+   "address": "68 Orchard Road, #03-23 Plaza Singapura, Singapore 238839",
+   "postal_code": "238839",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "Classic family ice cream parlour chain, halal-certified, connected to Dhoby Ghaut MRT. Known for the Earthquake sundae of eight scoops and eight toppings.",
+   "website": "https://swensens.com.sg/singapore/",
+   "phone": "<PHONE>",
+   "dishes": [
+    "Earthquake sundae"
+   ],
+   "hours": "11:00AM-10:30PM daily",
+   "booking_url": null,
+   "lat": 1.300747709639166,
+   "lng": 103.8450475734307,
+   "source": {
+    "url": "https://swensens.com.sg/singapore/",
+    "title": "Swensen's Singapore Outlets Locations"
+   }
+  },
+  {
+   "name": "llaollao Tampines 1",
+   "address": "10 Tampines Central 1, #02-K2, Tampines 1, Singapore 529536",
+   "postal_code": "529536",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Frozen yogurt",
+    "Dessert"
+   ],
+   "summary": "Spanish frozen yogurt chain with an outlet at Tampines 1 per the llaollao website. OpenRice lists a different unit as closed, so confirm before visiting.",
+   "website": "https://www.llaollaoweb.com/en/tienda/singapur-sc-tampines-central-1/",
+   "phone": null,
+   "dishes": [
+    "Frozen yogurt"
+   ],
+   "hours": null,
+   "booking_url": null,
+   "lat": 1.35425637962116,
+   "lng": 103.9450717480269,
+   "source": {
+    "url": "https://www.llaollaoweb.com/en/tienda/singapur-sc-tampines-central-1/",
+    "title": "Singapur Sc Tampines Central 1 - llaollao"
+   }
+  },
+  {
+   "name": "The Better Scoop",
+   "address": "88 Punggol Way, #02-124 Punggol Coast Mall, Singapore 829913",
+   "postal_code": "829913",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "Local ice cream and gelato shop in Tower 7 of Punggol Coast Mall, near White Cloud Cafe.",
+   "website": null,
+   "phone": "<PHONE>",
+   "dishes": [
+    "Ice cream"
+   ],
+   "hours": null,
+   "booking_url": null,
+   "lat": 1.414773534913812,
+   "lng": 103.9106142924083,
+   "source": {
+    "url": "https://burpple.com/the-better-scoop-punggol-coast",
+    "title": "The Better Scoop (Punggol Coast) - Burpple"
+   }
+  },
+  {
+   "name": "Beans & Cream",
+   "address": "347 Bukit Batok Street 34, #01-260, Singapore 650347",
+   "postal_code": "650347",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Cafe"
+   ],
+   "summary": "Ice cream, waffle and coffee shop in Bukit Batok, near Lakeside MRT, appearing in near-Jurong searches. Yelp lists 12:30pm-9:30pm Monday to Thursday.",
+   "website": "https://www.facebook.com/beansncreamsg/",
+   "phone": null,
+   "dishes": [
+    "Ice cream",
+    "Waffles",
+    "Coffee"
+   ],
+   "hours": "Mon-Thu 12:30pm-9:30pm",
+   "booking_url": null,
+   "lat": 1.362270342004219,
+   "lng": 103.7511929389099,
+   "source": {
+    "url": "https://www.yelp.com/biz/beans-and-cream-singapore",
+    "title": "Beans & Cream - Yelp"
+   }
+  },
+  {
+   "name": "The Meowgical Scoop",
+   "address": "264 Tampines Street 21, #01-112, Singapore 520264",
+   "postal_code": "520264",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Gelato",
+    "Dessert",
+    "Cafe"
+   ],
+   "summary": "Cat-themed, pet-friendly dessert cafe in Tampines serving waffles and rotating gelato. Registered April 2025 and listed as live.",
+   "website": null,
+   "phone": "<PHONE>",
+   "dishes": [
+    "Grape Yakult gelato",
+    "Bubble Gum gelato",
+    "Waffles",
+    "Tiramisu"
+   ],
+   "hours": "2PM-10PM Sun-Thu, 2PM-11PM Fri-Sat",
+   "booking_url": null,
+   "lat": 1.352804865066532,
+   "lng": 103.9511457116378,
+   "source": {
+    "url": "https://www.gojek.com/sg/blog/explore-singapore-august-2025-activities-gojek-ridehailing-singapore",
+    "title": "Gojek recommends - Gojek"
+   }
+  },
+  {
+   "name": "Cottontail Creamery",
+   "address": "326 Serangoon Avenue 3, #01-378, Singapore 550326",
+   "postal_code": "550326",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Cafe"
+   ],
+   "summary": "Heartland ice cream and waffle cafe in Serangoon, near Serangoon MRT. Closed Mondays per Yelp.",
+   "website": "https://www.facebook.com/cottontailcreamery/",
+   "phone": "<PHONE>",
+   "dishes": [
+    "Ice cream",
+    "Waffles"
+   ],
+   "hours": null,
+   "booking_url": null,
+   "lat": 1.35035198508251,
+   "lng": 103.8689969906034,
+   "source": {
+    "url": "https://www.facebook.com/cottontailcreamery/",
+    "title": "Cottontail Creamery - Facebook"
+   }
+  },
+  {
+   "name": "Ice-Cream Man And Friends (The Garden Cafe)",
+   "address": "60 Yuan Ching Road, #01-01 Sunken Garden, Jurong Lake Gardens, Singapore 619672",
+   "postal_code": "619672",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Cafe"
+   ],
+   "summary": "Kiosk of a Jurong ice cream brand at Jurong Lake Gardens; the original Taman Jurong shop appears closed. The OpenRice listing is about 595 days old.",
+   "website": null,
+   "phone": "<PHONE>",
+   "dishes": [
+    "Ice cream"
+   ],
+   "hours": null,
+   "booking_url": null,
+   "lat": 1.335365135478602,
+   "lng": 103.7306120667174,
+   "source": {
+    "url": "https://sg.openrice.com/en/singapore/r-ice-cream-man-friends-the-garden-cafe-jurong-east-ice-cream-and-gelato-r239731/menus",
+    "title": "Ice Cream Man & Friends The Garden Cafe - OpenRice"
+   }
+  },
+  {
+   "name": "Cold Flings",
+   "address": "21 Fernvale Road, #01-05 High Park Residences, Singapore 797637",
+   "postal_code": "797637",
+   "price_text": "$$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "Ice cream shop in Fernvale, Sengkang, open late until 2am per Daniel's Food Diary (2022).",
+   "website": null,
+   "phone": null,
+   "dishes": [
+    "Ice cream"
+   ],
+   "hours": "Until 2am",
+   "booking_url": null,
+   "lat": 1.396389613185159,
+   "lng": 103.8751327785169,
+   "source": {
+    "url": "https://danielfooddiary.com/2022/07/30/coldflings/",
+    "title": "Cold Flings - Daniel's Food Diary"
+   }
+  },
+  {
+   "name": "The Ice Cream Store",
+   "address": "61 Sengkang East Road, Shell Petrol Kiosk, Singapore 545015",
+   "postal_code": "545015",
+   "price_text": "$",
+   "per_pax": null,
+   "cuisine": [
+    "Ice cream",
+    "Dessert"
+   ],
+   "summary": "Ice cream store at a Shell petrol kiosk in Sengkang; a second branch is at Jurong West Avenue 5.",
+   "website": null,
+   "phone": null,
+   "dishes": [
+    "Ice cream"
+   ],
+   "hours": null,
+   "booking_url": null,
+   "lat": 1.391531025969681,
+   "lng": 103.8926604414866,
+   "source": {
+    "url": "https://mart.grab.com/sg/en/merchant/the-ice-cream-store-sengkang-east-road/4-C2NKCETTG2M2KE",
+    "title": "The Ice Cream Store - Grab"
+   }
   }
  ],
  "hide": [
