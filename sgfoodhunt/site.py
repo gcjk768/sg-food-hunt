@@ -235,6 +235,7 @@ def build_site_data(
     bootstrap = all_runs[0].run_id if all_runs else None  # first run saw everything "new"
     curated = _curated(config)
     popular: dict[str, list[str]] = curated.get("dishes") or {}
+    hide = set(curated.get("hide") or [])  # closed, moved or not a place to eat: kept off every list
 
     categories: dict[str, Any] = {}
     tops: dict[str, list[tuple[int, str]]] = {}
@@ -250,6 +251,7 @@ def build_site_data(
                 or s.get("excluded_reason")
                 or s.get("hidden")
                 or s["venue_id"] not in venues
+                or venues[s["venue_id"]]["name"].strip(" .·-") in hide
             ):
                 continue
             ranked.append(

@@ -212,3 +212,16 @@ def test_curated_dishes_and_izakaya_list(app_config: AppConfig, run_store: RunSt
     assert [r["id"] for r in data["categories"]["izakaya"]["ranked"]] == ["v1", "x002"]
     assert data["venues"]["x002"]["mrt"] and data["venues"]["x002"]["worth"]
     assert any(g["key"] == "izakaya" for g in data["groups"])
+
+
+def test_curated_hide_keeps_closed_venues_off_every_list(
+    app_config: AppConfig, run_store: RunStore
+) -> None:
+    v1, v2 = _venue("v1", "Alpha"), _venue("v2", "Gone Cafe")
+    _write_run(
+        run_store, "20260908T000000Z", [v1, v2], _scores([("v1", "Alpha"), ("v2", "Gone Cafe")])
+    )
+    write_json(app_config.config_dir / "curated.json", {"hide": ["Gone Cafe"]})
+    data = read_json(build_site(app_config, run_store))
+    assert "v1" in data["venues"] and "v2" not in data["venues"]
+    assert all(r["id"] != "v2" for c in data["categories"].values() for r in c["ranked"])

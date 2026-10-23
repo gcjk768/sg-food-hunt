@@ -1815,6 +1815,261 @@
    "Lor Mee",
    "Ayam Penyet"
   ],
+  "Newton Food Centre": [
+   "Sambal stingray",
+   "Oyster omelette",
+   "Chicken wing and satay",
+   "Chilli crab",
+   "Kway chap"
+  ],
+  "Maxwell Food Centre": [
+   "Hainanese chicken rice",
+   "Fish bee hoon soup",
+   "Roast duck noodles",
+   "Hokkien mee",
+   "Porridge"
+  ],
+  "Golden Mile Food Centre": [
+   "Chilli prawn noodles",
+   "Claypot rice",
+   "Hokkien prawn mee",
+   "Ayam buah keluak",
+   "Xiao long bao"
+  ],
+  "Tiong Bahru Market & Food Centre": [
+   "Chwee kueh",
+   "Fried kway teow",
+   "Hokkien mee",
+   "Lor mee",
+   "Pig's organ porridge"
+  ],
+  "Hong Lim Market & Food Centre": [
+   "Chicken cutlet curry noodles",
+   "Min jiang kueh",
+   "Tau suan",
+   "Wanton noodles",
+   "Sungei Road laksa"
+  ],
+  "Tekka Centre": [
+   "Mutton briyani",
+   "Chicken briyani",
+   "Masala dosa",
+   "Mee siam",
+   "Carrot cake"
+  ],
+  "Whampoa Hawker Centre": [
+   "Prawn noodles",
+   "Lor mee",
+   "Braised duck rice",
+   "Laksa yong tau foo",
+   "Fried bee hoon"
+  ],
+  "Geylang Serai Market & Food Centre": [
+   "Chicken briyani",
+   "Nasi ayam sambal",
+   "Mee siam",
+   "Mutton soup",
+   "Kueh talam"
+  ],
+  "Yishun Park Hawker Centre": [
+   "Nasi lemak ayam taliwang",
+   "Har cheong gai",
+   "Fried fish pao fan",
+   "Mie bakso",
+   "Sambal stingray"
+  ],
+  "East Coast Lagoon Food Village": [
+   "Satay",
+   "BBQ sambal stingray",
+   "BBQ chicken wings",
+   "Hokkien mee",
+   "Bak kut teh"
+  ],
+  "Market Street Hawker Centre": [
+   "Ipoh hor fun",
+   "Chicken briyani",
+   "Hainanese curry rice",
+   "Teochew mee pok",
+   "Wanton mee"
+  ],
+  "Amoy Street Food Centre": [
+   "Wanton mee ramen",
+   "Fish bee hoon soup",
+   "Curry puff",
+   "Kaya toast",
+   "Nasi lemak"
+  ],
+  "Chinatown Complex Food Centre": [
+   "Claypot rice",
+   "Soya sauce chicken rice",
+   "Xiao long bao",
+   "Yong tau foo",
+   "Fish head mee hoon"
+  ],
+  "Adam Road Food Centre": [
+   "Nasi lemak",
+   "Mee soto",
+   "Mee rebus",
+   "Pork ribs prawn noodle",
+   "Mutton soup"
+  ],
+  "Chomp Chomp Food Centre": [
+   "BBQ chicken wings",
+   "Hokkien mee",
+   "Satay",
+   "Sambal stingray",
+   "Oyster omelette"
+  ],
+  "Pasir Ris Central Hawker Centre": [
+   "Teochew fish soup",
+   "Nasi lemak",
+   "Ayam penyet",
+   "Fish collagen broth pao fan",
+   "Curry chicken"
+  ],
+  "Zion Riverside Food Centre": [
+   "Char kway teow",
+   "Prawn noodles",
+   "Fried carrot cake",
+   "Xiao long bao",
+   "Kway chap"
+  ],
+  "Timbre+": [
+   "Dry minced meat noodles",
+   "Seafood white bee hoon",
+   "Lechon",
+   "Mala xiang guo",
+   "Teppei kaisendon"
+  ],
+  "Satay by the Bay": [
+   "Satay",
+   "BBQ stingray",
+   "Chilli crab",
+   "Oyster omelette",
+   "BBQ chicken wings"
+  ],
+  "Lau Pa Sat": [
+   "Satay",
+   "Fried kway teow",
+   "Hokkien mee",
+   "Nasi lemak",
+   "Chicken rice"
+  ],
+  "Kovan 209 Market & Food Centre": [
+   "Wanton mee",
+   "Fishball noodles",
+   "Prawn noodles",
+   "Pig leg rice",
+   "Mee rebus"
+  ],
+  "Toa Payoh West Market and Food Centre": [
+   "Fried carrot cake",
+   "Fried Hokkien prawn mee",
+   "Fish porridge",
+   "Kway chap",
+   "You tiao"
+  ],
+  "Bukit Timah Market & Food Centre": [
+   "Satay bee hoon",
+   "Fried white carrot cake",
+   "Fish soup",
+   "Lala white bee hoon",
+   "Hokkien mee"
+  ],
+  "ABC Brickworks": [
+   "Fish and chips",
+   "Herbal black chicken soup",
+   "Claypot rice",
+   "Char siew rice",
+   "Prawn mee"
+  ],
+  "Alexandra Food Village": [
+   "Claypot Laksa",
+   "Xiao Long Bao",
+   "Char Siew Wanton Noodles",
+   "Hor Fun",
+   "Avocado Milkshake"
+  ],
+  "Ci Yuan Hawker Centre": [
+   "Nasi Lemak Ayam Taliwang",
+   "Lor Mee",
+   "Braised Soft Pork Ribs Noodles",
+   "Kway Chap",
+   "Xiao Long Bao"
+  ],
+  "Prive at ACM": [
+   "Eggs Benedict",
+   "Pulled Pork Knuckle Burger",
+   "Sticky Date Pudding",
+   "Spaghetti Aglio Olio with Roast Pork Belly"
+  ],
+  "Bukit Timah Food Centre": [
+   "Teochew Fish Soup",
+   "Satay Bee Hoon",
+   "Hokkien Mee",
+   "Roasted Chicken Rice",
+   "Carrot Cake"
+  ],
+  "Le Matin Pâtisserie – Iconic pastry shop by Michelin chef": [
+   "Escargot Escargot",
+   "Fermented Mushroom Quiche",
+   "Kouign Amann",
+   "Canelé",
+   "Pistachio Escargot"
+  ],
+  "Keong Saik Bakery Holland Village – Kopitiam shophouse": [
+   "Chendol Delight",
+   "Sor Hei",
+   "Miso Kouign-Amann",
+   "Basque Burnt Cheesecake",
+   "Black Sesame Croissant"
+  ],
+  "Haus217 – Japanese-style pop-up cafe": [
+   "Fennel-Scented Meatballs",
+   "Bolognese",
+   "Matcha Canelé",
+   "Hojicha Roll"
+  ],
+  "State of Affairs – Coffee from 6am at Upper Thomson": [
+   "Loaded Croquettes",
+   "Miso Butter Salmon Fettuccine",
+   "Grilled Cheese with Tomato Soup",
+   "Smoked Banana Bread",
+   "Mont Blanc"
+  ],
+  "Pazzion Cafe – Opened by shoe brand": [
+   "The Fab Burger",
+   "Big Fabulous Breakfast",
+   "Braised Beef Cheeks",
+   "Cold Truffle Pasta",
+   "Triple Cheese Sandwich"
+  ],
+  "DAWN – Quiet coffee bar in the CBD": [
+   "Pandan Coconut Loaf Cake",
+   "Walnut Banana Bread",
+   "Lemon Pound Loaf Cake",
+   "Ham & Cheese Toastie"
+  ],
+  "Surrey Hills Grocer Cafe – Alfresco cafe in Jurong with OZ vibes": [
+   "Crayfish Benny",
+   "Hot Honey Fried Chicken Waffle",
+   "Tasmanian Salmon",
+   "Wagyu Bolognese",
+   "Truffle Pasta"
+  ],
+  "NOX – “Surprise” menu with visually impaired hosts": [
+   "Braised Wagyu Short Ribs",
+   "Seared Ahi Tuna",
+   "Beef Cheek Croquettes",
+   "Pan-Seared Scallops"
+  ],
+  "Sonny’s Pizzeria – New York-style pizza parlour": [
+   "Pepperoni Pizza",
+   "GM Pizza",
+   "Sausage Pizza",
+   "Cheese Pizza",
+   "Saigon Stunner"
+  ],
   "Supernova": [
    "Fried Chicken French Toast",
    "Steak Hash",
@@ -1947,6 +2202,83 @@
    "Army Stew",
    "Kimcheese Fried Rice",
    "US Prime Short Rib"
+  ],
+  "The Food Peeps – Retro shophouse cafe with brunch fare": [
+   "Rendang on Toast",
+   "Big Breakfast Club",
+   "Hong Kong Breakfast Bagelwich",
+   "Omelette Crepe",
+   "Prawn & Avocado on Toast"
+  ],
+  "Off Track – Retro bar with Pan-Asian food & cocktails": [
+   "SF-style Garlic Noodles",
+   "Dashi Mascarpone Dip with Sourdough",
+   "Eggplant Fries",
+   "Iberico Pork Collar",
+   "Charcoal-grilled Banana Cake"
+  ],
+  "Yun Ga Traditional Korean Restaurant": [
+   "Beef Rib Soup",
+   "Black Pork Belly BBQ",
+   "Kimchi Seafood Pancake",
+   "Army Stew",
+   "Dolsot Bibimbap"
+  ],
+  "Daniu Teochew Seafood Restaurant": [
+   "Marinated Raw Crab",
+   "Braised Goose",
+   "Oyster Omelette",
+   "Handmade Pork Balls",
+   "Lala with Specialty Sauce"
+  ],
+  "Seroja": [
+   "Mangrove Wood-Charred Scallop with Roti Paung",
+   "Duck Percik",
+   "Red Seabream with Sarawak White Pepper Gulai"
+  ],
+  "Gotti Italiano": [
+   "N'duja e Granchio",
+   "Sfoglia Arrotolata ai Porcini e Tartufo",
+   "Cacio e Pepe",
+   "Mezze Maniche alla Norma",
+   "Guanciale di Manzo"
+  ],
+  "Estuary Restaurant & Bar": [
+   "Signature Fish & Chips",
+   "Grilled Octopus",
+   "Crab Toast",
+   "Sakura Pork Chop",
+   "Aged Fish"
+  ],
+  "Toby’s Estate Coffee Roasters Singapore": [
+   "Brekkie of Champions",
+   "Breakfast Tacos",
+   "Eggs Benedict Brooklyn Style",
+   "Toby's French Toast"
+  ],
+  "King’s Cart Coffee Factory": [
+   "La Zi Ji Mala Karaage Chicken",
+   "Blur Like Sotong Fritters",
+   "Truffle Fries",
+   "Souffle Pancakes",
+   "Parma Ham & Brie Croissant"
+  ],
+  "Highlander Coffee Espresso Bar": [
+   "Tandoori Chicken Wrap",
+   "Chicken Pie",
+   "BBQ Gouda Chicken Toastie"
+  ],
+  "Jimmy Monkey Cafe": [
+   "Thai Laksa Beef Short Ribs",
+   "Boston Bay Mussel Pot",
+   "Sticky Honey Chili Sakura Pork Belly",
+   "The Hulk Smashed Avocado on Sourdough",
+   "Moroccan Chermoula Salmon Bowl"
+  ],
+  "Strangers at Work": [
+   "Tandoori Chicken Sandwich",
+   "Chicken Meatball Marinara Sandwich",
+   "Spam Fries"
   ],
   "Garibaldi Italian Restaurant & Bar": [
    "Ossobuco",
@@ -2587,5 +2919,45 @@
   {
    "id": "v02903"
   }
+ ],
+ "hide": [
+  "(CLOSED) Error 404",
+  "Sabio by the Sea",
+  "Koal",
+  "Braci",
+  "O Happi Place",
+  "Missus",
+  "Panquecas’",
+  "Hooloo Cafe",
+  "What The Pug",
+  "The Ritz-Carlton, Millenia Singapore",
+  "Far East Plaza",
+  "Plaza Singapura",
+  "Mandarin Oriental, Singapore",
+  "Reverie On Hill",
+  "Gallery26",
+  "Museum of Ice Cream",
+  "Kids21",
+  "B.P. de Silva Jewellers",
+  "Dover Street Market",
+  "Core Collective Dempsey",
+  "The Wagington",
+  "Ground Floor Coffee",
+  "White Rabbit @ Dempsey Hill",
+  "Roast @ One Rochester",
+  "Tourterelle Cafe – Quirky paintings with Parisian vibe",
+  "Soul Coffee – Robot barista & “underwater” photo ops",
+  "(Temporarily Closed) Brown Butter – Pink cafe with dreamy vibes",
+  "North Singapore",
+  "West Singapore",
+  "1",
+  "SweeT.Rex – 1",
+  "Bugis+",
+  "Am I Addicted – Korean vegetarian cafe and pottery studio",
+  "CoComelon Cafe – Themed pop-up cafe open till April 2022",
+  "Two Bakers",
+  "Starter Lab",
+  "Luxe Singapore",
+  "Eden Restaurant"
  ]
 }
