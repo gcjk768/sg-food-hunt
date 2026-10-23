@@ -127,6 +127,7 @@ def app_config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> AppConfig:
     """The real config files, copied to a temp dir with paths and options pointed at temp dirs."""
     cfg_dir = tmp_path / "config"
     shutil.copytree(ROOT / "config", cfg_dir)
+    (cfg_dir / "curated.json").unlink(missing_ok=True)  # hand-picked data; tests bring their own
     settings = yaml.safe_load((cfg_dir / "settings.yaml").read_text())
     settings["paths"] = {
         "vault_dir": str(tmp_path / "vault"),

@@ -1,0 +1,1454 @@
+{
+ "dishes": {
+  "Burnt Ends": [
+   "Burnt Ends Sanger",
+   "Smoked quail egg with sour cream and caviar",
+   "Bone marrow and onion"
+  ],
+  "Candlenut": [
+   "Ayam buah keluak",
+   "Kueh pie tee",
+   "Beef short rib rendang"
+  ],
+  "Violet Oon Dempsey": [
+   "Kueh Pie Tee",
+   "Beef Rendang",
+   "Laksa",
+   "Ayam Buah Keluak",
+   "Chicken Satay"
+  ],
+  "Violet Oon Singapore": [
+   "Kueh Pie Tee",
+   "Beef Rendang",
+   "Laksa",
+   "Ayam Buah Keluak",
+   "Chicken Satay"
+  ],
+  "Canchita Peruvian Cuisine": [
+   "Ceviche",
+   "Lomo Saltado",
+   "Anticuchos",
+   "Pollo a la Brasa"
+  ],
+  "Jumbo Seafood": [
+   "Chilli Crab",
+   "Black Pepper Crab",
+   "Cereal Prawns",
+   "Fried Mantou"
+  ],
+  "Tiong Bahru Bakery Siglap": [
+   "Croissant",
+   "Kouign Amann",
+   "Pain au Chocolat"
+  ],
+  "SUSHISAMBA": [
+   "Rock Shrimp Tempura",
+   "Tiradito",
+   "Anticucho",
+   "Samba Roll"
+  ],
+  "Cut by Wolfgang Puck": [
+   "Bone Marrow Flan",
+   "Creamed Spinach",
+   "Wagyu Steak"
+  ],
+  "Typhoon Cafe": [
+   "Pad Thai",
+   "Green Curry",
+   "Tom Yum Soup",
+   "Mango Sticky Rice"
+  ],
+  "Wan Hao Chinese Restaurant": [
+   "Honey-Glazed Char Siew Rice Dumpling",
+   "White Pepper Crab Rice Dumpling",
+   "Abalone Rice Dumpling",
+   "Signature Pork & Salted Egg Rice Dumpling"
+  ],
+  "Shisen Hanten by Chen Kentaro": [
+   "Mapo Tofu",
+   "Dan Dan Noodles",
+   "Prawns in Chilli Sauce"
+  ],
+  "Nobu Singapore": [
+   "Black Cod with Miso",
+   "Yellowtail Jalapeno",
+   "Rock Shrimp Tempura"
+  ],
+  "Tiong Bahru Bakery Safari": [
+   "Kouign Amann",
+   "Butter Croissant",
+   "Pain au Chocolat"
+  ],
+  "Keng Eng Kee Seafood": [
+   "Salted Egg Yolk Pork Ribs",
+   "Coffee Pork Ribs",
+   "Moonlight Hor Fun",
+   "Hot Plate Tofu"
+  ],
+  "Hua Ting Restaurant – healthy yusheng shaped in an ox": [
+   "Peking Duck",
+   "Fish Maw Soup",
+   "Baked Lobster"
+  ],
+  "Nobu Singapore – Famous Japanese restaurant from NYC": [
+   "Black Cod Miso",
+   "Yellowtail Jalapeño",
+   "Rock Shrimp Tempura",
+   "New Style Sashimi"
+  ],
+  "Xin Wang Hong Kong Café 新旺香港茶餐厅 (One@KentRidge)": [
+   "Egg Tart",
+   "Roast Meat Rice",
+   "Hong Kong Milk Tea"
+  ],
+  "Xin Wang Hong Kong Café 新旺香港茶餐厅 (AMK Hub)": [
+   "Egg Tart",
+   "Roast Meat Rice",
+   "Hong Kong Milk Tea"
+  ],
+  "Xin Wang Hong Kong Café 新旺香港茶餐厅 (Velocity)": [
+   "Egg Tart",
+   "Roast Meat Rice",
+   "Hong Kong Milk Tea"
+  ],
+  "Uncle Leong Seafood (Techview)": [
+   "Chilli Crab",
+   "Black Pepper Crab",
+   "Salted Egg Yolk Crab"
+  ],
+  "Zorba The Greek Taverna": [
+   "Moussaka",
+   "Souvlaki",
+   "Greek Salad"
+  ],
+  "Old Airport Road Food Centre": [
+   "Hokkien mee",
+   "Lor mee",
+   "Char kway teow",
+   "Chwee kueh"
+  ],
+  "Chinatown Complex Market and Food Centre": [
+   "Soya sauce chicken rice",
+   "Bak chang",
+   "Claypot rice",
+   "Char kway teow"
+  ],
+  "Bedok 85 Fengshan Food Centre": [
+   "BBQ chicken wings",
+   "Pork porridge",
+   "Hokkien mee"
+  ],
+  "Kelly Jie Seafood (former Mellben Seafood)": [
+   "Superior soup crab bee hoon",
+   "Claypot curry fish head",
+   "Hot plate tofu"
+  ],
+  "Heng Gi Goose and Duck Rice": [
+   "Goose rice",
+   "Duck rice",
+   "Duck liver",
+   "Braised egg",
+   "Braised tofu"
+  ],
+  "Ming Fa Fishball": [
+   "Fishball noodles",
+   "Seafood vegetable fishcake",
+   "Ngoh hiang"
+  ],
+  "WINESTONE": [
+   "Slow-cooked Beef Bolognese",
+   "Chicken Parmigiana",
+   "Tableside Pandan Creme Brulee"
+  ],
+  "Barossa Steak and Grill": [
+   "Pork Rack Shio Koji Dry-Aged",
+   "Pan-Roasted Red Snapper",
+   "Sticky Date Pudding"
+  ],
+  "Hong Kee Beef Noodle": [
+   "Beef Noodle Soup",
+   "Dry Beef Noodles",
+   "Beef Ball Noodles"
+  ],
+  "Inspirasi: Soto Ayam, Mee Soto, Chicken Porridge ($2.50)": [
+   "Soto Ayam",
+   "Mee Soto",
+   "Chicken Porridge"
+  ],
+  "Guzman y Gomez": [
+   "Burrito",
+   "Tacos",
+   "Nachos"
+  ],
+  "Noci Bakehouse": [
+   "Burrata Jambon panuozzo",
+   "Ricotta Mortadella panuozzo",
+   "Bulgogi panuozzo",
+   "Kaya Butter bagel"
+  ],
+  "Odette": [
+   "Rosemary smoked organic egg",
+   "Mushroom tea with cep sabayon",
+   "Heirloom beetroot variation",
+   "Normandy brown crab"
+  ],
+  "Waku Ghin": [
+   "Marinated botan shrimp with uni and caviar",
+   "Wagyu with citrus and wasabi soy",
+   "Ghin cheesecake",
+   "Grilled carabinero shrimp"
+  ],
+  "Les Amis": [
+   "Cold angel hair pasta with caviar",
+   "Duck foie gras terrine",
+   "Pork loin",
+   "Hazelnut soufflé"
+  ],
+  "Restaurant Zen": [
+   "Truffle French toast",
+   "Chawanmushi",
+   "Onion, almond and liquorice",
+   "Scottish scallop with foie gras"
+  ],
+  "Labyrinth": [
+   "Labyrinth chili crab",
+   "Labyrinth rojak",
+   "Nasi lemak cheong fun",
+   "Ramly burger"
+  ],
+  "Cloudstreet": [
+   "Grilled oyster with betel leaf",
+   "Marron in Sri Lankan curry",
+   "Stout and liquorice bread",
+   "Murray cod"
+  ],
+  "Claudine": [
+   "Bouillabaisse",
+   "Vol-au-vent",
+   "Steak tartare",
+   "Chou farci"
+  ],
+  "Stella Seaside Lounge": [
+   "White Wine Clams",
+   "Seafood Linguine",
+   "Barramundi with Seafood Stew",
+   "St. Louis Pork Ribs"
+  ],
+  "The Garden Slug": [
+   "Rustic Ragu Bolognese",
+   "Carbonara",
+   "Seafood Laksa Squid Ink Pasta",
+   "Bun-Jo-Beef Burger",
+   "Crispy Calamari"
+  ],
+  "The Coastal Settlement": [
+   "TCS Nasi Lemak",
+   "Chicken Croffle",
+   "XO Prawn Aglio Olio",
+   "Truffle Fries",
+   "Mala Fish Skin"
+  ],
+  "Canopy Garden Dining": [
+   "Crabmeat Aglio Olio",
+   "Beer Battered Fish & Chips",
+   "Smoked Salmon Kouign Amann",
+   "Signature Fried Calamari"
+  ],
+  "Wheeler’s Estate": [
+   "Tomahawk Steak",
+   "Pull Apart Breads",
+   "300g Ribeye",
+   "Oven-baked Flounder",
+   "Scrambled Chilli Crab Bagel"
+  ],
+  "Les Bouchons Rochester": [
+   "Steak Frites",
+   "Duck Confit",
+   "Grilled Lamb Chops",
+   "French Onion Soup",
+   "Creme Brulee"
+  ],
+  "Under Der Linden": [
+   "Woodfire Koji Ribeye",
+   "Chilli Crab Pasta",
+   "Butter Broth Spaghetti",
+   "Iberico Pork Secreto",
+   "Crispy Calamari Fritters"
+  ],
+  "Mr Bucket Chocolaterie": [
+   "72% Hot Chocolate",
+   "Signature Chocolate Cake",
+   "Bonbon Tasting Set",
+   "Cacao Tea Somen",
+   "Buttermilk Fried Chicken & Waffles"
+  ],
+  "Tanjong Beach Club": [
+   "Dry-aged Barramundi",
+   "Wood-fired Half Chicken",
+   "Grilled Seasonal Oysters",
+   "Crispy Calamari",
+   "Tuna Tartare"
+  ],
+  "Habibi Grill Mediterranean Food": [
+   "Mixed kebab rice",
+   "Falafel with pita",
+   "Kunafe",
+   "Cheese pide",
+   "Baklava"
+  ],
+  "Yew’s Noodle": [
+   "Sarawak laksa",
+   "Kolo mee"
+  ],
+  "Jinggho Shokudo": [
+   "Unagi ju tendon",
+   "Toji tonkatsu",
+   "Aburi cheese toji don",
+   "Katsu chicken"
+  ],
+  "Yu Xiang Fang Seafood Pao Fan": [
+   "Fried fish pao fan",
+   "Scallop pao fan",
+   "Prawn pao fan"
+  ],
+  "Ah Tan Wings": [
+   "Har cheong gai wings",
+   "Har cheong gai cutlet set"
+  ],
+  "One Mouth Noodle": [
+   "Char siew wanton noodle",
+   "Dry wanton noodle"
+  ],
+  "Ah Lock Hakka Tofu Bowl": [
+   "Hakka tofu bowl",
+   "Thunder tea tofu bowl"
+  ],
+  "Nanyang Homemade Curry": [
+   "Chicken curry wing",
+   "Curry chicken whole leg",
+   "Chicken cutlet"
+  ],
+  "Smokin’ Joe": [
+   "BBQ boneless chicken leg",
+   "Wagyu burger",
+   "Angus tenderloin steak",
+   "Fish and chips"
+  ],
+  "Allauddin’s Briyani": [
+   "Mutton briyani",
+   "Chicken briyani",
+   "Prata",
+   "Murtabak"
+  ],
+  "Temasek Indian Rojak": [
+   "Prawn fritters",
+   "Indian rojak"
+  ],
+  "Hanifa’s Briyani Specialist": [
+   "Quail briyani",
+   "Mutton briyani",
+   "Mutton soup",
+   "Sup tulang merah"
+  ],
+  "Delhi Lahori": [
+   "Chicken masala rice set",
+   "Chicken tikka masala",
+   "Butter chicken",
+   "Naan",
+   "Seekh kebab"
+  ],
+  "545 Whampoa Noodles": [
+   "Prawn noodle soup",
+   "Dry prawn noodles"
+  ],
+  "Neha Tiffin Centre": [
+   "Putu mayam",
+   "Thosai",
+   "Masala vadai",
+   "Samosa"
+  ],
+  "Imaroy Thai Food": [
+   "Pad Thai",
+   "Mango salad",
+   "Tom yum soup",
+   "Seafood fried rice",
+   "Beef kway teow"
+  ],
+  "Generation Coffee": [
+   "Kopi C siew dai",
+   "Iced dirty matcha",
+   "Flat white",
+   "Long black"
+  ],
+  "Guan Chun Seng Mixed Veg Rice": [
+   "Chinese-style nasi lemak",
+   "Steamed egg",
+   "Stir-fried bitter gourd",
+   "Soy sauce ginger chicken"
+  ],
+  "Siti Rodiah Nasi Padang": [
+   "Nasi padang",
+   "Nasi rawon",
+   "Bagedil",
+   "Nasi lemak"
+  ],
+  "Wah Kee Big Prawn Noodles": [
+   "Big prawn noodles (dry)",
+   "Big prawn noodles (soup)",
+   "Clam soup"
+  ],
+  "Singapore Fried Hokkien Mee & Seafood": [
+   "Hokkien mee",
+   "Hokkien mee with prawns and squid",
+   "Crispy pork lard"
+  ],
+  "Huay Kwang Thai Wanton Mee @ Ubi": [
+   "Thai-style char siew wanton mee",
+   "Prawn dumpling soup",
+   "Fried wanton",
+   "Thai-style pork trotter rice"
+  ],
+  "Hee Hee Hee Steamed Fish": [
+   "Steamed golden pomfret",
+   "Steamed grouper",
+   "Steamed seabass",
+   "Thai chilli sotong"
+  ],
+  "Dosa Delights": [
+   "Masala dosa",
+   "Onion dosa",
+   "Ghee dosa",
+   "Poori",
+   "Idli vadai"
+  ],
+  "Jade’s Chicken": [
+   "Korean fried chicken (original)",
+   "Honey butter chicken",
+   "Soy sauce chicken",
+   "Sweet spicy chicken",
+   "Kimchi pancake"
+  ],
+  "SJ Sickander Ammal Muslim Foods": [
+   "Indian rojak",
+   "Roti prata",
+   "Murtabak",
+   "Tsunami prata"
+  ],
+  "South Buona Vista Braised Duck": [
+   "Teochew braised duck rice",
+   "Braised duck with yam rice"
+  ],
+  "Hong Kong Style Chee Cheong Fun": [
+   "Prawn chee cheong fun",
+   "Char siew chee cheong fun",
+   "Scallop chee cheong fun",
+   "Plain chee cheong fun"
+  ],
+  "What The Puff!": [
+   "Original curry puff",
+   "Sardine puff",
+   "Cheesy curry puff",
+   "Black pepper chicken puff",
+   "Char siew chicken puff"
+  ],
+  "Whampoa Traditional Fried Oyster": [
+   "Oyster omelette",
+   "Fried oyster",
+   "Sambal oyster",
+   "Carrot cake"
+  ],
+  "Aliff Tee – Ann Chin Popiah": [
+   "Popiah",
+   "Kueh pie tee",
+   "Fried spring roll"
+  ],
+  "Lindene Cleary – Lao Chen Carrot Cake, Popiah": [
+   "Fried carrot cake (white)",
+   "Fried carrot cake (black)",
+   "Popiah"
+  ],
+  "Kevin Ho – Auntie Rojak": [
+   "Popiah",
+   "Rojak"
+  ],
+  "Famous Sungei Road Trishaw Laksa": [
+   "Laksa",
+   "Fruit juice mee siam",
+   "Mee rebus"
+  ],
+  "Chuan Kee Boneless Braised Duck": [
+   "Braised duck rice",
+   "Yam rice",
+   "Braised peanuts"
+  ],
+  "Rolina Traditional Hainanese Curry Puff": [
+   "Curry chicken and egg puff",
+   "Sardine puff",
+   "Glutinous rice"
+  ],
+  "Na Na Homemade Curry": [
+   "Fish head curry",
+   "Chicken curry",
+   "Hokkien ngoh hiang"
+  ],
+  "Fresh Taste Big Prawn Noodle": [
+   "Big prawn noodle (soup)",
+   "Big prawn noodle (dry)",
+   "Prawn and pork ribs noodle"
+  ],
+  "Ah Er Soup (阿2": [
+   "Buddha Jumps Over the Wall soup",
+   "Herbal ginseng black chicken soup",
+   "Ten tonic ginseng chicken soup",
+   "Lotus root peanut pork rib soup",
+   "Pumpkin rice"
+  ],
+  "Famous Curry Puff": [
+   "Curry chicken puff",
+   "Sardine puff",
+   "Black pepper chicken puff"
+  ],
+  "Shi Hui Yuan Hor Fun": [
+   "Blissful set hor fun",
+   "Braised pork ribs hor fun",
+   "Braised chicken feet hor fun",
+   "Roast duck hor fun"
+  ],
+  "Liang Zhao Ji": [
+   "Braised duck rice",
+   "Duck porridge"
+  ],
+  "Imperial Broth Noodles": [
+   "Signature fresh pork noodle soup",
+   "Pig blood curd",
+   "Crispy lard rice"
+  ],
+  "Chen Fa Fish Soup": [
+   "Batang fish soup",
+   "Grouper fish soup",
+   "Silver pomfret fish soup",
+   "Seaweed chicken prawn rolls"
+  ],
+  "No. 25 Minced Meat Noodles": [
+   "Signature minced meat noodle",
+   "Handmade fish dumplings"
+  ],
+  "Liang Ji Legendary Char Kway Teow": [
+   "Char kway teow",
+   "Penang char kway teow",
+   "Humful char kway teow"
+  ],
+  "Jin Ji Teochew Braised Duck & Kway Chap": [
+   "Braised duck rice",
+   "Kway chap",
+   "Duck ramen",
+   "Braised duck bento set"
+  ],
+  "Shared Table": [
+   "Nourish Plate",
+   "Crispy miso salmon",
+   "Baked halibut with capsicum escabeche",
+   "Grilled chicken skewers",
+   "Hummus with roasted mushroom"
+  ],
+  "Cloudmills": [
+   "Unagi Moon",
+   "Banh Mi shio pan",
+   "Mango Mochi doughnut",
+   "Kohi nama",
+   "Kare pan"
+  ],
+  "The City Bakery": [
+   "Pretzel croissant",
+   "Real Hot Chocolate",
+   "Pretzel bagel",
+   "Sausage Danish",
+   "Coffee cinnamon roll"
+  ],
+  "Loulouca": [
+   "Loulouca entremet",
+   "Matcha Kaya Pistachio",
+   "Tiramisu with sobacha ice cream",
+   "Strawberry plated dessert",
+   "Shizuoka melon dessert"
+  ],
+  "Ameising Memories": [
+   "Mee sua with baby oyster",
+   "Braised pork rice",
+   "Kaya butter toast",
+   "Seafood laksa"
+  ],
+  "Uptown Nasi Lemak": [
+   "Nasi lemak with ayam goreng berempah",
+   "Beef rendang nasi lemak"
+  ],
+  "Ah Lock & Co": [
+   "Min jiang kueh",
+   "Hakka tofu bowl",
+   "Hakka signature rice bowl",
+   "Black beef rice bowl"
+  ],
+  "Little Ribbons Pasta Co": [
+   "Pomodoro pasta",
+   "Beef bolognese pasta",
+   "Pink sauce pasta",
+   "Carbonara"
+  ],
+  "Atout": [
+   "Escargot",
+   "Duck foie gras terrine",
+   "Braised short ribs",
+   "Creme brulee"
+  ],
+  "RedDot Brewhouse": [
+   "Satay",
+   "Crispy pork belly",
+   "RedDot guava salad",
+   "Truffle fries"
+  ],
+  "Chopsuey Cafe": [
+   "Crispy duck pow pockets",
+   "Sweet & sour fish and chips",
+   "Mud crab fried rice",
+   "Salted caramel giant profiterole"
+  ],
+  "Maison Garden": [
+   "Acai bowl",
+   "Kale power salad",
+   "Crab claw orecchiette",
+   "Maison club panini"
+  ],
+  "Surrey Hills Grocer Glasshouse Cafe": [
+   "Truffle pasta",
+   "Miso carbonara udon",
+   "Roast chicken",
+   "Pork shoulder benny"
+  ],
+  "There Was No Coffee": [
+   "Durian latte",
+   "Watermelon latte",
+   "Orange americano",
+   "Rose latte"
+  ],
+  "So France Cafe": [
+   "Quiche",
+   "Complete galette",
+   "Madame Croq",
+   "Canele"
+  ],
+  "Rough Guys Coffee": [
+   "Kurasu pour-over coffee",
+   "Iced oat white",
+   "Brownie",
+   "Banana bread"
+  ],
+  "Sourbombe Artisanal Bakery at Jewel Changi": [
+   "Strawberry milk bombolini",
+   "Dark chocolate hazelnut bombolini",
+   "Basque burnt cheesecake bombolini",
+   "Creme brulee bombolini"
+  ],
+  "September Coffee": [
+   "Iced black sesame latte",
+   "Fried chicken french toast",
+   "Mentaiko udon",
+   "Rose udon"
+  ],
+  "Ree.Connect by Ree and Mummy": [
+   "Charred pineapple cheesecake",
+   "Caramel biscoff cheesecake",
+   "Lemon tart gelato",
+   "Almond pecan toffee"
+  ],
+  "Lola’s Cafe Holland Village": [
+   "Spicy crab rigatoni",
+   "Honey paprika crispy wings",
+   "Pulled pork eggs benedict",
+   "Hazelnut waffle"
+  ],
+  "Oh My Cow!": [
+   "Soya bean & dough fritters ice cream",
+   "Truffle cheesecake ice cream",
+   "Love letter waffle",
+   "Ice cream hotpot"
+  ],
+  "Small Tables": [
+   "Ipoh curry mee",
+   "Ipoh chee cheong fun",
+   "Whole fish otah",
+   "Ipoh white coffee"
+  ],
+  "Supernova": [
+   "Fried Chicken French Toast",
+   "Steak Hash",
+   "Scallop Pad Thai",
+   "Wagyu Cheeseburger",
+   "Burnt Brussels Sprouts"
+  ],
+  "Hello Arigato Joo Chiat": [
+   "Gyu Sando",
+   "Har Cheong Gai Sando",
+   "Ebi Sando",
+   "Tamago Sando",
+   "Pasta BKT"
+  ],
+  "Blue Balls Cafe": [
+   "Blue Balls Burger",
+   "Peloton Salmon",
+   "Fish and Chips",
+   "Seafood Cioppino",
+   "Creme Brulee"
+  ],
+  "Ratio Cafe + Gastrobar": [
+   "Seafood Laksa Cream Linguine",
+   "Sweet Potato Fries with Sour Plum",
+   "Har Cheong Wings",
+   "Cray Pie Tee",
+   "Ondeh Ondeh Cake"
+  ],
+  "Hvala Beach Road": [
+   "Ichigo Ice Blend",
+   "Rockmelon Ice Blend",
+   "Tea Azuki Ice Blend",
+   "Iced Genmaicha Latte",
+   "Kinako Warabi Mochi"
+  ],
+  "Cava Cafe": [
+   "Otah Bruschetta",
+   "Chicken and Croffles",
+   "Mentaiko Cream Pasta",
+   "Cava Burger"
+  ],
+  "Working Title Riverside": [
+   "Truffle Tater Tots",
+   "Baconator Burger",
+   "Jammy Chicken Waffle",
+   "Banana French Toast",
+   "Bent Ribs"
+  ],
+  "GelatiAmo": [
+   "Pistachio Gelato",
+   "76% Dark Chocolate Gelato",
+   "Burrata Balsamico Gelato",
+   "Salted Caramel Gelato"
+  ],
+  "Vanda Botanical Desserts": [
+   "Chrysanthemum Goji Berries Gelato",
+   "Black Sesame Gelato",
+   "Pistachio Gelato",
+   "Bacio Gelato",
+   "Mochi-Wrapped Gelato"
+  ],
+  "99 Old Trees": [
+   "Stinky Bowl",
+   "Stinky Bomb",
+   "Stinky Roll",
+   "Stinky Chendul",
+   "Durian High Tea Set"
+  ],
+  "Cowpresso Coffee Roasters": [
+   "Flat White",
+   "Mocha Sea Salt",
+   "Pistachio Soft Serve",
+   "French Croissant",
+   "Furikake Mentaiko Fries"
+  ],
+  "La Levain": [
+   "Kouign Amann",
+   "Burnt Cheese Croissant",
+   "Bo Bo Cha Cha Croissant",
+   "Hojicha Mochi Croissant",
+   "Sourdough Egg Tart"
+  ],
+  "Guerilla Coffee": [
+   "Singapore Latte",
+   "Iced Black Mint",
+   "Mint Mocha",
+   "Pear Crumble Danish",
+   "Matcha Latte"
+  ],
+  "Panamericana Bakery": [
+   "Churros",
+   "Wood-Fired Lamb",
+   "Grilled Chicken",
+   "Lime Pie"
+  ],
+  "A Beautiful Day": [
+   "Pink Sugar Bandung Souffle Pancakes",
+   "Red Velvet Latte",
+   "Mala Pork Belly",
+   "Mala Popcorn Chicken"
+  ],
+  "Basilico": [
+   "Signature Cheese Room",
+   "Seafood Spaghetti",
+   "Wagyu Beef Lasagna",
+   "Romana-Style Pizza",
+   "Pistachio Raspberry Cake"
+  ],
+  "Yeon Cafe": [
+   "Gamjatang",
+   "Seafood Kimchi Pancake",
+   "Garlic Fried Rice",
+   "Pork Belly BBQ"
+  ],
+  "Space Cafe": [
+   "Black Sesame Cream Latte",
+   "Matcha Vegan Croissant",
+   "Tiramisu"
+  ],
+  "Crossroads Cafe": [
+   "Wagyu Beef Burger",
+   "Seafood Char Hor Fun",
+   "Beef Hor Fun",
+   "Lobster Brioche Roll",
+   "Laksa"
+  ],
+  "8 Korean BBQ": [
+   "8 Colours Pork Set",
+   "Flower Pork Set",
+   "Army Stew",
+   "Kimcheese Fried Rice",
+   "US Prime Short Rib"
+  ],
+  "Garibaldi Italian Restaurant & Bar": [
+   "Ossobuco",
+   "Costoletta alla Milanese",
+   "Tiramisu",
+   "Ravioli di Vitello e Porcini"
+  ],
+  "Bedrock Bar & Grill": [
+   "Tomahawk steak",
+   "Mac n' cheese",
+   "Bedrock pepper steak",
+   "Roasted bone marrow",
+   "Bombe Alaska"
+  ],
+  "The Feather Blade": [
+   "Feather blade steak",
+   "Uni butter",
+   "Miso glazed scallops",
+   "West Coast burger"
+  ],
+  "Nyonya Next Door": [
+   "Chicken berempah",
+   "Coconut chicken kapitan",
+   "Assam pedas barramundi",
+   "Beef brisket rendang"
+  ],
+  "Jiin Omakase": [
+   "Monaka with ankimo",
+   "Ise ebi hot pot",
+   "Grilled A5 Kagoshima wagyu"
+  ],
+  "Rice": [
+   "Dashi laksa seafood pao fan",
+   "Smokey fish soup",
+   "Beef rendang crunch",
+   "Spicy shrimp lemper rolls"
+  ],
+  "MyX": [
+   "Dirrrty chicken rice",
+   "Artichoke dip",
+   "Salmon tiradito",
+   "Venus clams"
+  ],
+  "Miura": [
+   "Fruit daifuku",
+   "Matcha",
+   "Coconut warabimochi",
+   "Cold brew tea with cheese cloud"
+  ],
+  "Accompany Coffee": [
+   "Accompany einspanner",
+   "Coconut latte",
+   "Citrus olive oil cake"
+  ],
+  "Pull by TPG": [
+   "Cluckin' Good bagel",
+   "Eggstatic bagel",
+   "Strawberry matcha",
+   "Salted coffee"
+  ],
+  "Yimanfen Dessert": [
+   "Grand Slam 100",
+   "Grassava 100",
+   "Mango Snowy",
+   "Taro snowy bowl with gelato"
+  ],
+  "Cafe Yasuragi": [
+   "Banana oat matcha latte",
+   "Aburi mentaiko salmon donburi",
+   "Black Angus striploin donburi",
+   "Yuzu kosho chicken steak"
+  ],
+  "Rituel": [
+   "Escargot Danish",
+   "Signature layer croissant",
+   "Japanese egg danish sandwich",
+   "Mushroom pot pie"
+  ],
+  "Stash": [
+   "White coffee",
+   "Black Milk",
+   "Cardamom loaf",
+   "Secret Stash"
+  ],
+  "Jing Studio": [
+   "Toasted Velvet oolong",
+   "Ember Road black tea",
+   "Coco Pulut Pu-erh",
+   "Oolong Osmanthus Bloom"
+  ],
+  "Visitors": [
+   "Croissant",
+   "Matcha latte",
+   "Matcha cloud",
+   "Brulee milk tea"
+  ],
+  "Wildseed Cafe": [
+   "Seabass assam pedas",
+   "Soft shell chilli crab linguine",
+   "Kelong prawn & scallop pizza",
+   "Chicken satay"
+  ],
+  "Cafe Nesuto": [
+   "Pandan coconut kaya butter French toast",
+   "Citrus ponzu prawns",
+   "Baked bean shakshuka",
+   "Vongole linguine",
+   "Chocolate banana crumble tart"
+  ],
+  "Postboy Coffee": [
+   "PBJ waffle",
+   "White chocolate matcha",
+   "Spanish latte",
+   "Triple chocolate cookie"
+  ],
+  "Kim Dae Mun Korean Food": [
+   "Spicy pork hotplate",
+   "Kimchi soup with pork",
+   "Beancurd soup (sundubu jjigae)",
+   "Bibimbap",
+   "Yukgaejang"
+  ],
+  "Sushi Sato": [
+   "Signature uni and ikura rice",
+   "Chawanmushi",
+   "Conger eel tempura",
+   "Seasonal sashimi"
+  ],
+  "Wakuda": [
+   "Wakuda flan with caviar",
+   "Carabineros prawn",
+   "Cold soba with botan shrimp",
+   "Yuba with sea urchin",
+   "Bara chirashi"
+  ],
+  "Mare Hachikyo": [
+   "Hokkaido temaki (kegani, ikura, uni)",
+   "Tsukko meshi",
+   "Ikura donabe",
+   "Kutchan potato gratin with caviar"
+  ],
+  "Ganko Sushi": [
+   "Omakase",
+   "Sushi platter",
+   "Wagyu sando",
+   "Seasonal premium chawanmushi",
+   "Unagi don"
+  ],
+  "Ki-Sho": [
+   "Tottori wagyu shabu-shabu",
+   "Foie gras monaka",
+   "Kuro awabi (abalone)",
+   "Seasonal donabe rice"
+  ],
+  "Shinji by Kanesaka": [
+   "Bafun uni",
+   "Chutoro",
+   "Otoro",
+   "Baby sardine chawanmushi"
+  ],
+  "The Ramen House": [
+   "Volcano ramen",
+   "Dry ramen",
+   "Chashu ramen",
+   "Teppanyaki beef"
+  ],
+  "5 ON 25": [
+   "Flambeed claypot baked jasmine rice",
+   "Roasted Cherry Valley duck",
+   "Crispy-fried black cod",
+   "Chef's barbecue combination platter",
+   "Scallop siew mai"
+  ],
+  "Peach Blossoms": [
+   "Deep-fried cigar roll",
+   "Crispy marble goby with spicy pineapple sauce",
+   "Mung bean noodles with crab",
+   "Four combination platter"
+  ],
+  "Summer Pavilion": [
+   "Deep-fried lobster roll",
+   "Braised three-head abalone",
+   "Poached rice with Canadian lobster",
+   "Barbecued Iberico pork in honey sauce"
+  ],
+  "Xin Cuisine Chinese Restaurant": [
+   "Roast duck smoked with tea leaves",
+   "Braised live lobster ee-fu noodle",
+   "Poached rice with seafood and crispy rice",
+   "Deep-fried prawn with yuzu mayonnaise"
+  ],
+  "Crystal Jade Golden Palace": [
+   "Teochew happiness four platter",
+   "Braised crystal potato noodle with sole fish",
+   "Hakka pork belly with lotus bun",
+   "Palace Peking duck",
+   "Fried beancurd with pepper and salt"
+  ],
+  "Shukuu Izakaya": [
+   "Kushiyaki skewers",
+   "Kani gratin",
+   "Buta charshu bowl",
+   "Torikawa oroshi ponzu",
+   "Tori kara-age"
+  ],
+  "Mongkok Dim Sum": [
+   "Prawn dumpling",
+   "Siew mai",
+   "Pan-fried carrot cake"
+  ],
+  "Atlas Coffeehouse": [
+   "Butterscotch Banana Pancake",
+   "Wurst Rosti",
+   "Cereal Prawn Pasta",
+   "Salmon Soba"
+  ],
+  "Colbar": [
+   "Hainanese pork chop",
+   "Chicken Maryland",
+   "Liver and onions",
+   "Lamb chop",
+   "Dry fried bee hoon"
+  ],
+  "Cafe Margaret": [
+   "Injeolmi Cube Pie",
+   "Matcha Cube Pie",
+   "Peanut Butter Cookie",
+   "Scones"
+  ],
+  "Blue Lotus Chinese Eating House @ Sentosa Cove": [
+   "Chilli Pomelo Crab",
+   "Lemongrass Prawn Sticks",
+   "Wok-Fried Wagyu Beef Tenderloin",
+   "King Prawn Truffle Wonton Soup"
+  ],
+  "Summerlong – @ Robertson Quay": [
+   "Chargrilled octopus",
+   "Whole squid",
+   "Market ceviche",
+   "Crab cakes",
+   "Shakshuka"
+  ],
+  "Cafe Monochrome – Monochromatic backdrop": [
+   "Truffle Cream Pasta",
+   "Chilli Crab Pasta",
+   "Youtiao Ice Cream",
+   "Truffle fries"
+  ],
+  "Good Bites – Outdoor cafe with neon signs & fairy lights": [
+   "Tom Yum Seafood Pasta",
+   "Lamb chop",
+   "Sharing platter",
+   "Chilli Softshell Crab Pasta"
+  ],
+  "GIG Cafe – All-pink high tea cafe with hanging flowers": [
+   "High Tea Set",
+   "Creamy Scallop Pink Rose Pasta",
+   "GIG Big Breakfast",
+   "Bacon Carbonara"
+  ],
+  "Queic – Yellow & brown-themed cheesecake boutique": [
+   "Signature Cheesecake",
+   "Basque Burnt Cheesecake",
+   "Ube Cheesecake"
+  ],
+  "Singapore Chocolate – Blue-themed Parisian chocolate bar": [
+   "Pain au chocolat",
+   "Hot chocolate",
+   "Smoked salmon avocado salad",
+   "Thai tuna salad croissant"
+  ],
+  "Coach Cafe – Pastel yellow & pink cafe with artisanal coffee": [
+   "Classic Pancakes",
+   "All American Cheeseburger",
+   "Chicken & Waffles",
+   "Coach Hot Chocolate"
+  ],
+  "Cafe Kreams – Korean cafe with a canopy of autumn-coloured leaves": [
+   "Dalgona Latte",
+   "Tiramisu",
+   "Strawberry cream crepe",
+   "Scones"
+  ],
+  "Prairie by Craftsmen – Botanical brunch spot with coral & cream tones": [
+   "Beef Breakfast",
+   "Prairie Breakfast",
+   "Hummus Sourdough",
+   "Blue Mussel Pasta"
+  ],
+  "Smile Dessert": [
+   "Thai Style Snow Ice",
+   "Tiramisu Souffle",
+   "Dragon Fruit Tea",
+   "Oden"
+  ],
+  "Open Farm Community": [
+   "Mud crab spaghettoni",
+   "Coal-baked omelette",
+   "Lemon tart with basil ice cream",
+   "Orange meringue pie",
+   "Fried cauliflower wings"
+  ],
+  "Blue Balls Bike Cafe – Bicycle-friendly cafe open till 12am": [
+   "Blue Balls Burger",
+   "Slip Stream Bolognese",
+   "Fish and chips",
+   "Seafood cioppino"
+  ],
+  "Zen Cafe – Vegetarian cafe in a monastery": [
+   "Mushroom soup",
+   "Herbal noodle soup",
+   "Cream of tomato soup"
+  ],
+  "Sarnies": [
+   "Bacon & Egg Sarnie",
+   "Egg's Benjamin",
+   "Miso Salmon Carbonara",
+   "Chicken Schnitzel Sandwich"
+  ],
+  "Fore Coffee": [
+   "Butterscotch Sea Salt Latte",
+   "Pandan Oat Latte",
+   "Gula Aren Latte",
+   "Kouign Amann"
+  ],
+  "Thus Coffee": [
+   "Chicken Cutlet Jjolmyeon",
+   "Wagyu Beef Grain Bowl",
+   "Garlic Carbonara",
+   "Crispy Fish Fingers"
+  ],
+  "Market Bistro": [
+   "Irish Duck Confit",
+   "Fried Baby Squid",
+   "Wagyu Royale Burger",
+   "Tiramisu"
+  ],
+  "6 Letter Brunch": [
+   "Rosti",
+   "Salted Egg Pasta",
+   "Smoked Duck Rosti",
+   "Pancakes"
+  ],
+  "Canopy HortPark": [
+   "Crabmeat Aglio Olio",
+   "Beer Battered Fish & Chips",
+   "Signature Fried Calamari",
+   "Mentaiko Ebi Pasta"
+  ],
+  "Neptune": [
+   "Shrimp Scampi Tagliatelle",
+   "Crab & Scallop Tagliatelle",
+   "Aglio Olio Tagliatelle",
+   "Mentaiko Tagliatelle"
+  ],
+  "The Populus Coffee & Food Co": [
+   "Populus Scramble",
+   "Truffle Wagyu Beef Donburi",
+   "Seafood Linguine",
+   "Pulled Pork Grain Bowl"
+  ],
+  "Dewgather": [
+   "Cotton Candy French Toast",
+   "Waffle & Fried Chicken",
+   "Salmon with Rosti",
+   "Hummus in the Pan"
+  ],
+  "Elixir Coffee & Wine": [
+   "Stracciatella Tartine",
+   "Salumi Tartine",
+   "Not-Carbonara Pizza",
+   "Tiramisu"
+  ],
+  "Pancake & Waffle Place": [
+   "Lemak Duck Pancake",
+   "Cempedak Creme Brulee Pancake",
+   "Grilled Tiger Prawn Pancake",
+   "Har Cheong Gai Waffle"
+  ],
+  "Whisk & Paddle": [
+   "Seafood Pan",
+   "French Toast",
+   "Mac & Cheese",
+   "Beef Stroganoff"
+  ],
+  "Simplicité by Fresh Fruits Lab": [
+   "Duck Confit",
+   "Crab Meat Aglio Olio",
+   "Fish and Chips",
+   "Brioche French Toast"
+  ],
+  "Fuel Plus+": [
+   "Chicken Overload",
+   "Grilled Seabass",
+   "Miso Salmon",
+   "Salmon Pancakes"
+  ],
+  "Habitat Coffee": [
+   "Chili Crab Linguine",
+   "Pasta Lemak",
+   "Truffle Scrambled & Salmon",
+   "Pork Belly Ban Mian Soup"
+  ],
+  "Hwa Heng Beef Noodle": [
+   "Beef noodles (dry)",
+   "Beef noodle soup",
+   "Beef kway teow",
+   "Beef ball soup"
+  ],
+  "Ah Hua Teochew Fishball Noodles": [
+   "Dry bee tai mak",
+   "Fishball noodles",
+   "Prawn roll",
+   "Fish ruler",
+   "Herh kiao"
+  ],
+  "Neo Garden Catering": [
+   "Curry chicken",
+   "Thai pineapple rice",
+   "Mini soon kueh",
+   "Cereal prawn"
+  ],
+  "Zhenyi Veggie Place": [
+   "Nasi lemak",
+   "Rendang mutton",
+   "Szechuan fish",
+   "Cereal prawn",
+   "Assam fish"
+  ],
+  "Yaowarat Seafood": [
+   "Deep-fried garlic pork",
+   "Chai poh omelette",
+   "Grilled seafood platter",
+   "Thai-style steamed seabass",
+   "Tom yum seafood"
+  ],
+  "Holland Village XO Fish Head Bee Hoon": [
+   "XO fish soup",
+   "San lou hor fun",
+   "Prawn paste chicken"
+  ],
+  "The Public Izakaya": [
+   "Gyoza Croquette",
+   "Buta Kakuni",
+   "Iwashi Mentaiko Yaki",
+   "Wagyu Beef Rosu",
+   "Omakase Oden Set"
+  ]
+ },
+ "izakaya": [
+  {
+   "id": "v00114"
+  },
+  {
+   "name": "The Public Izakaya 2",
+   "address": "Altez, #01-14/15/16, 16 Enggor Street, Singapore 079717",
+   "postal_code": "079717",
+   "price_text": "$$",
+   "per_pax": 50,
+   "cuisine": [
+    "Japanese",
+    "Izakaya",
+    "Sake & Shochu"
+   ],
+   "summary": "The second Public Izakaya, opened in 2014 about 75 metres from the flagship, with a large outdoor seating area. It serves the same broad izakaya menu and is suited to groups of up to 20.",
+   "website": "https://www.thepublicizakaya.com",
+   "phone": "<PHONE>",
+   "dishes": [
+    "Gyoza Croquette",
+    "Buta Kakuni",
+    "Iwashi Mentaiko Yaki",
+    "Wagyu Beef Rosu",
+    "Omakase Oden Set"
+   ],
+   "hours": "Mon-Thu 11:30am-2pm, 5:30pm-12am; Fri 11:30am-2pm, 5:30pm-1am; Sat 5pm-12am; Sun closed",
+   "booking_url": "https://inline.app/booking/-OQNPHeT-ndC2kZ7Oncy:inline-live-3/-OQNPHlIOo0br-3txnD3",
+   "lat": 1.274617941038219,
+   "lng": 103.8443195536877,
+   "source": {
+    "url": "https://www.thepublicizakaya.com/",
+    "title": "The Public Izakaya official site"
+   }
+  },
+  {
+   "name": "The Public Izakaya Nitengo",
+   "address": "10 Hoe Chiang Road, #01-06, Keppel South Central, Singapore 089315",
+   "postal_code": "089315",
+   "price_text": "$$",
+   "per_pax": 50,
+   "cuisine": [
+    "Japanese",
+    "Izakaya",
+    "Sake & Shochu"
+   ],
+   "summary": "The newest outlet (2025), set beside Hachi Restaurant's relocated home at Keppel South Central. It has indoor and outdoor seating and the same wide izakaya menu and Japanese drinks list.",
+   "website": "https://www.thepublicizakaya.com",
+   "phone": "<PHONE>",
+   "dishes": [
+    "Gyoza Croquette",
+    "Buta Kakuni",
+    "Iwashi Mentaiko Yaki",
+    "Wagyu Beef Rosu",
+    "Omakase Oden Set"
+   ],
+   "hours": "Mon-Thu 11:30am-2pm, 5:30pm-12am; Fri 11:30am-2pm, 5:30pm-1am; Sat 5pm-12am; Sun closed",
+   "booking_url": "https://inline.app/booking/-OSHSRh1DBzrLIx7pNMh:inline-live-3/-OSHSRo8Ez3hOvmjPZxA",
+   "lat": 1.274402489195323,
+   "lng": 103.8422382442537,
+   "source": {
+    "url": "https://www.thepublicizakaya.com/",
+    "title": "The Public Izakaya official site"
+   }
+  },
+  {
+   "name": "Robata Akari",
+   "address": "10 Duxton Hill, Singapore 089594",
+   "postal_code": "089594",
+   "price_text": "$$$",
+   "per_pax": 80,
+   "cuisine": [
+    "Japanese",
+    "Robatayaki",
+    "Izakaya",
+    "Seafood"
+   ],
+   "summary": "An open-kitchen robatayaki on Duxton Hill built around a central irori hearth where seafood, vegetables and meat are slow-grilled over charcoal. The Peak singles it out for its limited-quantity charcoal-grilled blackthroat sea perch, so reservations are recommended.",
+   "website": "https://robata-akari.sg/",
+   "phone": "",
+   "dishes": [
+    "Charcoal-grilled blackthroat sea perch (nodoguro)"
+   ],
+   "hours": "5pm-12am daily (last order 11pm), irregular holidays",
+   "booking_url": null,
+   "lat": 1.279296410564486,
+   "lng": 103.8427619259318,
+   "source": {
+    "url": "https://robata-akari.sg/",
+    "title": "Robata Akari official site (hours 5pm-12am, last order 11pm); also The Peak, Best Izakaya Singapore"
+   }
+  },
+  {
+   "name": "Neon Pigeon",
+   "address": "36 Carpenter Street, #01-01, Singapore 059915",
+   "postal_code": "059915",
+   "price_text": "$$$",
+   "per_pax": 75,
+   "cuisine": [
+    "Modern Japanese",
+    "Izakaya",
+    "Cocktail Bar"
+   ],
+   "summary": "A Keong Saik-area Japanese restaurant inspired by izakayas, with a moody industrial look and a bar listed as a 50 Best Discovery Bar. It turns out playful small plates and sake and cocktails, and is celebrating ten years of operation.",
+   "website": "https://www.neonpigeonsg.com",
+   "phone": "",
+   "dishes": [
+    "KFC Bao",
+    "Grilled Tsukune",
+    "Tokyo Hummus",
+    "Duck Gyoza with Foie Gras",
+    "Wagyu Tsukune Skewers"
+   ],
+   "hours": "Mon-Sat 5:30pm-12am; closed Sunday",
+   "booking_url": "https://www.sevenrooms.com/reservations/neonpigeon",
+   "lat": 1.287970552623526,
+   "lng": 103.8476690864016,
+   "source": {
+    "url": "https://singaporeizakaya.com/best-izakaya-singapore/",
+    "title": "Best Izakaya Singapore (singaporeizakaya.com); also neonpigeonsg.com"
+   }
+  },
+  {
+   "name": "Issho Izakaya",
+   "address": "Marina One The Heart, 5 Straits View, #01-03, Singapore 018935",
+   "postal_code": "018935",
+   "price_text": "$$$",
+   "per_pax": 65,
+   "cuisine": [
+    "Japanese",
+    "Izakaya",
+    "Sushi",
+    "Kushiyaki"
+   ],
+   "summary": "A modern, waterfront-facing izakaya and sushi bar in the Marina One CBD cluster, good for after-work rounds that turn into dinner. It is known for flame-grilled kushiyaki, sashimi platters and ice-cold sake.",
+   "website": "https://www.isshoizakaya.com/",
+   "phone": "",
+   "dishes": [
+    "Sashimi platter of five belly cuts",
+    "Grilled Tai",
+    "Miyazaki A5 with Foie Gras Miso",
+    "Cheese Kani",
+    "Prawn Wanton in Black Vinegar"
+   ],
+   "hours": "Daily 11:30am-2:30pm, 6pm-10:30pm",
+   "booking_url": "https://reserve.oddle.me/en_SG/issho-izakaya",
+   "lat": 1.277372350722986,
+   "lng": 103.8528448012656,
+   "source": {
+    "url": "https://singaporeizakaya.com/best-izakaya-singapore/",
+    "title": "Best Izakaya Singapore (singaporeizakaya.com); also isshoizakaya.com"
+   }
+  },
+  {
+   "name": "Izakaya Hikari",
+   "address": "190 Middle Road, #03-01, Fortune Centre, Singapore 188979",
+   "postal_code": "188979",
+   "price_text": "$$",
+   "per_pax": 40,
+   "cuisine": [
+    "Japanese",
+    "Izakaya",
+    "Donburi"
+   ],
+   "summary": "A relaxed, unfussy izakaya on level 3 of Fortune Centre in Bugis, popular with students and office workers for affordable Japanese comfort food. Rice bowls, grilled items and small plates pair with sake, beer and highballs.",
+   "website": "https://www.izakayahikari.com",
+   "phone": "<PHONE>",
+   "dishes": [
+    "Karaage Don",
+    "Salmon Mentai Don",
+    "Chashu Don",
+    "Grilled Yakitori Set",
+    "Chicken wings"
+   ],
+   "hours": "Mon-Fri 12pm-2:30pm, 5:30pm-10:30pm (hours differ slightly between sources); Sat dinner; closed Sunday per one source",
+   "booking_url": "https://book.easytablebooking.com/book/?ref=mb&id=4ac33&lang=en",
+   "lat": 1.300422419139759,
+   "lng": 103.8522866273858,
+   "source": {
+    "url": "https://singaporeizakaya.com/best-izakaya-singapore/",
+    "title": "Best Izakaya Singapore (singaporeizakaya.com); also izakayahikari.com"
+   }
+  },
+  {
+   "id": "v00575"
+  },
+  {
+   "id": "v01231"
+  },
+  {
+   "id": "v02903"
+  }
+ ]
+}

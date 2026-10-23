@@ -232,6 +232,7 @@
       `<span><h3 class="name">${esc(v.name)}${v.name_zh ? `<span class="zh">${esc(v.name_zh)}</span>` : ""}</h3>` +
       `<div class="meta">${meta}</div>` +
       (v.summary ? `<p class="summary">${esc(v.summary)}</p>` : "") +
+      (v.dishes.length ? `<p class="dishes"><i class="ph ph-bowl-food"></i>${esc(v.dishes.slice(0, 5).join(" · "))}</p>` : "") +
       (badges ? `<div class="badges">${badges}</div>` : "") + `</span>` +
       `<span class="side">${verdictBadge(v)}</span></button></li>`;
   }
@@ -430,7 +431,7 @@
       `<a href="${gmaps}" target="_blank" rel="noopener"><i class="ph ph-navigation-arrow"></i>Directions</a>` +
       (v.website && v.website !== v.booking_url ? `<a href="${esc(v.website)}" target="_blank" rel="noopener"><i class="ph ph-globe"></i>Website</a>` : "") +
       `</div>` +
-      (v.dishes.length ? `<h3>Dishes people mention</h3><div class="chips">${v.dishes.map((d) => `<span>${esc(d)}</span>`).join("")}</div>` : "") +
+      (v.dishes.length ? `<h3>Popular dishes</h3><div class="chips">${v.dishes.map((d) => `<span>${esc(d)}</span>`).join("")}</div>` : "") +
       (chips.length ? `<h3>Good to know</h3><div class="chips">${chips.map((d) => `<span>${esc(d)}</span>`).join("")}</div>` : "") +
       `<h3>Opening hours</h3>${hoursHtml(v.hours)}` +
       (entry && Object.keys(entry.components).length ? `<h3>Why it ranks #${entry.rank} on ${esc(shortLabel(scored.cat))}</h3>${scoreHtml(entry)}` : "") +

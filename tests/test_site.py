@@ -187,3 +187,28 @@ def test_michelin_tabs_per_star_level(app_config: AppConfig, run_store: RunStore
     assert [g["categories"] for g in data["groups"] if g["key"] == "michelin"] == [
         ["michelin_3", "michelin_2", "michelin_star"]
     ]
+
+
+def test_curated_dishes_and_izakaya_list(app_config: AppConfig, run_store: RunStore) -> None:
+    """curated.json fills dishes by name and adds a hand-picked Izakaya list (ids pick known venues)."""
+    v1 = _venue("v1", "Alpha")
+    _write_run(run_store, "20260908T000000Z", [v1], _scores([("v1", "Alpha")]))
+    curated = {
+        "dishes": {"Alpha": ["Dish A", "Dish B", "Dish C"]},
+        "izakaya": [
+            {"id": "v1"},
+            {
+                "name": "Bar X",
+                "lat": 1.2796,
+                "lng": 103.8428,
+                "dishes": ["Yakitori"],
+                "source": {"url": "https://x.test"},
+            },
+        ],
+    }
+    write_json(app_config.config_dir / "curated.json", curated)
+    data = read_json(build_site(app_config, run_store))
+    assert data["venues"]["v1"]["dishes"] == ["Dish A", "Dish B", "Dish C"]
+    assert [r["id"] for r in data["categories"]["izakaya"]["ranked"]] == ["v1", "x002"]
+    assert data["venues"]["x002"]["mrt"] and data["venues"]["x002"]["worth"]
+    assert any(g["key"] == "izakaya" for g in data["groups"])

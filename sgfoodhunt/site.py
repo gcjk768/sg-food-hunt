@@ -17,6 +17,7 @@ from typing import Any
 
 from sgfoodhunt.config import AppConfig
 from sgfoodhunt.diff import _load_scores, _load_venues, michelin_award, verdict
+from sgfoodhunt.enrich.mrt import nearest_station
 from sgfoodhunt.http.cache import read_json, write_json
 from sgfoodhunt.occasion import is_buffet
 from sgfoodhunt.promos import PROMOS_FILE
@@ -32,6 +33,9 @@ MICHELIN_TABS = [  # (tab key, label, the venue's stored award)
     ("michelin_1", "1 Michelin star", "1 Star"),
     ("michelin_star", "Michelin-starred (stars not stated)", "Star"),
 ]
+CURATED_FILE = (
+    "curated.json"  # in the config dir: hand-picked dishes, plus venues the scrapers don't list
+)
 NEW_DAYS = 14  # a venue first seen this recently is new, unless the tool itself was new then
 
 # How the lists are grouped on the page: (key, label, Phosphor icon, category keys). A category
@@ -73,6 +77,7 @@ GROUPS: list[tuple[str, str, str, list[str]]] = [
     ("date", "Date night", "heart", ["restaurants_date", "rooftop_waterfront_date"]),
     ("occasion", "Special occasions", "confetti", ["occasion_4pax"]),
     ("new", "New openings", "sparkle", ["new_cafes", "new_zichar", "new_restaurants"]),
+    ("izakaya", "Izakaya", "beer-stein", ["izakaya"]),
 ]
 
 
@@ -82,6 +87,35 @@ def _run_time(run_id: str) -> datetime | None:
         return None
     y, mo, d, h, mi, s = (int(g) for g in m.groups())
     return datetime(y, mo, d, h, mi, s, tzinfo=UTC)
+
+
+def _curated(config: AppConfig) -> dict[str, Any]:
+    path = config.config_dir / CURATED_FILE
+    return read_json(path) if path.exists() else {}
+
+
+def _curated_row(x: dict[str, Any], vid: str) -> dict[str, Any]:
+    """A site row for a hand-picked venue (``izakaya`` in curated.json); the nearest MRT comes
+    from its coordinates. It counts as worth going: it was picked for being well liked."""
+    lat, lng = x.get("lat"), x.get("lng")
+    mrt = nearest_station(lat, lng)[0] if lat and lng else None
+    src = x.get("source") or {}
+    return {
+        "id": vid, "name": x["name"], "name_zh": None, "address": x.get("address"),
+        "postal_code": x.get("postal_code"), "district": None, "region": x.get("region"),
+        "lat": lat, "lng": lng, "mrt": mrt.name if mrt else None,
+        "mrt_lines": list(mrt.lines) if mrt else [], "cuisine": x.get("cuisine") or [],
+        "price_level": None, "price_text": x.get("price_text"), "per_pax": x.get("per_pax"),
+        "rating": None, "reviews": None, "michelin": None, "hygiene": None, "status": None,
+        "halal": False, "kids": False, "private_room": False, "buffet": False, "tags": [],
+        "hours": None, "open_weekends": None, "booking_url": x.get("booking_url"),
+        "website": x.get("website"), "phone": x.get("phone"), "summary": x.get("summary"),
+        "best_for": None, "dishes": x.get("dishes") or [], "aspects": {}, "noise": None,
+        "trend": None, "first_seen": None, "new": False, "worth": True,
+        "why": "well-liked izakaya pick", "promo": None,
+        "sources": [{"source": src.get("title") or "Curated", "title": src.get("title") or "Curated",
+                     "url": src["url"], "date": None}] if src.get("url") else [],
+    }  # fmt: skip
 
 
 def _sources(config: AppConfig, v: dict[str, Any]) -> list[dict[str, Any]]:
@@ -120,6 +154,7 @@ def _venue_row(
     tops: list[tuple[int, str]],
     new: bool,
     promo: dict[str, Any] | None,
+    dishes: list[str] | None = None,
 ) -> dict[str, Any]:
     g = (v.get("ratings") or {}).get("google_places") or {}
     worth, why = verdict(v, tops)
@@ -158,7 +193,7 @@ def _venue_row(
         "phone": v.get("phone"),
         "summary": v.get("summary"),
         "best_for": v.get("best_for"),
-        "dishes": v.get("ai_dishes") or [],
+        "dishes": v.get("ai_dishes") or dishes or [],
         "aspects": v.get("aspects") or {},
         "noise": v.get("noise_level"),
         "trend": v.get("rating_trend"),
@@ -198,6 +233,8 @@ def build_site_data(
     run_at = _run_time(run_id)
     all_runs = store.list_runs()
     bootstrap = all_runs[0].run_id if all_runs else None  # first run saw everything "new"
+    curated = _curated(config)
+    popular: dict[str, list[str]] = curated.get("dishes") or {}
 
     categories: dict[str, Any] = {}
     tops: dict[str, list[tuple[int, str]]] = {}
@@ -260,7 +297,30 @@ def build_site_data(
         seen = _run_time(v.get("first_seen_run") or "")
         recent = bool(run_at and seen and run_at - seen <= timedelta(days=NEW_DAYS))
         new = vid in new_ids or (recent and v.get("first_seen_run") != bootstrap)
-        out_venues[vid] = _venue_row(config, v, pairs, new, promos.get(v["name"]))
+        out_venues[vid] = _venue_row(
+            config, v, pairs, new, promos.get(v["name"]), popular.get(v["name"])
+        )
+
+    # the izakaya list: hand-picked outlets (curated.json) plus any scraped venue named in it
+    izakaya: list[str] = []
+    for i, x in enumerate(curated.get("izakaya") or []):
+        if x.get("id"):  # an id picks a venue the scrapers already know
+            if x["id"] in out_venues:
+                izakaya.append(x["id"])
+            continue
+        vid = f"x{i + 1:03d}"
+        out_venues[vid] = _curated_row(x, vid)
+        izakaya.append(vid)
+    if izakaya:
+        categories["izakaya"] = {
+            "key": "izakaya", "label": "Izakaya", "group": "izakaya", "party_size": 2,
+            "new": False, "digest_only": True,
+            "ranked": [{"id": vid, "rank": r, "score": 0, "components": {}, "adjustments": {}}
+                       for r, vid in enumerate(izakaya, 1)],
+        }  # fmt: skip
+        groups.append(
+            {"key": "izakaya", "label": "Izakaya", "icon": "beer-stein", "categories": ["izakaya"]}
+        )
 
     diff_path = run_dir / "diff.json"
     diff = read_json(diff_path) if diff_path.exists() else {}
