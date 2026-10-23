@@ -249,3 +249,18 @@ def test_ice_cream_list_is_its_own_group(app_config: AppConfig, run_store: RunSt
     assert [r["id"] for r in data["categories"]["ice_cream"]["ranked"]] == ["v1", "y002"]
     assert data["venues"]["y002"]["why"] == "well-liked ice cream pick"
     assert any(g["key"] == "ice_cream" and g["icon"] == "ice-cream" for g in data["groups"])
+
+
+def test_scraped_ice_cream_finds_join_the_hand_picked_list(
+    app_config: AppConfig, run_store: RunStore
+) -> None:
+    v1, v2 = _venue("v1", "Cone Place"), _venue("v2", "Plain Cafe")
+    v1["cuisine"], v2["cuisine"] = ["Ice cream"], ["Cafe"]
+    _write_run(
+        run_store, "20260908T000000Z", [v1, v2],
+        {"icecream_hunt": _scores([("v1", "Cone Place"), ("v2", "Plain Cafe")])["cafes_date"]},
+    )  # fmt: skip
+    write_json(app_config.config_dir / "curated.json", {"ice_cream": []})
+    data = read_json(build_site(app_config, run_store))
+    assert [r["id"] for r in data["categories"]["ice_cream"]["ranked"]] == ["v1"]
+    assert "icecream_hunt" not in data["categories"]

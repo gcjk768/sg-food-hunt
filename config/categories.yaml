@@ -344,6 +344,38 @@ categories:
   # is lowered and recommendations (recent articles) raised. opened_within_months keeps only
   # venues whose earliest evidence (article date, first Google review, first seen by this tool)
   # falls inside the window (1 month = the last `scoring.new_within_days` days).
+  # Weekly discovery for the hand-picked website lists (Izakaya, Ice cream): finds that match are
+  # added to the list by sgfoodhunt/site.py; the category itself is never shown on its own.
+  - key: icecream_hunt
+    display_name: Ice cream shops
+    group: general
+    party_size: 2
+    digest_only: true
+    queries:
+      - "best ice cream Singapore"
+      - "best gelato Singapore"
+      - "best soft serve Singapore"
+      - "new ice cream shop Singapore 2026"
+      - "newly opened gelato ice cream cafe Singapore"
+      - "新加坡 冰淇淋 推荐"
+    keywords: ["ice cream", "gelato", "soft serve", "scoop", "creamery"]
+    weights: {rating: 0.25, recommendations: 0.35, keyword_match: 0.20, food: 0.10, value: 0.10}
+    hard_filters: {}
+
+  - key: izakaya_hunt
+    display_name: Izakaya
+    group: general
+    party_size: 2
+    digest_only: true
+    queries:
+      - "best izakaya Singapore"
+      - "new izakaya Singapore 2026"
+      - "japanese izakaya yakitori Singapore"
+      - "新加坡 居酒屋 推荐"
+    keywords: ["izakaya", "yakitori", "sake", "robata"]
+    weights: {rating: 0.25, recommendations: 0.35, keyword_match: 0.20, food: 0.10, value: 0.10}
+    hard_filters: {}
+
   - key: new_cafes
     display_name: Newly opened cafes
     group: general

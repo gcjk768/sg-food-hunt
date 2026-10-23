@@ -127,6 +127,8 @@ def test_only_chosen_categories_are_on(monkeypatch) -> None:  # type: ignore[no-
     keys = {c.key for c in load_config(CONFIG).categories.categories}
     assert keys == {
         "cafes_date",
+        "icecream_hunt",
+        "izakaya_hunt",
         "brunch_date",
         "new_cafes",
         "zichar_family",

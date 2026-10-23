@@ -79,10 +79,25 @@ GROUPS: list[tuple[str, str, str, list[str]]] = [
     ("new", "New openings", "sparkle", ["new_cafes", "new_zichar", "new_restaurants"]),
     ("izakaya", "Izakaya", "beer-stein", ["izakaya"]),
 ]
-# hand-picked lists in curated.json: (key, label, icon, id prefix for the site-only venues)
+# hand-picked lists in curated.json: (key, label, icon, id prefix for the site-only venues, scraped
+# category whose finds join the list, regex a find must match to belong to it)
 CURATED_LISTS = [
-    ("izakaya", "Izakaya", "beer-stein", "x"),
-    ("ice_cream", "Ice cream", "ice-cream", "y"),
+    (
+        "izakaya",
+        "Izakaya",
+        "beer-stein",
+        "x",
+        "izakaya_hunt",
+        r"izakaya|yakitori|robata|sake|shochu",
+    ),
+    (
+        "ice_cream",
+        "Ice cream",
+        "ice-cream",
+        "y",
+        "icecream_hunt",
+        r"ice.?cream|gelat|soft.?serve|creamery|sorbet|frozen",
+    ),
 ]
 
 
@@ -312,7 +327,7 @@ def build_site_data(
         )
 
     # hand-picked lists (curated.json): outlets with full entries plus any scraped venue named by id
-    for key, label, icon, prefix in CURATED_LISTS:
+    for key, label, icon, prefix, hunt_key, hunt_re in CURATED_LISTS:
         picked: list[str] = []
         for i, x in enumerate(curated.get(key) or []):
             if x.get("id"):  # an id picks a venue the scrapers already know
@@ -322,6 +337,18 @@ def build_site_data(
             vid = f"{prefix}{i + 1:03d}"
             out_venues[vid] = _curated_row(x, vid, f"well-liked {label.lower()} pick")
             picked.append(vid)
+        # what the weekly scrape finds joins the list when it is plainly that kind of place
+        hunt = categories.pop(hunt_key, None)
+        names = {out_venues[v]["name"].lower() for v in picked}
+        for r in (hunt or {}).get("ranked", []):
+            v = out_venues[r["id"]]
+            blob = " ".join([v["name"], *v["cuisine"], v["summary"] or "", *v["dishes"]])
+            if (
+                r["id"] not in picked
+                and v["name"].lower() not in names
+                and re.search(hunt_re, blob, re.I)
+            ):
+                picked.append(r["id"])
         if picked:
             categories[key] = {
                 "key": key, "label": label, "group": key, "party_size": 2,
