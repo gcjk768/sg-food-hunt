@@ -64,6 +64,8 @@
     wireNear();
     addEventListener("hashchange", route);
     route();
+    window.SGFH = D; // read by motion.js (totals, freshness)
+    document.dispatchEvent(new Event("sgfh:ready"));
   }
 
   // ------------------------------------------------------------ routing
@@ -101,7 +103,6 @@
     $("foot").innerHTML =
       `<span>Basemap ${ATTRIB}, ${SAT_ATTRIB}</span>` +
       `<span>Blog and review data, not a booking. Check hours before you go.</span>` +
-      `<span><a href="https://claude.com/resources/articles/dashboards-and-motion" target="_blank" rel="noopener">Build live dashboards with Claude</a></span>` +
       `<span>Run <code>${esc(D.run_id)}</code></span>`;
   }
 
@@ -353,7 +354,7 @@
     for (const v of venues) {
       if (v.lat == null || v.lng == null) continue;
       const m = L.marker([v.lat, v.lng], {
-        icon: L.divIcon({ className: "", html: `<div class="pin${v.worth ? "" : " dim"}" data-pin="${esc(v.id)}"></div>`, iconSize: [14, 14], iconAnchor: [7, 7] }),
+        icon: L.divIcon({ className: "", html: `<div class="pin${v.worth ? "" : " dim"}" style="--d:${Math.min(pts.length, 40) * 18}ms" data-pin="${esc(v.id)}"></div>`, iconSize: [14, 14], iconAnchor: [7, 7] }),
         keyboard: false, title: v.name,
       }).addTo(layer);
       m.bindPopup(`<b>${esc(v.name)}</b><br>${esc(v.mrt ? v.mrt + " MRT" : v.region || "")}<br><a href="#" data-open="${esc(v.id)}">Details</a>`);
@@ -410,7 +411,7 @@
     const scored = ranks.find((r) => r.cat === state.cat) || ranks[0];
     const entry = scored && D.categories[scored.cat].ranked.find((r) => r.id === v.id);
     const la = Number(v.lat).toFixed(6), lo = Number(v.lng).toFixed(6); // public OneMap static map, no token
-    const img = v.lat != null ? `https://www.onemap.gov.sg/api/staticmap/getStaticImage?layerchosen=${DARK.matches ? "night" : "default"}&latitude=${la}&longitude=${lo}&zoom=16&height=320&width=512&points=[${la},${lo},%22196,58,38%22,%22%22]` : null;
+    const img = v.lat != null ? `https://www.onemap.gov.sg/api/staticmap/getStaticImage?layerchosen=${document.documentElement.dataset.theme === "dark" ? "night" : "default"}&latitude=${la}&longitude=${lo}&zoom=16&height=320&width=512&points=[${la},${lo},%22196,58,38%22,%22%22]` : null;
     const gmaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([v.name, v.address || v.region || "Singapore"].join(" "))}`;
     const facts = [
       v.address ? `<li class="wide"><i class="ph ph-map-pin"></i><span>${esc(v.address)} <button type="button" class="badge" data-copy="${esc(v.address)}">Copy</button></span></li>` : "",

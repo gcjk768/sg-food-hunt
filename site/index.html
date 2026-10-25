@@ -6,36 +6,45 @@
 <title>SG Food Hunt</title>
 <meta name="description" content="Where to eat in Singapore this weekend: cafes, zi char, hawker stalls and celebration dinners, ranked daily from the food blogs.">
 <meta name="color-scheme" content="light dark">
+<script>(function(){var t;try{t=localStorage.getItem("sgfh-theme")}catch(e){}if(t!=="light"&&t!=="dark")t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";document.documentElement.dataset.theme=t;document.documentElement.classList.add("js")})()</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='6' y='6' width='20' height='20' rx='4' transform='rotate(45 16 16)' fill='%23c43a26'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800;900&family=Instrument+Serif:ital@0;1&family=Hanken+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
 <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<div class="glow" aria-hidden="true"><span></span><span></span><span></span></div>
+<div class="app">
+  <nav class="rail" aria-label="Site">
+    <a class="brand" href="#"><span class="mark" aria-hidden="true"><i class="ph-fill ph-bowl-steam"></i></span><b>SG <br>Food <br>Hunt</b></a>
+    <ul class="groups" id="groups" aria-label="Lists"></ul>
+    <div class="rail-foot">
+      <a class="promos-link" href="#promos" id="promos-link" data-count="0"><i class="ph ph-gift" aria-hidden="true"></i><span>Promos</span></a>
+      <button type="button" class="theme-btn" id="theme" aria-label="Switch to dark theme" title="Light / dark">
+        <i class="ph ph-sun" aria-hidden="true"></i><i class="ph ph-moon" aria-hidden="true"></i>
+      </button>
+    </div>
+  </nav>
 
-<header class="top">
-  <div class="wrap" style="display:flex;align-items:center;gap:1rem;">
-    <a class="brand" href="#"><span class="mark" aria-hidden="true"></span>SG Food Hunt</a>
+  <header class="mast">
+    <p class="eyebrow"><i class="ph-fill ph-map-pin" aria-hidden="true"></i>Singapore &middot; ranked every morning</p>
+    <h1 id="home-title"><span class="l"><span class="w" style="--i:0">Where</span> <span class="w" style="--i:1">to</span></span> <span class="l"><span class="w" style="--i:2">eat</span></span> <em><span class="w" style="--i:3">this</span> <span class="w" style="--i:4">weekend.</span></em></h1>
+    <div class="mast-row">
+      <p id="lede">Loading the latest run…</p>
+      <p class="fresh" id="fresh" role="status" hidden><i aria-hidden="true"></i><span></span></p>
+    </div>
     <label class="search">
       <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
       <span class="visually-hidden">Search venues</span>
       <input id="q" type="search" placeholder="Search a place, cuisine or MRT" autocomplete="off">
     </label>
-    <a class="promos-link" href="#promos" id="promos-link" data-count="0"><i class="ph ph-gift" aria-hidden="true"></i><span>Promos</span></a>
-  </div>
-</header>
+  </header>
 
-<main class="wrap">
-  <section class="hero">
-    <div>
-      <h1>Where to eat <em>this weekend.</em></h1>
-      <p id="lede">Loading the latest run…</p>
-      <ul class="groups" id="groups" aria-label="Lists"></ul>
-    </div>
+  <aside class="mapcol">
     <div class="map-wrap">
       <div id="map" role="region" aria-label="Map of the places in this list"></div>
       <div class="map-note" id="map-note"></div>
@@ -44,7 +53,18 @@
         <button type="button" id="expand-btn" aria-label="Expand map" aria-pressed="false"><i class="ph ph-arrows-out" aria-hidden="true"></i></button>
       </div>
     </div>
-  </section>
+  </aside>
+
+  <main class="main">
+    <ul class="stats" id="stats" aria-label="Totals" hidden>
+      <li class="t-places"><button type="button" data-how="places" aria-expanded="false"><b id="s-places">0</b><span>places on the lists</span></button></li>
+      <li class="t-worth"><button type="button" data-how="worth" aria-expanded="false"><b id="s-worth">0</b><span>worth going</span></button></li>
+      <li class="t-new"><button type="button" data-how="new" aria-expanded="false"><b id="s-new">0</b><span>new</span></button></li>
+      <li class="t-mich"><button type="button" data-how="mich" aria-expanded="false"><b id="s-mich">0</b><span>Michelin</span></button></li>
+    </ul>
+    <div class="how" id="how" role="note" hidden></div>
+
+    <div class="ribbon" aria-hidden="true"><div class="track"><span>Chicken rice</span><span>Laksa</span><span>Chilli crab</span><span>Char kway teow</span><span>Bak kut teh</span><span>Kaya toast</span><span>Satay</span><span>Roti prata</span><span>Hokkien mee</span><span>Nasi lemak</span><span>Chicken rice</span><span>Laksa</span><span>Chilli crab</span><span>Char kway teow</span><span>Bak kut teh</span><span>Kaya toast</span><span>Satay</span><span>Roti prata</span><span>Hokkien mee</span><span>Nasi lemak</span></div></div>
 
   <section class="changes" id="changes" hidden>
     <h2><i class="ph ph-fill ph-lightning" aria-hidden="true"></i> Since the last run</h2>
@@ -99,8 +119,9 @@
     <ul class="deals" id="deals"></ul>
   </section>
 
-  <footer id="foot"></footer>
-</main>
+    <footer id="foot"></footer>
+  </main>
+</div>
 
 <div class="scrim" id="scrim"></div>
 <aside class="drawer" id="drawer" aria-label="Venue details">
@@ -110,5 +131,6 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script src="app.js"></script>
+<script src="motion.js"></script>
 </body>
 </html>
