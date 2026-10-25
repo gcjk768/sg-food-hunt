@@ -101,6 +101,7 @@
     $("foot").innerHTML =
       `<span>Basemap ${ATTRIB}, ${SAT_ATTRIB}</span>` +
       `<span>Blog and review data, not a booking. Check hours before you go.</span>` +
+      `<span><a href="https://claude.com/resources/articles/dashboards-and-motion" target="_blank" rel="noopener">Build live dashboards with Claude</a></span>` +
       `<span>Run <code>${esc(D.run_id)}</code></span>`;
   }
 
@@ -397,6 +398,13 @@
     if (push && location.hash.split("/").length > 2) history.replaceState(null, "", "#" + listHash());
   }
 
+  // A YouTube source the venue already has wins; otherwise a search for the place.
+  // ponytail: search link, not an embedded video; embed needs a yt-dlp lookup per venue at site build.
+  function ytUrl(v) {
+    const src = v.sources.find((s) => /youtube\.com\/watch|youtu\.be\//.test(s.url));
+    return src ? src.url : `https://www.youtube.com/results?search_query=${encodeURIComponent(v.name + " Singapore")}`;
+  }
+
   function drawerHtml(v) {
     const ranks = rankIndex[v.id] || [];
     const scored = ranks.find((r) => r.cat === state.cat) || ranks[0];
@@ -428,6 +436,7 @@
       (v.booking_url ? `<a class="primary" href="${esc(v.booking_url)}" target="_blank" rel="noopener"><i class="ph ph-calendar-check"></i>Book a table</a>` : "") +
       `<a href="${gmaps}" target="_blank" rel="noopener"><i class="ph ph-navigation-arrow"></i>Directions</a>` +
       (v.website && v.website !== v.booking_url ? `<a href="${esc(v.website)}" target="_blank" rel="noopener"><i class="ph ph-globe"></i>Website</a>` : "") +
+      `<a href="${esc(ytUrl(v))}" target="_blank" rel="noopener"><i class="ph ph-youtube-logo"></i>YouTube</a>` +
       `</div>` +
       (v.dishes.length ? `<h3>Popular dishes</h3><div class="chips">${v.dishes.map((d) => `<span>${esc(d)}</span>`).join("")}</div>` : "") +
       (chips.length ? `<h3>Good to know</h3><div class="chips">${chips.map((d) => `<span>${esc(d)}</span>`).join("")}</div>` : "") +
