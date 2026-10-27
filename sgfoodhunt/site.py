@@ -53,6 +53,7 @@ GROUPS: list[tuple[str, str, str, list[str]]] = [
         "medal",
         ["michelin_3", "michelin_2", "michelin_1", "michelin_star", "michelin_bib"],
     ),
+    ("fine", "Fine dining", "wine", ["fine_dining"]),
     (
         "cafes",
         "Cafes & brunch",
@@ -98,7 +99,46 @@ CURATED_LISTS = [
         "icecream_hunt",
         r"ice.?cream|gelat|soft.?serve|creamery|sorbet|frozen",
     ),
+    ("omakase", "Omakase", "fish", "o", "omakase_hunt", r"omakase|kaiseki|kappo|chef.?s table"),
 ]
+# "By cuisine" tabs: (label, pattern). The scrapers rarely fill cuisine, so it is worked out from
+# the place's own words (name, cuisine, summary, dishes, tags); a place may have several. The page
+# builds the tabs itself (site/app.js) so they never count as a rank.
+CUISINES = [
+    ("Japanese", r"japanese|sushi|sashimi|omakase|ramen|udon|\bsoba\b|izakaya|yakitori|yakiniku|"
+     r"tempura|tonkatsu|donburi|kaiseki|unagi|teppanyaki|robata"),
+    ("Chinese", r"chinese|cantonese|szechuan|sichuan|hokkien|teochew|hakka|hainanese|dim sum|"
+     r"dumpling|xiao long bao|zi ?char|peking duck|roast duck|char siew|wonton|\bmala\b|hot ?pot|"
+     r"steamboat|bak kut teh|congee"),
+    ("Korean", r"korean|kimchi|bibimbap|bulgogi|tteok|soju"),
+    ("Thai", r"\bthai\b|tom yum|pad thai|som tam|boat noodle"),
+    ("Vietnamese", r"vietnam|\bpho\b|banh mi|bun cha"),
+    ("Indian", r"indian|biryani|briyani|prata|naan|tandoori|masala|dosa|thosai|banana leaf|"
+     r"fish head curry"),
+    ("Malay & Indonesian", r"\bmalay|\bnasi\b|satay|rendang|indonesian|mee rebus|mee soto|"
+     r"ayam penyet"),
+    ("Peranakan", r"peranakan|nyonya|nonya|buah keluak|kueh"),
+    ("Local & hawker", r"hawker|food cent(?:re|er)|kopitiam|chicken rice|char kway teow|hokkien mee|"
+     r"bak chor mee|carrot cake|kaya toast|laksa|rojak|prawn mee|fishball|wanton mee|singaporean"),
+    ("Italian", r"italian|pasta|pizz|trattoria|osteria|risotto|tiramisu"),
+    ("French", r"french(?! toast)|bistro|brasserie|cr[eê]perie|patisserie"),
+    ("Spanish", r"spanish|tapas|paella"),
+    ("Mexican", r"mexican|\btacos?\b|burrito|quesadilla"),
+    ("Mediterranean & Middle Eastern", r"mediterranean|greek|taverna|lebanese|turkish|kebab|mezze|"
+     r"hummus|shawarma|falafel|persian|middle eastern"),
+    ("Western", r"western|steak|burger|\bbbq\b|barbecue|fish (?:and|&) chips|rotisserie|smokehouse"),
+    ("Seafood", r"seafood|chill?i crab|pepper crab|lobster|oyster"),
+    ("Desserts", r"dessert|ice cream|gelato|soft serve|waffle|bingsu|patisserie|pastr(?:y|ies)|"
+     r"sorbet|frozen yogurt|chocolate|cheesecake|cake shop"),
+]  # fmt: skip
+
+
+def _cuisines(row: dict[str, Any]) -> list[str]:
+    """The ``CUISINES`` labels a site row matches, in that order."""
+    blob = " ".join(
+        [row["name"], *row["cuisine"], row["summary"] or "", *row["dishes"], *row["tags"]]
+    )
+    return [label for label, rx in CUISINES if re.search(rx, blob, re.I)]
 
 
 def _run_time(run_id: str) -> datetime | None:
@@ -357,6 +397,8 @@ def build_site_data(
                            for r, vid in enumerate(picked, 1)],
             }  # fmt: skip
             groups.append({"key": key, "label": label, "icon": icon, "categories": [key]})
+    for row in out_venues.values():
+        row["cuisines"] = _cuisines(row)
 
     diff_path = run_dir / "diff.json"
     diff = read_json(diff_path) if diff_path.exists() else {}
@@ -376,6 +418,7 @@ def build_site_data(
         "groups": groups,
         "categories": categories,
         "venues": out_venues,
+        "cuisines": [label for label, _ in CUISINES],
         "changes": {
             "entered": entered,
             "new_venues": [

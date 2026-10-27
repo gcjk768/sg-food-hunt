@@ -12,7 +12,7 @@
 
   let D = null; // data.json
   let rankIndex = {}; // venue id -> [{rank, cat, label}]
-  const state = { group: null, cat: null, view: "list", shown: PAGE, q: "", near: null, picking: false, big: false };
+  const state = { group: null, cat: null, by: "category", view: "list", shown: PAGE, q: "", near: null, picking: false, big: false };
   const NEAR_KEY = "sgfh-near";
   const km = (a, b, c, d) => {
     const r = Math.PI / 180;
@@ -24,7 +24,7 @@
   const SAT = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
   const SAT_LABELS = "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}";
   const SAT_ATTRIB = 'Imagery &copy; <a href="https://www.esri.com/" target="_blank" rel="noopener">Esri</a>, Maxar, Earthstar Geographics';
-  let map, markers = {}, layer;
+  let map, markers = {}, layer, pins, markersKey = "";
 
   // ------------------------------------------------------------ boot
   fetch("live/data.json", { cache: "no-cache" })
@@ -54,6 +54,18 @@
     for (const [k, c] of Object.entries(D.categories)) if (LABELS[k]) c.label = LABELS[k];
     for (const list of Object.values(rankIndex)) for (const r of list) if (LABELS[r.cat]) r.label = LABELS[r.cat];
     D.categories.all = { key: "all", label: "All places", ranked: everyone.map((v, i) => ({ id: v.id, rank: i + 1, score: 0, components: {}, adjustments: {} })) };
+    // The sidebar shows either the lists (by: "category") or one entry per cuisine (by: "cuisine"),
+    // each in the All order. sgfoodhunt/site.py works out v.cuisines from each place's own words; the
+    // cuisine lists are built here (derived) so they never show as a rank chip.
+    for (const g of D.groups) g.by = "category";
+    for (const c of D.cuisines || []) {
+      const ranked = everyone.filter((v) => (v.cuisines || []).includes(c))
+        .map((v, i) => ({ id: v.id, rank: i + 1, score: 0, components: {}, adjustments: {} }));
+      if (!ranked.length) continue;
+      const slug = c.toLowerCase().replace(/[^a-z]+/g, "_");
+      D.categories["cuisine_" + slug] = { key: "cuisine_" + slug, label: c, derived: true, ranked };
+      D.groups.push({ key: "cuisine-" + slug, label: c, icon: CUISINE_ICONS[c] || "fork-knife", categories: ["cuisine_" + slug], by: "cuisine" });
+    }
     D.groups.unshift({ key: "all", label: "All", icon: "squares-four", categories: ["all"] });
     renderLede();
     renderGroups();
@@ -76,6 +88,7 @@
     const groups = D.groups;
     const g = groups.find((x) => x.key === parts[0]) || groups[0];
     state.group = g.key;
+    if (g.by) state.by = g.by; // a cuisine link opens the sidebar in cuisine mode
     state.cat = g.categories.includes(parts[1]) ? parts[1] : g.categories[0];
     state.shown = PAGE;
     showView();
@@ -106,13 +119,24 @@
       `<span>Run <code>${esc(D.run_id)}</code></span>`;
   }
 
+  const CUISINE_ICONS = {
+    Japanese: "fish", Chinese: "bowl-steam", Korean: "fire", Thai: "pepper", Vietnamese: "bowl-food",
+    Indian: "flame", "Malay & Indonesian": "tree-palm", Peranakan: "flower-lotus", "Local & hawker": "storefront",
+    Italian: "pizza", French: "bread", Spanish: "sun", Mexican: "avocado",
+    "Mediterranean & Middle Eastern": "globe-hemisphere-west", Western: "hamburger", Seafood: "shrimp", Desserts: "cake",
+  };
   function renderGroups() {
-    $("groups").innerHTML = D.groups.map((g) => {
+    const modes = D.groups.some((g) => g.by === "cuisine")
+      ? `<li class="by" role="group" aria-label="Browse by">` + [["category", "Category"], ["cuisine", "Cuisine"]].map(([m, label]) =>
+        `<button type="button" data-by="${m}" aria-pressed="${state.by === m}">${label}</button>`).join("") + `</li>`
+      : "";
+    $("groups").innerHTML = modes + D.groups.filter((g) => !g.by || g.by === state.by).map((g) => {
       const n = new Set(g.categories.flatMap((c) => D.categories[c].ranked.map((r) => r.id))).size;
       return `<li><button type="button" data-g="${esc(g.key)}" aria-pressed="${g.key === state.group && state.view === "list"}">` +
         `<i class="ph ph-${esc(g.icon)}" aria-hidden="true"></i>${esc(g.label)} <span class="n">${n}</span></button></li>`;
     }).join("");
-    $("groups").querySelectorAll("button").forEach((b) => b.onclick = () => { $("q").value = ""; state.q = ""; setHash(b.dataset.g); });
+    $("groups").querySelectorAll("button[data-g]").forEach((b) => b.onclick = () => { $("q").value = ""; state.q = ""; setHash(b.dataset.g); });
+    $("groups").querySelectorAll("button[data-by]").forEach((b) => b.onclick = () => { state.by = b.dataset.by; renderGroups(); });
   }
 
   function renderChanges() {
@@ -160,7 +184,7 @@
     return true;
   }
   function matches(v, q) {
-    const hay = [v.name, v.name_zh, ...(v.cuisine || []), v.mrt, v.district, v.region, v.address, ...(v.tags || [])].join(" ").toLowerCase();
+    const hay = [v.name, v.name_zh, ...(v.cuisine || []), ...(v.cuisines || []), v.mrt, v.district, v.region, v.address, ...(v.tags || [])].join(" ").toLowerCase();
     return q.split(/\s+/).every((w) => hay.includes(w));
   }
 
@@ -215,7 +239,7 @@
     const meta = [
       dist != null ? `<span class="dist"><i class="ph ph-navigation-arrow"></i>${fmtKm(dist)}</span>` : "",
       bestLine,
-      v.cuisine.length ? `<span><i class="ph ph-fork-knife"></i>${esc(v.cuisine.slice(0, 3).join(", "))}</span>` : "",
+      cuisineOf(v).length ? `<span><i class="ph ph-fork-knife"></i>${esc(cuisineOf(v).slice(0, 3).join(", "))}</span>` : "",
       v.price_level ? `<span><i class="ph ph-coins"></i>${"$".repeat(v.price_level)}${v.per_pax ? ` about S$${Math.round(v.per_pax)} each` : ""}</span>` : (v.price_text ? `<span><i class="ph ph-coins"></i>${esc(v.price_text)}</span>` : ""),
       v.mrt ? `<span><i class="ph ph-train"></i>${esc(v.mrt)}</span>` : (v.region ? `<span><i class="ph ph-map-pin"></i>${esc(v.region)}</span>` : ""),
       v.rating ? `<span><i class="ph ph-star"></i>${v.rating} (${v.reviews ?? "?"})</span>` : "",
@@ -240,6 +264,7 @@
     ? `<span class="badge worth"><i class="ph ph-fill ph-check-circle"></i>Worth going</span>`
     : `<span class="badge nope"><i class="ph ph-x-circle"></i>${v.why === "too little proof yet" ? "Not yet" : "Skip"}</span>`) +
     `<small class="why">${esc(v.why)}</small>`;
+  const cuisineOf = (v) => (v.cuisine.length ? v.cuisine : v.cuisines || []);
   const shortLabel = (cat) => D.categories[cat]?.label.replace(/^Best /, "") || cat;
 
   function wireFilters() {
@@ -263,6 +288,12 @@
     ]).addTo(map);
     map.setMaxBounds([[1.144, 103.535], [1.494, 104.502]]);
     layer = L.layerGroup().addTo(map);
+    // Pins are drawn on one canvas, not one DOM element per place: with 750+ places, DOM pins made every
+    // list switch, filter and keystroke rebuild and re-composite hundreds of layers (the lag on phones).
+    // tolerance widens the tap target. ponytail: no pop-in or ping animation on canvas pins.
+    pins = L.canvas({ padding: 0.5, tolerance: 6 });
+    new MutationObserver(() => { const c = pinColours(); for (const m of Object.values(markers)) m.setStyle({ fillColor: m.worth ? c.worth : c.dim }); })
+      .observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
     map.on("click", (e) => {
       if (state.picking) return setNear(e.latlng.lat, e.latlng.lng, "the spot you tapped");
       if (!state.big) expandMap(true);
@@ -348,15 +379,24 @@
       if (saved && typeof saved.lat === "number") setNear(saved.lat, saved.lng, saved.label, false);
     } catch (_) { /* bad saved value */ }
   }
+  const PIN = { radius: 7, weight: 2.5, color: "#15123b", fillOpacity: 1, bubblingMouseEvents: false };
+  const HOVER = matchMedia("(hover: hover)").matches;
+  const pinColours = () => {
+    const cs = getComputedStyle(document.documentElement);
+    return { worth: cs.getPropertyValue("--accent").trim(), dim: "#9a95b8", hot: cs.getPropertyValue("--kaya").trim() };
+  };
   function renderMarkers(venues) {
+    // same places as last time (Show more, a re-render): keep the pins and the map where the user left it
+    const key = venues.map((v) => v.id).join() + (state.near ? `|${state.near.lat},${state.near.lng},${$("near-radius").value}` : "");
+    if (key === markersKey) return;
+    markersKey = key;
     layer.clearLayers(); markers = {};
-    const pts = [];
+    const pts = [], c = pinColours();
     for (const v of venues) {
       if (v.lat == null || v.lng == null) continue;
-      const m = L.marker([v.lat, v.lng], {
-        icon: L.divIcon({ className: "", html: `<div class="pin${v.worth ? "" : " dim"}" style="--d:${Math.min(pts.length, 40) * 18}ms" data-pin="${esc(v.id)}"></div>`, iconSize: [14, 14], iconAnchor: [7, 7] }),
-        keyboard: false, title: v.name,
-      }).addTo(layer);
+      const m = L.circleMarker([v.lat, v.lng], { ...PIN, renderer: pins, fillColor: v.worth ? c.worth : c.dim }).addTo(layer);
+      m.worth = v.worth;
+      if (HOVER) m.bindTooltip(v.name, { direction: "top", offset: [0, -8] });
       m.bindPopup(`<b>${esc(v.name)}</b><br>${esc(v.mrt ? v.mrt + " MRT" : v.region || "")}<br><a href="#" data-open="${esc(v.id)}">Details</a>`);
       m.on("popupopen", (e) => { e.popup.getElement().querySelector("[data-open]").onclick = (ev) => { ev.preventDefault(); openVenue(v.id); }; });
       markers[v.id] = m;
@@ -374,8 +414,11 @@
     else if (pts.length) map.setView(pts[0], 15, { animate: false });
   }
   function hot(id, on) {
-    const el = document.querySelector(`.pin[data-pin="${id}"]`);
-    if (el) el.classList.toggle("hot", on);
+    const m = markers[id];
+    if (!m) return;
+    const c = pinColours();
+    m.setStyle(on ? { radius: 11, fillColor: c.hot } : { radius: PIN.radius, fillColor: m.worth ? c.worth : c.dim });
+    if (on) m.bringToFront();
   }
 
   // ------------------------------------------------------------ drawer
@@ -417,7 +460,7 @@
       v.address ? `<li class="wide"><i class="ph ph-map-pin"></i><span>${esc(v.address)} <button type="button" class="badge" data-copy="${esc(v.address)}">Copy</button></span></li>` : "",
       v.mrt ? `<li><i class="ph ph-train"></i><span>${esc(v.mrt)} MRT${v.mrt_lines.length ? ` <small style="color:var(--ink-3)">${esc(v.mrt_lines.join(", "))}</small>` : ""}</span></li>` : "",
       v.district ? `<li><i class="ph ph-compass"></i><span>${esc(v.district)}</span></li>` : "",
-      v.cuisine.length ? `<li><i class="ph ph-fork-knife"></i><span>${esc(v.cuisine.join(", "))}</span></li>` : "",
+      cuisineOf(v).length ? `<li><i class="ph ph-fork-knife"></i><span>${esc(cuisineOf(v).join(", "))}</span></li>` : "",
       v.price_level || v.price_text ? `<li><i class="ph ph-coins"></i><span>${v.price_level ? "$".repeat(v.price_level) : ""}${v.per_pax ? ` about S$${Math.round(v.per_pax)} a person` : ""}${v.price_text ? ` <small style="color:var(--ink-3)">${esc(v.price_text)}</small>` : ""}</span></li>` : "",
       v.rating ? `<li><i class="ph ph-star"></i><span>${v.rating} from ${v.reviews ?? "?"} Google reviews${v.trend ? `, ${esc(v.trend)}` : ""}</span></li>` : "",
       v.phone ? `<li><i class="ph ph-phone"></i><span><a href="tel:${esc(v.phone.replace(/\s/g, ""))}">${esc(v.phone)}</a></span></li>` : "",

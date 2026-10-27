@@ -340,11 +340,29 @@ categories:
     weights: {food: 0.25, value: 0.20, service: 0.0, ambience: 0.0}
     hard_filters: {michelin: [bib]}
 
+  # Fine dining (website only): tasting menus and chef-led rooms. Same pool and price filter as the
+  # expensive tier, but ranked on the fine-dining words, Michelin and service instead of review volume.
+  - key: fine_dining
+    display_name: Fine dining
+    group: general
+    party_size: 2
+    digest_only: true
+    pool_from: *all_lists
+    queries:
+      - "best fine dining restaurants Singapore 2026"
+      - "best tasting menu Singapore"
+      - "best degustation menu Singapore"
+      - "chef's table omakase Singapore"
+      - "新加坡 高级料理 推荐"
+    keywords: ["fine dining", "tasting menu", "degustation", "omakase", "chef's table", "wine pairing", "kaiseki", "courses"]
+    weights: {keyword_match: 0.25, michelin: 0.20, food: 0.20, service: 0.15, ambience: 0.10, value: 0.0}
+    hard_filters: {price_levels: [3, 4]}
+
   # --- "what's new" categories: recency matters more than review volume, so the rating weight
   # is lowered and recommendations (recent articles) raised. opened_within_months keeps only
   # venues whose earliest evidence (article date, first Google review, first seen by this tool)
   # falls inside the window (1 month = the last `scoring.new_within_days` days).
-  # Weekly discovery for the hand-picked website lists (Izakaya, Ice cream): finds that match are
+  # Weekly discovery for the hand-picked website lists (Izakaya, Ice cream, Omakase): finds that match are
   # added to the list by sgfoodhunt/site.py; the category itself is never shown on its own.
   - key: icecream_hunt
     display_name: Ice cream shops
@@ -373,6 +391,24 @@ categories:
       - "japanese izakaya yakitori Singapore"
       - "新加坡 居酒屋 推荐"
     keywords: ["izakaya", "yakitori", "sake", "robata"]
+    weights: {rating: 0.25, recommendations: 0.35, keyword_match: 0.20, food: 0.10, value: 0.10}
+    hard_filters: {}
+
+  # Only its own searches (no pool_from): a rank here counts towards "worth going", and site.py
+  # keeps only finds whose own words say omakase, kaiseki, kappo or chef's table.
+  - key: omakase_hunt
+    display_name: Omakase
+    group: general
+    party_size: 2
+    digest_only: true
+    queries:
+      - "best omakase Singapore"
+      - "best value omakase Singapore"
+      - "new omakase restaurant Singapore 2026"
+      - "sushi omakase Singapore"
+      - "kaiseki kappo Singapore"
+      - "新加坡 omakase 推荐"
+    keywords: ["omakase", "kaiseki", "kappo", "chef's table", "sushi"]
     weights: {rating: 0.25, recommendations: 0.35, keyword_match: 0.20, food: 0.10, value: 0.10}
     hard_filters: {}
 

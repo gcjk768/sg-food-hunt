@@ -7,7 +7,7 @@ services:
       context: . # this folder is the source of truth (nas-sync pushes it to GitHub main); bump the tag to rebuild
       args:
         WITH_CLAUDE: "true"
-    image: sgfoodhunt:20261023-checks
+    image: sgfoodhunt:20261027-cuisine
     container_name: sgfoodhunt
     # uid 0 keeps the shared Claude login (/app/claude-config: root 600, rewritten by trading-desk) usable;
     # gid 10 (admin) + umask 002 in the entrypoint make every written file editable by the owner (664/775).
@@ -60,6 +60,29 @@ services:
       - ./site:/usr/share/nginx/html:ro
       - ./data/site:/usr/share/nginx/html/live:ro
       - ./site/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+  # Public address for the website: its own Tailscale node "foodhunt" with Funnel on 443, so the link is
+  # https://foodhunt.<tailnet>.ts.net and the NAS node is not exposed. Only the static food-site is reachable.
+  # First start: no key needed; open the login URL from "docker logs foodhunt-public" once (state is kept in data/tailscale).
+  foodhunt-public:
+    image: tailscale/tailscale:stable
+    pull_policy: always
+    container_name: foodhunt-public
+    hostname: foodhunt
+    environment:
+      TS_AUTHKEY: ${TS_AUTHKEY_FOODHUNT:-}
+      TS_STATE_DIR: /var/lib/tailscale
+      TS_USERSPACE: "true"
+      TS_SERVE_CONFIG: /config/serve.json
+    volumes:
+      - ./data/tailscale:/var/lib/tailscale
+      - ./tailscale-serve.json:/config/serve.json:ro
+    depends_on: [food-site]
     restart: unless-stopped
     logging:
       driver: json-file

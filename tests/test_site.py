@@ -8,7 +8,7 @@ from pathlib import Path
 from sgfoodhunt.config import AppConfig, Secrets
 from sgfoodhunt.enrich.geocode import onemap_state, onemap_token
 from sgfoodhunt.http.cache import read_json, write_json
-from sgfoodhunt.site import build_site
+from sgfoodhunt.site import _cuisines, build_site
 from sgfoodhunt.storage.runs import RunStore
 from tests.test_stage5 import _scores, _venue, _write_run
 
@@ -264,3 +264,19 @@ def test_scraped_ice_cream_finds_join_the_hand_picked_list(
     data = read_json(build_site(app_config, run_store))
     assert [r["id"] for r in data["categories"]["ice_cream"]["ranked"]] == ["v1"]
     assert "icecream_hunt" not in data["categories"]
+
+
+def test_cuisines_come_from_the_places_own_words() -> None:
+    row = {"name": "Kin Sushi", "cuisine": [], "summary": "great char kway teow and gelato",
+           "dishes": [], "tags": []}  # fmt: skip
+    assert _cuisines(row) == ["Japanese", "Local & hawker", "Desserts"]
+    # "carrot cake" is a hawker dish, not a dessert
+    assert _cuisines({**row, "name": "Carrot Cake Stall", "summary": None}) == ["Local & hawker"]
+
+
+def test_site_rows_carry_cuisines(app_config: AppConfig, run_store: RunStore) -> None:
+    v1 = _venue("v1", "Alpha Ramen")
+    _write_run(run_store, "20260908T000000Z", [v1], _scores([("v1", "Alpha Ramen")]))
+    data = read_json(build_site(app_config, run_store))
+    assert data["venues"]["v1"]["cuisines"] == ["Japanese"]
+    assert data["cuisines"][0] == "Japanese"

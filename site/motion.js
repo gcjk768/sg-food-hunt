@@ -97,7 +97,7 @@
   // ------------------------------------------------------------ 3. totals, freshness and "how is this made" (needs the data)
   let D = null, chip = null, when = null;
   const HOW = () => {
-    const lists = Object.values(D.categories).filter((c) => c.key !== "all" && c.ranked.length).length;
+    const lists = Object.values(D.categories).filter((c) => c.key !== "all" && !c.derived && c.ranked.length).length;
     return {
       places: [`Every place that holds a rank on at least one list in the latest run, merged across the blogs so a place counts once. ${lists} lists feed it; a place nobody ranks is left out.`, "sgfoodhunt/site.py: only venues with a rank in some list"],
       worth: ["A place is worth going unless it is closed, has under 4.0 stars from 20+ Google reviews, or has hygiene grade C or D. Then a Michelin star or Bib Gourmand is in; a falling rating is out; otherwise it is in with 4.2+ stars from 20+ reviews, a top 10 rank on a list, or 2+ independent sources.", "verdict() in sgfoodhunt/diff.py"],

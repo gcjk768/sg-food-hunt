@@ -19,3 +19,4 @@ social_exports/
 claude-config/
 data/venues.json
 data/social/
+data/tailscale/

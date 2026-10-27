@@ -129,6 +129,7 @@ def test_only_chosen_categories_are_on(monkeypatch) -> None:  # type: ignore[no-
         "cafes_date",
         "icecream_hunt",
         "izakaya_hunt",
+        "omakase_hunt",
         "brunch_date",
         "new_cafes",
         "zichar_family",
@@ -141,6 +142,7 @@ def test_only_chosen_categories_are_on(monkeypatch) -> None:  # type: ignore[no-
         "restaurants_expensive",
         "michelin_stars",
         "michelin_bib",
+        "fine_dining",
     }
 
 
