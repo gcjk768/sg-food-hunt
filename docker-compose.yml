@@ -24,7 +24,7 @@ services:
       TELEGRAM_THREAD_ID: "<THREAD_ID>"
       # Text-only AI calls go to Ollama (slow is fine, saves Claude limit); web-search calls still use Claude.
       SHIM_REAL: /usr/lib/node_modules/@anthropic-ai/claude-code/bin/claude.exe
-      OLLAMA_URL: http://<LAN_IP>:11434
+      OLLAMA_URL: http://172.17.0.1:11434
       OLLAMA_MODEL: gpt-oss:20b
       SHIM_TIMEOUT: "3000"
       SHIM_FALLBACK: unreachable
