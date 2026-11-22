@@ -44,6 +44,9 @@ class Venue:
     cuisine: list[str] = field(default_factory=list)
     price_level: int | None = None
     price_text: str | None = None
+    # the model's guess (1-4) when no source states a price; 0 = asked, it could not tell.
+    # Never copied into price_level: only the website's price tiers read it (hard_filter_reason).
+    price_estimate: int | None = None
     hours: dict[str, list[list[str]]] | None = None
     open_weekends: bool | None = None
     late_night: bool | None = None

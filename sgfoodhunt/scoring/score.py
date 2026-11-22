@@ -233,11 +233,13 @@ def hard_filter_reason(
     if hf.price_levels:
         if max(hf.price_levels) <= 2 and HOTEL_RE.search(venue.name):
             return "hotel, not a cheap or affordable place"
-        if venue.price_level is None:
+        # website-only tiers: a stated price wins, else the model's estimate (price_estimate)
+        level = venue.price_level or venue.price_estimate or None
+        if level is None:
             if category.key not in venue.category_keys:
                 return "no price level"
-        elif venue.price_level not in hf.price_levels:
-            return f"price level {venue.price_level} not in this tier"
+        elif level not in hf.price_levels:
+            return f"price level {level} not in this tier"
     if hf.bill_range_sgd and venue.price_level:
         per_pax = s.price_per_pax_sgd.get(venue.price_level)
         if per_pax is not None:

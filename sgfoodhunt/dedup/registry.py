@@ -23,6 +23,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 from rapidfuzz import fuzz
 
@@ -182,6 +183,10 @@ class VenueRegistry:
                 venue.name = clean
                 brand, outlet = split_brand_outlet(clean)
                 venue.brand, venue.outlet = (brand if outlet else None), outlet
+            if venue.website and urlsplit(venue.website).netloc in {
+                urlsplit(e.url or "").netloc for e in venue.evidence
+            }:  # saved before the blog scraper stopped taking the blog's own links
+                venue.website = None
             if venue.price_text and not venue.google_place_id:  # levels saved before the parser fix
                 text = venue.price_text.strip()
                 if not DOLLAR_SYMBOLS_RE.match(text):

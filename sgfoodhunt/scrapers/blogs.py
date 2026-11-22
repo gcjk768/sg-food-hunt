@@ -242,7 +242,9 @@ class ListicleBlogScraper(BaseScraper):
                     (
                         link
                         for link in entry.links
-                        if not re.search(r"(maps\.|goo\.gl|instagram|facebook|tiktok)", link)
+                        # the blog's own links (related articles) are not the venue's site
+                        if urlsplit(link).netloc != urlsplit(url).netloc
+                        and not re.search(r"(maps\.|goo\.gl|instagram|facebook|tiktok)", link)
                     ),
                     None,
                 )

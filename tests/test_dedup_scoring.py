@@ -59,7 +59,7 @@ def test_registry_matching_paths(tmp_path: Path) -> None:
             "Keng Eng Kee Seafood",
             source_ref="ChIJ_kek",
             postal_code="150124",
-            phone="+65 " "6272 1038",
+            phone="<PHONE>",
             address="124 Bukit Merah Lane 1, Singapore 150124",
             rating=4.3,
             review_count=2100,
@@ -94,7 +94,7 @@ def test_registry_matching_paths(tmp_path: Path) -> None:
             snippet="romantic? no, but family favourite",
             extra={"article_title": "Best zi char", "published_at": "2026-03-14"},
         ),
-        row("burpple", "KEK Seafood", phone="+65 " "6272 1038"),  # phone relink
+        row("burpple", "KEK Seafood", phone="<PHONE>"),  # phone relink
         row(
             "michelin",
             "Keng Eng Kee Seafood",
@@ -198,8 +198,8 @@ def test_build_venues_writes_files(app_config: AppConfig, tmp_path: Path) -> Non
     run_dir.mkdir()
     rows = [
         row("sethlui", "Cafe A", postal_code="160056"),
-        row("burpple", "Cafe A", phone="+65 " "6220 3430", postal_code="160056"),
-        row("eatbook", "Kafe A", phone="+65 " "6220 3430"),
+        row("burpple", "Cafe A", phone="<PHONE>", postal_code="160056"),
+        row("eatbook", "Kafe A", phone="<PHONE>"),
     ]
     registry, stats = build_venues(app_config, rows, RUN, run_dir)
     assert len(registry.venues) == 1 and stats.created == 1
@@ -511,3 +511,38 @@ def test_not_a_place_and_hotel_guards(app_config: AppConfig) -> None:
         != "hotel, not a cheap or affordable place"
     )
     assert reason("Cafe Mallory") is None
+
+
+def test_price_tier_uses_estimate_only_without_a_stated_price(app_config: AppConfig) -> None:
+    from sgfoodhunt.scoring.score import hard_filter_reason
+
+    s, today = app_config.settings.scoring, date(2026, 11, 22)
+
+    def reason(key: str, level: int | None, estimate: int | None) -> str | None:
+        v = Venue(id="v", name="V", price_level=level, price_estimate=estimate)
+        v.evidence = [
+            Evidence(source_key="eatbook", url="https://x.test", category_keys=["new_restaurants"])
+        ]
+        return hard_filter_reason(v, app_config.categories.get(key), s, today)
+
+    assert reason("restaurants_affordable", None, 2) is None  # the Centro case
+    assert reason("restaurants_cheap", None, 2) == "price level 2 not in this tier"
+    assert reason("restaurants_cheap", 1, 2) is None  # a stated price wins over the estimate
+    assert reason("restaurants_affordable", None, 0) == "no price level"  # asked, unknown
+    # lists that send Telegram cards never read the estimate: a guessed 4 is not a S$640 bill
+    assert reason("restaurants_4pax", None, 4) is None
+
+
+def test_registry_drops_a_website_that_is_the_blogs_own_page(tmp_path: Path) -> None:
+    from sgfoodhunt.http.cache import write_json
+
+    blog = "https://blog.test/new-restaurants/"
+    rows = [
+        {"id": "v1", "name": "Centro", "website": "https://blog.test/outdoor-cinemas/"},
+        {"id": "v2", "name": "Other", "website": "https://other.test/"},
+    ]
+    for r in rows:
+        r["evidence"] = [{"source_key": "honeycombers", "url": blog}]
+    write_json(tmp_path / "venues.json", {"next_id": 3, "venues": rows})
+    reg = VenueRegistry(tmp_path / "venues.json")
+    assert reg.venues["v1"].website is None and reg.venues["v2"].website == "https://other.test/"

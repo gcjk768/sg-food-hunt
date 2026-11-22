@@ -4,6 +4,7 @@ beyond the caption you already saved."""
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -68,6 +69,29 @@ MATCH_SCHEMA: dict[str, Any] = {
     "properties": {"venue_id": {"type": "string"}, "confidence": {"type": "number"}},
     "required": ["venue_id"],
 }
+SYSTEM_PRICE = (
+    "You estimate what one person typically spends on a meal at eating places in Singapore. "
+    "Answer with a price level for every venue: 1 = under S$25 (hawker stalls, kopitiams, "
+    "bakeries, casual cafes, fast food), 2 = S$25 to S$60 (casual restaurants, bistros, brunch "
+    "cafes, zi char), 3 = S$60 to S$120 (upscale restaurants, hotel restaurants, steakhouses), "
+    "4 = over S$120 (fine dining, omakase, tasting menus). Use the name, the area, the cuisine "
+    "and what the note says. Answer 0 when it is not a place to eat or you cannot tell."
+)
+PRICE_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "venues": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {"id": {"type": "string"}, "level": {"type": "integer"}},
+                "required": ["id", "level"],
+            },
+        }
+    },
+    "required": ["venues"],
+}
+PRICE_BATCH = 10  # venues per call: small enough for the local model's context and patience
 MAX_TEXT = 12000
 
 
@@ -189,3 +213,37 @@ def match_caption(
         return None
     conf = payload.get("confidence")
     return vid, float(conf) if isinstance(conf, (int, float)) else 0.8
+
+
+def _price_line(v: Any) -> str:
+    note = " ".join((e.snippet or "") for e in v.evidence[:2])[:300].replace("\n", " ")
+    return (
+        f"- {v.id}: {v.name} | {v.district or v.address or 'area unknown'} | "
+        f"cuisine: {', '.join(v.cuisine) or 'unknown'} | "
+        f"lists: {', '.join(v.category_keys) or 'none'} | note: {note or 'none'}"
+    )
+
+
+def estimate_prices(ai: AiClient, venues: Sequence[Any], limit: int) -> int:
+    """Set ``price_estimate`` on up to ``limit`` venues (``Venue`` objects), ``PRICE_BATCH`` per
+    call, and return how many were answered. A venue the model skips or cannot place gets 0 so
+    it is not asked again. Stops at the first call with no answer (AI off, over budget, failing),
+    which leaves the rest for the next run."""
+    done = 0
+    todo = list(venues)[:limit]
+    for i in range(0, len(todo), PRICE_BATCH):
+        batch = todo[i : i + PRICE_BATCH]
+        prompt = "Venues:\n" + "\n".join(_price_line(v) for v in batch)
+        payload = ai.ask("price_estimate", SYSTEM_PRICE, prompt, PRICE_SCHEMA)
+        if payload is None:
+            break
+        got = {
+            str(x.get("id")): x.get("level")
+            for x in payload.get("venues") or []
+            if isinstance(x, dict)
+        }
+        for v in batch:
+            level = got.get(v.id)
+            v.price_estimate = level if isinstance(level, int) and 1 <= level <= 4 else 0
+            done += 1
+    return done

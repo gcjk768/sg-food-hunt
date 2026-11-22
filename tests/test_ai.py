@@ -332,3 +332,37 @@ def test_bare_only_with_api_key(cache: ResponseCache, monkeypatch: pytest.Monkey
     assert "--bare" in fake.calls[-1]
     assert _cli_error('{"usage": {}, "terminal_reason": "api_error"}') == "api_error"
     assert _cli_error("not json") is None
+
+
+def test_estimate_prices_batches_and_remembers_unknowns(cache: ResponseCache) -> None:
+    import re
+
+    from sgfoodhunt.ai import estimate_prices
+
+    calls: list[str] = []
+
+    def runner(cmd: list[str], timeout: int) -> subprocess.CompletedProcess[str]:
+        prompt = cmd[2]
+        calls.append(prompt)
+        ids = re.findall(r"^- (v\d+):", prompt, re.M)
+        # v3 is left out and v4 gets a level outside 1-4: both must end up as 0 (asked, unknown)
+        answer = {"venues": [{"id": i, "level": 9 if i == "v4" else 2} for i in ids if i != "v3"]}
+        out = {"is_error": False, "total_cost_usd": 0.0, "structured_output": answer}
+        return subprocess.CompletedProcess(cmd, 0, json.dumps(out), "")
+
+    venues = [Venue(id=f"v{i}", name=f"Venue {i}") for i in range(12)]
+    ai = AiClient(AiSettings(enabled=True), cache, runner=runner)
+    assert estimate_prices(ai, venues, limit=11) == 11
+    assert len(calls) == 2 and "- v0: Venue 0 |" in calls[0]  # ten a call
+    assert venues[0].price_estimate == 2 and venues[10].price_estimate == 2
+    assert venues[3].price_estimate == 0 and venues[4].price_estimate == 0
+    assert venues[11].price_estimate is None  # over the limit: left for the next run
+    assert all(v.price_level is None for v in venues)  # an estimate never becomes a stated price
+
+    def broken(cmd: list[str], timeout: int) -> subprocess.CompletedProcess[str]:
+        return subprocess.CompletedProcess(cmd, 1, "", "boom")
+
+    fresh = [Venue(id=f"w{i}", name=f"W {i}") for i in range(25)]
+    down = AiClient(AiSettings(enabled=True), cache, runner=broken)
+    assert estimate_prices(down, fresh, limit=25) == 0 and down.stats.calls == 1  # stops at once
+    assert all(v.price_estimate is None for v in fresh)

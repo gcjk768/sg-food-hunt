@@ -218,7 +218,8 @@ def _venue_row(
 ) -> dict[str, Any]:
     g = (v.get("ratings") or {}).get("google_places") or {}
     worth, why = verdict(v, tops)
-    per_pax = config.settings.scoring.price_per_pax_sgd.get(v.get("price_level") or 0)
+    level = v.get("price_level") or v.get("price_estimate") or None
+    per_pax = config.settings.scoring.price_per_pax_sgd.get(level or 0)
     flags = v.get("flags") or {}
     return {
         "id": v["id"],
@@ -233,7 +234,8 @@ def _venue_row(
         "mrt": v.get("nearest_mrt"),
         "mrt_lines": v.get("mrt_lines") or [],
         "cuisine": v.get("cuisine") or [],
-        "price_level": v.get("price_level"),
+        "price_level": level,
+        "price_est": bool(level) and not v.get("price_level"),  # the model's guess, not a source
         "price_text": (v.get("price_text") or "").strip(" ·|") or None,
         "per_pax": per_pax,
         "rating": g.get("rating"),

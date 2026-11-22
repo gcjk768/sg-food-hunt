@@ -101,6 +101,7 @@ class AiTasks(BaseModel):
     review_analysis: bool = True
     social_matching: bool = True
     promo_search: bool = True  # web search for current promotions (weekly message, occasion list)
+    price_estimate: bool = True  # guess a price tier for venues no source prices (website tiers)
 
 
 class AiSettings(BaseModel):

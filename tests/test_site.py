@@ -280,3 +280,32 @@ def test_site_rows_carry_cuisines(app_config: AppConfig, run_store: RunStore) ->
     data = read_json(build_site(app_config, run_store))
     assert data["venues"]["v1"]["cuisines"] == ["Japanese"]
     assert data["cuisines"][0] == "Japanese"
+
+
+def test_site_row_marks_an_estimated_price(app_config: AppConfig) -> None:
+    from sgfoodhunt.site import _venue_row
+
+    guessed = _venue_row(
+        app_config,
+        {**_venue("v1", "A"), "price_level": None, "price_estimate": 2},
+        [(1, "x")],
+        False,
+        None,
+    )
+    assert guessed["price_level"] == 2 and guessed["price_est"] is True and guessed["per_pax"] == 35
+    stated = _venue_row(
+        app_config,
+        {**_venue("v1", "A"), "price_level": 1, "price_estimate": 2},
+        [(1, "x")],
+        False,
+        None,
+    )
+    assert stated["price_level"] == 1 and stated["price_est"] is False
+    unknown = _venue_row(
+        app_config,
+        {**_venue("v1", "A"), "price_level": None, "price_estimate": 0},
+        [(1, "x")],
+        False,
+        None,
+    )
+    assert unknown["price_level"] is None and unknown["price_est"] is False

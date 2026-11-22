@@ -240,7 +240,7 @@
       dist != null ? `<span class="dist"><i class="ph ph-navigation-arrow"></i>${fmtKm(dist)}</span>` : "",
       bestLine,
       cuisineOf(v).length ? `<span><i class="ph ph-fork-knife"></i>${esc(cuisineOf(v).slice(0, 3).join(", "))}</span>` : "",
-      v.price_level ? `<span><i class="ph ph-coins"></i>${"$".repeat(v.price_level)}${v.per_pax ? ` about S$${Math.round(v.per_pax)} each` : ""}</span>` : (v.price_text ? `<span><i class="ph ph-coins"></i>${esc(v.price_text)}</span>` : ""),
+      v.price_level ? `<span><i class="ph ph-coins"></i>${"$".repeat(v.price_level)}${v.per_pax ? ` about S$${Math.round(v.per_pax)} each` : ""}${v.price_est ? " (estimate)" : ""}</span>` : (v.price_text ? `<span><i class="ph ph-coins"></i>${esc(v.price_text)}</span>` : ""),
       v.mrt ? `<span><i class="ph ph-train"></i>${esc(v.mrt)}</span>` : (v.region ? `<span><i class="ph ph-map-pin"></i>${esc(v.region)}</span>` : ""),
       v.rating ? `<span><i class="ph ph-star"></i>${v.rating} (${v.reviews ?? "?"})</span>` : "",
     ].filter(Boolean).join("");
@@ -461,7 +461,7 @@
       v.mrt ? `<li><i class="ph ph-train"></i><span>${esc(v.mrt)} MRT${v.mrt_lines.length ? ` <small style="color:var(--ink-3)">${esc(v.mrt_lines.join(", "))}</small>` : ""}</span></li>` : "",
       v.district ? `<li><i class="ph ph-compass"></i><span>${esc(v.district)}</span></li>` : "",
       cuisineOf(v).length ? `<li><i class="ph ph-fork-knife"></i><span>${esc(cuisineOf(v).join(", "))}</span></li>` : "",
-      v.price_level || v.price_text ? `<li><i class="ph ph-coins"></i><span>${v.price_level ? "$".repeat(v.price_level) : ""}${v.per_pax ? ` about S$${Math.round(v.per_pax)} a person` : ""}${v.price_text ? ` <small style="color:var(--ink-3)">${esc(v.price_text)}</small>` : ""}</span></li>` : "",
+      v.price_level || v.price_text ? `<li><i class="ph ph-coins"></i><span>${v.price_level ? "$".repeat(v.price_level) : ""}${v.per_pax ? ` about S$${Math.round(v.per_pax)} a person` : ""}${v.price_est ? " (estimate)" : ""}${v.price_text ? ` <small style="color:var(--ink-3)">${esc(v.price_text)}</small>` : ""}</span></li>` : "",
       v.rating ? `<li><i class="ph ph-star"></i><span>${v.rating} from ${v.reviews ?? "?"} Google reviews${v.trend ? `, ${esc(v.trend)}` : ""}</span></li>` : "",
       v.phone ? `<li><i class="ph ph-phone"></i><span><a href="tel:${esc(v.phone.replace(/\s/g, ""))}">${esc(v.phone)}</a></span></li>` : "",
       v.hygiene ? `<li><i class="ph ph-shield-check"></i><span>SFA hygiene grade ${esc(v.hygiene)}</span></li>` : "",

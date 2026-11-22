@@ -1,4 +1,4 @@
-# SG Food Hunt: weekly collector + Telegram notifier for a NAS (Synology / QNAP / any Docker host).
+# SG Food Hunt: weekly collector + Telegram notifier for a NAS (UGREEN / QNAP / any Docker host).
 # Build:  docker compose build
 # Run:    docker compose up -d        (runs on the schedule in SGFH_SCHEDULE, see docker-compose.yml)
 FROM python:3.11-slim

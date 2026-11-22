@@ -10,7 +10,7 @@ import logging
 from dataclasses import dataclass, field
 from typing import Any
 
-from sgfoodhunt.ai import AiClient, build_ai_client
+from sgfoodhunt.ai import AiClient, build_ai_client, estimate_prices
 from sgfoodhunt.config import AppConfig
 from sgfoodhunt.dedup import Venue, build_venues
 from sgfoodhunt.dedup.registry import MatchStats
@@ -40,6 +40,10 @@ from sgfoodhunt.storage.runs import RunStore
 from sgfoodhunt.storage.vault import VENUES, Vault
 
 log = logging.getLogger(__name__)
+
+# Unpriced venues sent to the model per run (10 a call). The local model needs about a minute
+# or more per call (2-3 on the NAS), so a backlog clears over several runs, not in one long one.
+PRICE_ESTIMATES_PER_RUN = 100
 
 
 @dataclass(slots=True)
@@ -153,6 +157,28 @@ async def rank_run(
         ai = build_ai_client(config.settings.ai, cache, offline=social_offline)
     for v in venues.values():
         analyse_venue(v, config, ai=ai if v.last_seen_run == run_id else None)
+    # price tiers (website only) hide a venue with no price: ask the model for the unpriced ones
+    # in those tiers' pools, newest first. A stated price always wins over the estimate.
+    tier_pools = {
+        k
+        for c in config.categories.categories
+        if c.hard_filters.price_levels
+        for k in (c.key, *c.pool_from)
+    }
+    unpriced = sorted(
+        (
+            v
+            for v in venues.values()
+            if v.price_level is None
+            and v.price_estimate is None
+            and tier_pools.intersection(v.category_keys)
+        ),
+        key=lambda v: v.last_seen_run or "",
+        reverse=True,
+    )
+    prices_estimated = (
+        estimate_prices(ai, unpriced, PRICE_ESTIMATES_PER_RUN) if ai is not None else 0
+    )
     social_stats = SocialStats(enabled=False)
     if config.settings.social.enabled:
         social_cache = cache or ResponseCache(config.resolve(config.settings.paths.cache_dir))
@@ -169,6 +195,12 @@ async def rank_run(
         for vid, b in social_stats.buzz.items()
     }
     vault.ensure()
+    if prices_estimated:
+        left = len(unpriced) - prices_estimated
+        log.info("price tiers estimated for %d venues (%d left)", prices_estimated, left)
+        log_activity(
+            vault, "💰", f"{prices_estimated} price tiers estimated", f"{left} still unpriced"
+        )
     personal = read_personal_notes(vault, list(venues.values()))
 
     wanted = category_keys or [c.key for c in config.categories.categories]

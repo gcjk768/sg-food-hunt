@@ -48,7 +48,7 @@ async def test_blog_scraper_extracts_venues(make_scraper, fake_session: FakeSess
     assert tbb.postal_code == "160056" and tbb.website == "https://www.tiongbahrubakery.com"
     assert tbb.page is not None and tbb.page.published_at == "2026-03-14"
     assert tbb.opening_hours == {
-        "text": "7.30am to 8pm daily Tel: +65 " "6220 3430"[:120]
+        "text": "7.30am to 8pm daily Tel: <PHONE>"[:120]
     } or "7.30am" in str(tbb.opening_hours)
     assert result.candidates[1].name_zh == "琼荣记海鲜"
     assert len(result.pages) == 2 and result.requests_made == 2  # off-query hawker guide skipped
@@ -385,3 +385,30 @@ def test_search_url_encodes_query(make_scraper, key: str) -> None:
 
 def _unused(*_: Any) -> None:  # keep linters quiet about the Any import in some environments
     return None
+
+
+async def test_blog_scraper_skips_the_blogs_own_links(
+    make_scraper, fake_session: FakeSession
+) -> None:
+    scraper, _ = make_scraper(
+        "sethlui",
+        search_url="https://example-blog.test/?s={query}",
+        base_url="https://example-blog.test",
+    )
+    fake_session.add(
+        "https://example-blog.test/?s=romantic+cafes+Singapore", fixture_text("blog_search.html")
+    )
+    fake_session.add(  # the venue's "Website" link now points at another article on the same blog
+        "https://example-blog.test/best-romantic-cafes-singapore/",
+        fixture_text("blog_article.html").replace(
+            "https://www.tiongbahrubakery.com", "https://example-blog.test/outdoor-cinemas/"
+        ),
+    )
+    fake_session.add(
+        "https://example-blog.test/hawker-guide-to-tiong-bahru/",
+        "<html><body><article><div class='entry-content'><p>nothing</p></div></article></body></html>",
+    )
+    result = await scraper.search(Q)
+    assert (
+        result.candidates[0].name == "Tiong Bahru Bakery" and result.candidates[0].website is None
+    )
